@@ -4,6 +4,8 @@ model.  The empirical data is stored in a separate csv file and is loaded in Set
 '''
 from __future__ import print_function
 import numpy as np
+from HARK.Calibration.Income.IncomeTools import parse_income_spec, CGM_income 
+from HARK.datasets.life_tables.us_ssa.SSATools import parse_ssa_life_table
 # ---------------------------------------------------------------------------------
 # Debugging flags
 # ---------------------------------------------------------------------------------
@@ -54,15 +56,17 @@ DiscFacAdj_start = 0.99             # Initial guess of the adjustment to the dis
 DiscFacAdj_bound = [0.0001,15.0]    # Bounds for beth; if violated, objective function returns "penalty value"
 CRRA_bound = [0.0001,15.0]          # Bounds for rho; if violated, objective function returns "penalty value"
 
-# Expected growth rates of permanent income over the lifecycle, starting from age 25
-PermGroFac = [ 1.025,  1.025,  1.025,  1.025,  1.025,  1.025,  1.025,  1.025,
-        1.025,  1.025,  1.025,  1.025,  1.025,  1.025,  1.025,  1.025,
-        1.025,  1.025,  1.025,  1.025,  1.025,  1.025,  1.025,  1.025,
-        1.025,  1.01 ,  1.01 ,  1.01 ,  1.01 ,  1.01 ,  1.01 ,  1.01 ,
-        1.01 ,  1.01 ,  1.01 ,  1.01 ,  1.01 ,  1.01 ,  1.01 ,  0.7 , # <-- This represents retirement
-        1.  ,  1.   ,  1.   ,  1.   ,  1.   ,  1.   ,  1.   ,  1.   ,
-        1.   ,  1.   ,  1.   ,  1.   ,  1.   ,  1.   ,  1.   ,  1.   ,
-        1.   ,  1.   ,  1.   ,  1.   ,  1.   ,  1.   ,  1.   ,  1.   ,  1.   ]
+# Income
+ss_variances = True
+income_spec = CGM_income["HS"]
+# Replace retirement age
+income_spec["age_ret"] = retirement_age
+inc_calib = parse_income_spec(
+        age_min=initial_age,
+        age_max=final_age,
+        **income_spec,
+        SabelhausSong=ss_variances
+    )
 
 # Age-varying discount factors over the lifecycle, lifted from Cagetti (2003)
 DiscFac_timevary = [1.064914 ,  1.057997 ,  1.051422 ,  1.045179 ,  1.039259 ,
@@ -79,35 +83,10 @@ DiscFac_timevary = [1.064914 ,  1.057997 ,  1.051422 ,  1.045179 ,  1.039259 ,
         0.9902111,  0.9902111,  0.9902111,  0.9902111,  0.9902111,
         0.9902111,  0.9902111,  0.9902111,  0.9902111,  0.9902111]
 
-# Survival probabilities over the lifecycle, starting from age 25
-LivPrb = [ 1.        ,  1.        ,  1.        ,  1.        ,  1.        ,
-           1.        ,  1.        ,  1.        ,  1.        ,  1.        ,
-           1.        ,  1.        ,  1.        ,  1.        ,  1.        ,
-           1.        ,  1.        ,  1.        ,  1.        ,  1.        ,
-           1.        ,  1.        ,  1.        ,  1.        ,  1.        ,
-           1.        ,  1.        ,  1.        ,  1.        ,  1.        ,
-           1.        ,  1.        ,  1.        ,  1.        ,  1.        ,
-           1.        ,  1.        ,  1.        ,  1.        ,  1.        , # <-- automatic survival to age 65
-           0.98438596,  0.98438596,  0.98438596,  0.98438596,  0.98438596,
-           0.97567062,  0.97567062,  0.97567062,  0.97567062,  0.97567062,
-           0.96207901,  0.96207901,  0.96207901,  0.96207901,  0.96207901,
-           0.93721595,  0.93721595,  0.93721595,  0.93721595,  0.93721595,
-           0.63095734,  0.63095734,  0.63095734,  0.63095734,  0.63095734]
-
-
-# Standard deviations of permanent income shocks by age, starting from age 25
-PermShkStd = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,
-0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,
-0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.0, 0.0, 0.0, # <-- no permanent income shocks after retirement
-0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-
-# Standard deviations of transitory income shocks by age, starting from age 25
-TranShkStd =  [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,
-0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,
-0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.0, 0.0, 0.0, # <-- no transitory income shocs after retirement
-0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+# Survival probabilities over the lifecycle
+liv_prb = parse_ssa_life_table(
+    female=False, min_age=initial_age, max_age=final_age - 1, cohort=1960
+)
 
 # Age groups for the estimation: calculate average wealth-to-permanent income ratio
 # for consumers within each of these age groups, compare actual to simulated data
@@ -132,11 +111,11 @@ seed = 31382                                                    # Just an intege
 # Dictionary that can be passed to ConsumerType to instantiate
 init_consumer_objects = {"CRRA":CRRA_start,
                         "Rfree":Rfree,
-                        "PermGroFac":PermGroFac,
+                        "PermGroFac":inc_calib["PermGroFac"],
                         "BoroCnstArt":BoroCnstArt,
-                        "PermShkStd":PermShkStd,
+                        "PermShkStd":inc_calib["PermShkStd"],
                         "PermShkCount":PermShkCount,
-                        "TranShkStd":TranShkStd,
+                        "TranShkStd":inc_calib["TranShkStd"],
                         "TranShkCount":TranShkCount,
                         "T_cycle":TT,
                         "UnempPrb":UnempPrb,
@@ -150,7 +129,7 @@ init_consumer_objects = {"CRRA":CRRA_start,
                         "aXtraCount":aXtraCount,
                         "aXtraExtra":[aXtraExtra,aXtraHuge],
                         "aXtraNestFac":exp_nest,
-                        "LivPrb":LivPrb,
+                        "LivPrb":liv_prb,
                         "DiscFac":DiscFac_timevary,
                         'AgentCount':num_agents,
                         'seed':seed,
