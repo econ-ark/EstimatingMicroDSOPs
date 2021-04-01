@@ -25,6 +25,7 @@ from time import time                           # Timing utility
 import HARK.ConsumptionSaving.ConsIndShockModel as Model # The consumption-saving micro model
 from HARK.distribution import DiscreteDistribution         # Method for sampling from a discrete distribution
 from HARK.estimation import minimize_nelder_mead, bootstrap_sample_from_data # Estimation methods
+from HARK.datasets.SCF.WealthIncomeDist.SCFDistTools import income_wealth_dists_from_scf
 
 # Find pathname to this file:
 my_file_path = os.path.dirname(os.path.abspath(__file__))
@@ -39,7 +40,7 @@ code_dir = os.path.join(my_file_path, "../Code/") # Relative directory for primi
 # Need to rely on the manual insertion of pathnames to all files in do_all.py
 # NOTE sys.path.insert(0, os.path.abspath(tables_dir)), etc. may need to be
 # copied from do_all.py to here
-import EstimationParameters as Params           # Parameters for the consumer type and the estimation
+import EstimationParameters as Params         # Parameters for the consumer type and the estimation
 import SetupSCFdata as Data                     # SCF 2004 data on household wealth
 
 
@@ -184,11 +185,19 @@ def smmObjectiveFxn(DiscFacAdj, CRRA,
     # Find the distance between empirical data and simulated medians for each age group
     group_count = len(map_simulated_to_empirical_cohorts)
     distance_sum = 0
-    for g in range(group_count):
-        cohort_indices = map_simulated_to_empirical_cohorts[g] # The simulated time indices corresponding to this age group
-        sim_median = np.median(sim_w_history[cohort_indices,]) # The median of simulated wealth-to-income for this age group
-        group_indices = empirical_groups == (g+1) # groups are numbered from 1
-        distance_sum += np.dot(np.abs(empirical_data[group_indices] - sim_median),empirical_weights[group_indices]) # Weighted distance from each empirical observation to the simulated median for this age group
+    # for g in range(group_count):
+    #     cohort_indices = map_simulated_to_empirical_cohorts[g] # The simulated time indices corresponding to this age group
+    #     sim_median = np.median(sim_w_history[cohort_indices,]) # The median of simulated wealth-to-income for this age group
+    #     group_indices = empirical_groups == (g+1) # groups are numbered from 1
+    #     distance_sum += np.dot(np.abs(empirical_data[group_indices] - sim_median),empirical_weights[group_indices]) # Weighted distance from each empirical observation to the simulated median for this age group
+
+    for i, ages in enumerate(Params.empirical_cohort_age_groups):
+        temp = income_wealth_dists_from_scf(2019, ages[-1])
+        empirical_mean = temp['aNrmInitMean']/temp['pLvlInitMean']
+        cohort_indices = map_simulated_to_empirical_cohorts[i]
+        sim_mean = np.mean(sim_w_history[cohort_indices,]) 
+        distance_sum += np.abs(empirical_mean-sim_mean)
+
 
     return distance_sum
 
