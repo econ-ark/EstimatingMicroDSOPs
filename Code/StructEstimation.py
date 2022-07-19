@@ -191,6 +191,7 @@ def smmObjectiveFxn(
     agent=EstimationAgent,
     DiscFacAdj_bound=Params.DiscFacAdj_bound,
     CRRA_bound=Params.CRRA_bound,
+    tgt_moments = targeted_moments,
     empirical_data=Data.w_to_y_data,
     empirical_weights=Data.empirical_weights,
     empirical_groups=Data.empirical_groups,
@@ -269,20 +270,20 @@ def smmObjectiveFxn(
     # Find the distance between empirical data and simulated medians for each age group
     group_count = len(map_simulated_to_empirical_cohorts)
     distance_sum = 0
+    sim_moments = []
     for g in range(group_count):
         cohort_indices = map_simulated_to_empirical_cohorts[
             g
         ]  # The simulated time indices corresponding to this age group
-        sim_median = np.median(
-            sim_w_history[cohort_indices,]
-        )  # The median of simulated wealth-to-income for this age group
-        group_indices = empirical_groups == (g + 1)  # groups are numbered from 1
-        distance_sum += np.dot(
-            np.abs(empirical_data[group_indices] - sim_median),
-            empirical_weights[group_indices],
-        )  # Weighted distance from each empirical observation to the simulated median for this age group
+        sim_moments += [
+            np.median(sim_w_history[cohort_indices,])
+        ]  # The median of simulated wealth-to-income for this age group
+    
+    sim_moments = np.array(sim_moments)
+    errors = tgt_moments - sim_moments
+    loss = np.dot(errors, errors)
 
-    return distance_sum
+    return loss
 
 
 # Make a single-input lambda function for use in the optimizer
@@ -423,7 +424,7 @@ def main(
             "--------------------------------------------------------------------------------"
         )
         test_fobj = smmObjectiveFxnReduced(initial_guess)
-        if test_fobj != 4905563203.833737:
+        if test_fobj != 319.0069645992222:
             raise ValueError('Objective function is not what it should be. Something changed')
 
         t_start_estimate = time()
