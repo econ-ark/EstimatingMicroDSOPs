@@ -35,6 +35,8 @@ tables_dir = os.path.join(my_file_path, "../Tables/") # Relative directory for p
 figures_dir = os.path.join(my_file_path, "../Figures/") # Relative directory for primitive parameter files
 code_dir = os.path.join(my_file_path, "../Code/") # Relative directory for primitive parameter files
 
+# Add the calibration folder to the path
+sys.path.insert(0, os.path.abspath(calibration_dir))
 
 # Need to rely on the manual insertion of pathnames to all files in do_all.py
 # NOTE sys.path.insert(0, os.path.abspath(tables_dir)), etc. may need to be
@@ -109,6 +111,37 @@ EstimationAgent.aNrmInit = DiscreteDistribution(
     seed=Params.seed).draw(N=Params.num_agents)    # Draw initial assets for each consumer
 EstimationAgent.make_shock_history()
 
+def weighted_median(values, weights):
+
+    inds = np.argsort(values)
+    values = values[inds]
+    weights = weights[inds]
+
+    wsum = np.cumsum(inds)
+    ind = np.where(wsum > wsum[-1]/2)[0][0]
+
+    median  = values[ind]
+    
+    return median
+
+
+def get_targeted_moments(empirical_data=Data.w_to_y_data,
+                         empirical_weights=Data.empirical_weights,
+                         empirical_groups=Data.empirical_groups,
+                         map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices):
+
+    # Initialize
+    group_count = len(map_simulated_to_empirical_cohorts)
+    tgt_moments = np.zeros(group_count)
+
+    for g in range(group_count):
+        
+        group_indices = empirical_groups == (g + 1)  # groups are numbered from 1
+        tgt_moments[g] = weighted_median(empirical_data[group_indices], empirical_weights[group_indices])
+
+    return tgt_moments
+        
+targeted_moments = get_targeted_moments()
 # Define the objective function for the simulated method of moments estimation
 def smmObjectiveFxn(DiscFacAdj, CRRA,
                      agent = EstimationAgent,
