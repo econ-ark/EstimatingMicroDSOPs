@@ -422,6 +422,10 @@ def main(
         print(
             "--------------------------------------------------------------------------------"
         )
+        test_fobj = smmObjectiveFxnReduced(initial_guess)
+        if test_fobj != 4905563203.833737:
+            raise ValueError('Objective function is not what it should be. Something changed')
+
         t_start_estimate = time()
         model_estimate = minimize_nelder_mead(
             smmObjectiveFxnReduced, initial_guess, verbose=True
