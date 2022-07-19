@@ -184,7 +184,57 @@ def get_targeted_moments(
 
 
 targeted_moments = get_targeted_moments()
+
 # Define the objective function for the simulated method of moments estimation
+def simulate_moments(
+    DiscFacAdj,
+    CRRA,
+    agent=EstimationAgent,
+    DiscFacAdj_bound=Params.DiscFacAdj_bound,
+    CRRA_bound=Params.CRRA_bound,
+    map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices,
+):
+    
+    # A quick check to make sure that the parameter values are within bounds.
+    # Far flung falues of DiscFacAdj or CRRA might cause an error during solution or
+    # simulation, so the objective function doesn't even bother with them.
+    if (
+        DiscFacAdj < DiscFacAdj_bound[0]
+        or DiscFacAdj > DiscFacAdj_bound[1]
+        or CRRA < CRRA_bound[0]
+        or CRRA > CRRA_bound[1]
+    ):
+        return 1e30 * np.ones(len(map_simulated_to_empirical_cohorts))
+
+    # Update the agent with a new path of DiscFac based on this DiscFacAdj (and a new CRRA)
+    agent.DiscFac = [b * DiscFacAdj for b in Params.DiscFac_timevary]
+    agent.CRRA = CRRA
+    # Solve the model for these parameters, then simulate wealth data
+    agent.solve()  # Solve the microeconomic model
+    agent.unpack("cFunc")  # "Unpack" the consumption function for convenient access
+    max_sim_age = max([max(ages) for ages in map_simulated_to_empirical_cohorts]) + 1
+    agent.initialize_sim()  # Initialize the simulation by clearing histories, resetting initial values
+    agent.simulate(max_sim_age)  # Simulate histories of consumption and wealth
+    sim_w_history = agent.history[
+        "bNrm"
+    ]  # Take "wealth" to mean bank balances before receiving labor income
+
+    # Find the distance between empirical data and simulated medians for each age group
+    group_count = len(map_simulated_to_empirical_cohorts)
+    distance_sum = 0
+    sim_moments = []
+    for g in range(group_count):
+        cohort_indices = map_simulated_to_empirical_cohorts[
+            g
+        ]  # The simulated time indices corresponding to this age group
+        sim_moments += [
+            np.median(sim_w_history[cohort_indices,])
+        ]  # The median of simulated wealth-to-income for this age group
+    
+    sim_moments = np.array(sim_moments)
+    
+    return sim_moments
+
 def smmObjectiveFxn(
     DiscFacAdj,
     CRRA,
@@ -192,9 +242,6 @@ def smmObjectiveFxn(
     DiscFacAdj_bound=Params.DiscFacAdj_bound,
     CRRA_bound=Params.CRRA_bound,
     tgt_moments = targeted_moments,
-    empirical_data=Data.w_to_y_data,
-    empirical_weights=Data.empirical_weights,
-    empirical_groups=Data.empirical_groups,
     map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices,
 ):
     """
@@ -243,43 +290,15 @@ def smmObjectiveFxn(
         Sum of distances between empirical data observations and the corresponding
         median wealth-to-permanent-income ratio in the simulation.
     """
-    # A quick check to make sure that the parameter values are within bounds.
-    # Far flung falues of DiscFacAdj or CRRA might cause an error during solution or
-    # simulation, so the objective function doesn't even bother with them.
-    if (
-        DiscFacAdj < DiscFacAdj_bound[0]
-        or DiscFacAdj > DiscFacAdj_bound[1]
-        or CRRA < CRRA_bound[0]
-        or CRRA > CRRA_bound[1]
-    ):
-        return 1e30
 
-    # Update the agent with a new path of DiscFac based on this DiscFacAdj (and a new CRRA)
-    agent.DiscFac = [b * DiscFacAdj for b in Params.DiscFac_timevary]
-    agent.CRRA = CRRA
-    # Solve the model for these parameters, then simulate wealth data
-    agent.solve()  # Solve the microeconomic model
-    agent.unpack("cFunc")  # "Unpack" the consumption function for convenient access
-    max_sim_age = max([max(ages) for ages in map_simulated_to_empirical_cohorts]) + 1
-    agent.initialize_sim()  # Initialize the simulation by clearing histories, resetting initial values
-    agent.simulate(max_sim_age)  # Simulate histories of consumption and wealth
-    sim_w_history = agent.history[
-        "bNrm"
-    ]  # Take "wealth" to mean bank balances before receiving labor income
-
-    # Find the distance between empirical data and simulated medians for each age group
-    group_count = len(map_simulated_to_empirical_cohorts)
-    distance_sum = 0
-    sim_moments = []
-    for g in range(group_count):
-        cohort_indices = map_simulated_to_empirical_cohorts[
-            g
-        ]  # The simulated time indices corresponding to this age group
-        sim_moments += [
-            np.median(sim_w_history[cohort_indices,])
-        ]  # The median of simulated wealth-to-income for this age group
-    
-    sim_moments = np.array(sim_moments)
+    sim_moments = simulate_moments(
+        DiscFacAdj,
+        CRRA,
+        agent,
+        DiscFacAdj_bound,
+        CRRA_bound,
+        map_simulated_to_empirical_cohorts,
+    )
     errors = tgt_moments - sim_moments
     loss = np.dot(errors, errors)
 
@@ -344,13 +363,20 @@ def calculateStandardErrorsByBootstrap(initial_estimate, N, seed=0, verbose=Fals
             2,
         ]
 
+        # Find moments with bootstrapped sample
+        bstrap_tgt_moments = get_targeted_moments(
+            empirical_data=w_to_y_data_bootstrap,
+            empirical_weights=empirical_weights_bootstrap,
+            empirical_groups=empirical_groups_bootstrap,
+            map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices,
+        )
+
         # Make a temporary function for use in this estimation run
         smmObjectiveFxnBootstrap = lambda parameters_to_estimate: smmObjectiveFxn(
             DiscFacAdj=parameters_to_estimate[0],
             CRRA=parameters_to_estimate[1],
-            empirical_data=w_to_y_data_bootstrap,
-            empirical_weights=empirical_weights_bootstrap,
-            empirical_groups=empirical_groups_bootstrap,
+            tgt_moments = bstrap_tgt_moments,
+            map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices,
         )
 
         # Estimate the model with the bootstrap data and add to list of estimates
