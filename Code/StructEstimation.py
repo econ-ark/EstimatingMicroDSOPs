@@ -21,6 +21,8 @@ import numpy as np  # Numeric Python
 import pylab  # Python reproductions of some Matlab functions
 from time import time  # Timing utility
 
+from scipy.optimize import approx_fprime
+
 # Import modules from core HARK libraries:
 import HARK.ConsumptionSaving.ConsIndShockModel as Model  # The consumption-saving micro model
 from HARK.distribution import (
@@ -61,6 +63,7 @@ import SetupSCFdata as Data  # SCF 2004 data on household wealth
 # Set booleans to determine which tasks should be done
 local_estimate_model = True  # Whether to estimate the model
 local_compute_standard_errors = False  # Whether to get standard errors via bootstrap
+local_compute_sensitivity = True # Whether to compute a measure of estimates' sensitivity to moments
 local_make_contour_plot = (
     True  # Whether to make a contour map of the objective function
 )
@@ -414,6 +417,7 @@ def calculateStandardErrorsByBootstrap(initial_estimate, N, seed=0, verbose=Fals
 def main(
     estimate_model=local_estimate_model,
     compute_standard_errors=local_compute_standard_errors,
+    compute_sensitivity=local_compute_sensitivity,
     make_contour_plot=local_make_contour_plot,
 ):
     """
@@ -479,6 +483,7 @@ def main(
             writer = csv.writer(f)
             writer.writerow(["DiscFacAdj", "CRRA"])
             writer.writerow([model_estimate[0], model_estimate[1]])
+
 
     if compute_standard_errors and not estimate_model:
         print(
@@ -546,6 +551,38 @@ def main(
             writer.writerow(
                 [model_estimate[0], std_errors[0], model_estimate[1], std_errors[1]]
             )
+
+    # Compute sensitivity measure
+    if compute_sensitivity and estimate_model:
+
+        print(
+            "````````````````````````````````````````````````````````````````````````````````"
+        )
+        print("Computing sensitivity measure.")
+        print(
+            "````````````````````````````````````````````````````````````````````````````````"
+        )
+
+        # Find the Jacobian of the function that simulates moments
+        def simulate_moments_reduced(x):
+
+            moments = simulate_moments(
+                x[0],
+                x[1],
+                agent=EstimationAgent,
+                DiscFacAdj_bound=Params.DiscFacAdj_bound,
+                CRRA_bound=Params.CRRA_bound,
+                map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices,
+            )
+
+            return moments
+
+        n_moments = len(Data.simulation_map_cohorts_to_age_indices)
+        jac = np.array([
+            approx_fprime(model_estimate, lambda x: simulate_moments_reduced(x)[j]) for j in range(n_moments)
+        ])
+
+        sensitivity = np.dot(np.linalg.inv(np.dot(jac.T, jac)), jac.T)
 
     # Make a contour plot of the objective function
     if make_contour_plot:
