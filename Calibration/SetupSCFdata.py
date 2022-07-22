@@ -49,6 +49,10 @@ scf_data_path = data_location = os.path.dirname(
 
 data = pd.read_csv(scf_data_path + "/SCFdata.csv")
 
+# Keep only observations with normal incomes > 0,
+# otherwise wealth/income is not well defined
+data = data[data.norminc > 0.0]
+
 # Initialize empty lists for the data
 w_to_y_data = []  # Ratio of wealth to permanent income
 empirical_weights = []  # Weighting for this observation
