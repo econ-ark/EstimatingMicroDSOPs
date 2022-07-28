@@ -13,6 +13,7 @@ from __future__ import absolute_import
 
 from builtins import str
 from builtins import range
+from cmath import isclose
 
 import os
 import sys
@@ -20,6 +21,7 @@ import csv
 import numpy as np  # Numeric Python
 import pylab  # Python reproductions of some Matlab functions
 from time import time  # Timing utility
+import matplotlib.pyplot as plt
 
 from scipy.optimize import approx_fprime
 
@@ -63,7 +65,9 @@ import SetupSCFdata as Data  # SCF 2004 data on household wealth
 # Set booleans to determine which tasks should be done
 local_estimate_model = True  # Whether to estimate the model
 local_compute_standard_errors = False  # Whether to get standard errors via bootstrap
-local_compute_sensitivity = True # Whether to compute a measure of estimates' sensitivity to moments
+local_compute_sensitivity = (
+    True  # Whether to compute a measure of estimates' sensitivity to moments
+)
 local_make_contour_plot = (
     True  # Whether to make a contour map of the objective function
 )
@@ -197,7 +201,7 @@ def simulate_moments(
     CRRA_bound=Params.CRRA_bound,
     map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices,
 ):
-    
+
     # A quick check to make sure that the parameter values are within bounds.
     # Far flung falues of DiscFacAdj or CRRA might cause an error during solution or
     # simulation, so the objective function doesn't even bother with them.
@@ -233,10 +237,11 @@ def simulate_moments(
         sim_moments += [
             np.median(sim_w_history[cohort_indices,])
         ]  # The median of simulated wealth-to-income for this age group
-    
+
     sim_moments = np.array(sim_moments)
-    
+
     return sim_moments
+
 
 def smmObjectiveFxn(
     DiscFacAdj,
@@ -244,7 +249,7 @@ def smmObjectiveFxn(
     agent=EstimationAgent,
     DiscFacAdj_bound=Params.DiscFacAdj_bound,
     CRRA_bound=Params.CRRA_bound,
-    tgt_moments = targeted_moments,
+    tgt_moments=targeted_moments,
     map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices,
 ):
     """
@@ -378,7 +383,7 @@ def calculateStandardErrorsByBootstrap(initial_estimate, N, seed=0, verbose=Fals
         smmObjectiveFxnBootstrap = lambda parameters_to_estimate: smmObjectiveFxn(
             DiscFacAdj=parameters_to_estimate[0],
             CRRA=parameters_to_estimate[1],
-            tgt_moments = bstrap_tgt_moments,
+            tgt_moments=bstrap_tgt_moments,
             map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices,
         )
 
@@ -454,8 +459,10 @@ def main(
             "--------------------------------------------------------------------------------"
         )
         test_fobj = smmObjectiveFxnReduced(initial_guess)
-        if test_fobj != 319.0069645992222:
-            raise ValueError('Objective function is not what it should be. Something changed')
+        if not np.isclose(test_fobj, 319.0069645992222):
+            raise ValueError(
+                "Objective function is not what it should be. Something changed"
+            )
 
         t_start_estimate = time()
         model_estimate = minimize_nelder_mead(
@@ -483,7 +490,6 @@ def main(
             writer = csv.writer(f)
             writer.writerow(["DiscFacAdj", "CRRA"])
             writer.writerow([model_estimate[0], model_estimate[1]])
-
 
     if compute_standard_errors and not estimate_model:
         print(
@@ -578,11 +584,44 @@ def main(
             return moments
 
         n_moments = len(Data.simulation_map_cohorts_to_age_indices)
-        jac = np.array([
-            approx_fprime(model_estimate, lambda x: simulate_moments_reduced(x)[j]) for j in range(n_moments)
-        ])
+        jac = np.array(
+            [
+                approx_fprime(
+                    model_estimate,
+                    lambda x: simulate_moments_reduced(x)[j],
+                    epsilon=0.01,
+                )
+                for j in range(n_moments)
+            ]
+        )
 
+        # Compute sensitivity measure. (all moments weighted equally)
         sensitivity = np.dot(np.linalg.inv(np.dot(jac.T, jac)), jac.T)
+
+        # Create lables for moments in the plots
+        moment_labels = [
+            "[" + str(min(x)) + "," + str(max(x)) + "]"
+            for x in Data.empirical_cohort_age_groups
+        ]
+
+        # Plot
+        fig, axs = plt.subplots(len(initial_guess))
+        fig.set_tight_layout(True)
+
+        axs[0].bar(range(n_moments), sensitivity[0, :], tick_label=moment_labels)
+        axs[0].set_title("DiscFacAdj")
+        axs[0].set_ylabel("Sensitivity")
+        axs[0].set_xlabel("Median W/Y Ratio")
+
+        axs[1].bar(range(n_moments), sensitivity[1, :], tick_label=moment_labels)
+        axs[1].set_title("CRRA")
+        axs[1].set_ylabel("Sensitivity")
+        axs[1].set_xlabel("Median W/Y Ratio")
+
+        plt.savefig(os.path.join(figures_dir, "Sensitivity.pdf"))
+        plt.savefig(os.path.join(figures_dir, "Sensitivity.png"))
+
+        plt.show()
 
     # Make a contour plot of the objective function
     if make_contour_plot:
