@@ -10,29 +10,28 @@ income as defined in ConsIndShockModel.
 """
 
 
-import Calibration.SetupSCFdata as Data  # SCF 2004 data on household wealth
-
-# Parameters for the consumer type and the estimation
-import Calibration.EstimationParameters as Params
+import csv
 import os
 import sys
-import csv
-import numpy as np  # Numeric Python
-import pylab  # Python reproductions of some Matlab functions
 from time import time  # Timing utility
-import matplotlib.pyplot as plt
-
-from scipy.optimize import approx_fprime
 
 # Import modules from core HARK libraries:
 # The consumption-saving micro model
 import HARK.ConsumptionSaving.ConsIndShockModel as Model
+import matplotlib.pyplot as plt
+import numpy as np  # Numeric Python
+import pylab  # Python reproductions of some Matlab functions
 
 # Method for sampling from a discrete distribution
 from HARK.distribution import DiscreteDistribution
 
 # Estimation methods
-from HARK.estimation import minimize_nelder_mead, bootstrap_sample_from_data
+from HARK.estimation import bootstrap_sample_from_data, minimize_nelder_mead
+from scipy.optimize import approx_fprime
+
+# Parameters for the consumer type and the estimation
+import Calibration.EstimationParameters as Params
+import Calibration.SetupSCFdata as Data  # SCF 2004 data on household wealth
 
 # Find pathname to this file:
 my_file_path = os.path.dirname(os.path.abspath(__file__))
