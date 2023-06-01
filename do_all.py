@@ -46,26 +46,24 @@ Python PATH with the locations of the MicroDSOP directory structure so it can
 still run.
 """
 
-from __future__ import division, print_function
 
-import os, sys
+import os
+import sys
+
+import Code.StructEstimation as struct
 
 # Find pathname to this file:
 my_file_path = os.path.dirname(os.path.abspath(__file__))
 
 # Pathnames to the other files:
-calibration_dir = os.path.join(
-    my_file_path, "Calibration"
-)  # Relative directory for primitive parameter files
-tables_dir = os.path.join(
-    my_file_path, "Tables"
-)  # Relative directory for primitive parameter files
-figures_dir = os.path.join(
-    my_file_path, "Figures"
-)  # Relative directory for primitive parameter files
-code_dir = os.path.join(
-    my_file_path, "Code"
-)  # Relative directory for primitive parameter files
+# Relative directory for primitive parameter files
+calibration_dir = os.path.join(my_file_path, "Calibration")
+# Relative directory for primitive parameter files
+tables_dir = os.path.join(my_file_path, "Tables")
+# Relative directory for primitive parameter files
+figures_dir = os.path.join(my_file_path, "Figures")
+# Relative directory for primitive parameter files
+code_dir = os.path.join(my_file_path, "Code")
 
 
 # manually add the pathnames to the various files directly to the beginning
@@ -79,8 +77,6 @@ sys.path.insert(0, my_file_path)
 
 # Manual import needed, should draw from first instance at start of Python
 # PATH added above:
-import StructEstimation as struct
-
 
 # Define settings for "main()" function in StructuralEstiamtion.py based on
 # resource requirements:

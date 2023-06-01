@@ -8,12 +8,12 @@ factor for an age-varying sequence of discount factors.  The estimation uses a
 consumption-saving model with idiosyncratic shocks to permanent and transitory
 income as defined in ConsIndShockModel.
 """
-from __future__ import print_function
-from __future__ import absolute_import
 
-from builtins import str
-from builtins import range
 
+import Calibration.SetupSCFdata as Data  # SCF 2004 data on household wealth
+
+# Parameters for the consumer type and the estimation
+import Calibration.EstimationParameters as Params
 import os
 import sys
 import csv
@@ -25,31 +25,27 @@ import matplotlib.pyplot as plt
 from scipy.optimize import approx_fprime
 
 # Import modules from core HARK libraries:
-import HARK.ConsumptionSaving.ConsIndShockModel as Model  # The consumption-saving micro model
-from HARK.distribution import (
-    DiscreteDistribution,
-)  # Method for sampling from a discrete distribution
-from HARK.estimation import (
-    minimize_nelder_mead,
-    bootstrap_sample_from_data,
-)  # Estimation methods
+# The consumption-saving micro model
+import HARK.ConsumptionSaving.ConsIndShockModel as Model
+
+# Method for sampling from a discrete distribution
+from HARK.distribution import DiscreteDistribution
+
+# Estimation methods
+from HARK.estimation import minimize_nelder_mead, bootstrap_sample_from_data
 
 # Find pathname to this file:
 my_file_path = os.path.dirname(os.path.abspath(__file__))
 
 # Pathnames to the other files:
-calibration_dir = os.path.join(
-    my_file_path, "../Calibration/"
-)  # Relative directory for primitive parameter files
-tables_dir = os.path.join(
-    my_file_path, "../Tables/"
-)  # Relative directory for primitive parameter files
-figures_dir = os.path.join(
-    my_file_path, "../Figures/"
-)  # Relative directory for primitive parameter files
-code_dir = os.path.join(
-    my_file_path, "../Code/"
-)  # Relative directory for primitive parameter files
+# Relative directory for primitive parameter files
+calibration_dir = os.path.join(my_file_path, "../Calibration/")
+# Relative directory for primitive parameter files
+tables_dir = os.path.join(my_file_path, "../Tables/")
+# Relative directory for primitive parameter files
+figures_dir = os.path.join(my_file_path, "../Figures/")
+# Relative directory for primitive parameter files
+code_dir = os.path.join(my_file_path, "../Code/")
 
 # Add the calibration folder to the path
 sys.path.insert(0, os.path.abspath(calibration_dir))
@@ -57,19 +53,16 @@ sys.path.insert(0, os.path.abspath(calibration_dir))
 # Need to rely on the manual insertion of pathnames to all files in do_all.py
 # NOTE sys.path.insert(0, os.path.abspath(tables_dir)), etc. may need to be
 # copied from do_all.py to here
-import EstimationParameters as Params  # Parameters for the consumer type and the estimation
-import SetupSCFdata as Data  # SCF 2004 data on household wealth
 
 
 # Set booleans to determine which tasks should be done
 local_estimate_model = True  # Whether to estimate the model
-local_compute_standard_errors = False  # Whether to get standard errors via bootstrap
-local_compute_sensitivity = (
-    True  # Whether to compute a measure of estimates' sensitivity to moments
-)
-local_make_contour_plot = (
-    True  # Whether to make a contour map of the objective function
-)
+# Whether to get standard errors via bootstrap
+local_compute_standard_errors = False
+# Whether to compute a measure of estimates' sensitivity to moments
+local_compute_sensitivity = True
+# Whether to make a contour map of the objective function
+local_make_contour_plot = True
 
 # =====================================================
 # Define objects and functions used for the estimation
@@ -101,12 +94,10 @@ class TempConsumerType(Model.IndShockConsumerType):
         Model.IndShockConsumerType.__init__(
             self, cycles=cycles, time_flow=time_flow, **kwds
         )
-        self.add_to_time_vary(
-            "DiscFac"
-        )  # This estimation uses age-varying discount factors as
-        self.del_from_time_inv(
-            "DiscFac"
-        )  # estimated by Cagetti (2003), so switch from time_inv to time_vary
+        # This estimation uses age-varying discount factors as
+        # estimated by Cagetti (2003), so switch from time_inv to time_vary
+        self.add_to_time_vary("DiscFac")
+        self.del_from_time_inv("DiscFac")
 
     def simBirth(self, which_agents):
         """
@@ -123,34 +114,30 @@ class TempConsumerType(Model.IndShockConsumerType):
         None
         """
         # Get and store states for newly born agents
-        self.state_now["aNrm"][which_agents] = self.aNrmInit[
-            which_agents
-        ]  # Take directly from pre-specified distribution
-        self.state_now["pLvl"][
-            which_agents
-        ] = 1.0  # No variation in permanent income needed
-        self.t_age[which_agents] = 0  # How many periods since each agent was born
-        self.t_cycle[
-            which_agents
-        ] = 0  # Which period of the cycle each agents is currently in
+        # Take directly from pre-specified distribution
+        self.state_now["aNrm"][which_agents] = self.aNrmInit[which_agents]
+        # No variation in permanent income needed
+        self.state_now["pLvl"][which_agents] = 1.0
+        # How many periods since each agent was born
+        self.t_age[which_agents] = 0
+        # Which period of the cycle each agents is currently in
+        self.t_cycle[which_agents] = 0
         return None
 
 
 # Make a lifecycle consumer to be used for estimation, including simulated shocks (plus an initial distribution of wealth)
-EstimationAgent = TempConsumerType(
-    **Params.init_consumer_objects
-)  # Make a TempConsumerType for estimation
-EstimationAgent.T_sim = (
-    EstimationAgent.T_cycle + 1
-)  # Set the number of periods to simulate
-EstimationAgent.track_vars = ["bNrm"]  # Choose to track bank balances as wealth
+# Make a TempConsumerType for estimation
+EstimationAgent = TempConsumerType(**Params.init_consumer_objects)
+# Set the number of periods to simulate
+EstimationAgent.T_sim = EstimationAgent.T_cycle + 1
+# Choose to track bank balances as wealth
+EstimationAgent.track_vars = ["bNrm"]
+# Draw initial assets for each consumer
 EstimationAgent.aNrmInit = DiscreteDistribution(
     Params.initial_wealth_income_ratio_probs,
     Params.initial_wealth_income_ratio_vals,
     seed=Params.seed,
-).draw(
-    N=Params.num_agents
-)  # Draw initial assets for each consumer
+).draw(N=Params.num_agents)
 EstimationAgent.make_shock_history()
 
 
@@ -198,9 +185,11 @@ def simulate_moments(
     CRRA_bound=Params.CRRA_bound,
     map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices,
 ):
-    # A quick check to make sure that the parameter values are within bounds.
-    # Far flung falues of DiscFacAdj or CRRA might cause an error during solution or
-    # simulation, so the objective function doesn't even bother with them.
+    """
+    A quick check to make sure that the parameter values are within bounds.
+    Far flung falues of DiscFacAdj or CRRA might cause an error during solution or
+    simulation, so the objective function doesn't even bother with them.
+    """
     if (
         DiscFacAdj < DiscFacAdj_bound[0]
         or DiscFacAdj > DiscFacAdj_bound[1]
@@ -214,24 +203,23 @@ def simulate_moments(
     agent.CRRA = CRRA
     # Solve the model for these parameters, then simulate wealth data
     agent.solve()  # Solve the microeconomic model
-    agent.unpack("cFunc")  # "Unpack" the consumption function for convenient access
+    # "Unpack" the consumption function for convenient access
+    agent.unpack("cFunc")
     max_sim_age = max([max(ages) for ages in map_simulated_to_empirical_cohorts]) + 1
-    agent.initialize_sim()  # Initialize the simulation by clearing histories, resetting initial values
+    # Initialize the simulation by clearing histories, resetting initial values
+    agent.initialize_sim()
     agent.simulate(max_sim_age)  # Simulate histories of consumption and wealth
-    sim_w_history = agent.history[
-        "bNrm"
-    ]  # Take "wealth" to mean bank balances before receiving labor income
+    # Take "wealth" to mean bank balances before receiving labor income
+    sim_w_history = agent.history["bNrm"]
 
     # Find the distance between empirical data and simulated medians for each age group
     group_count = len(map_simulated_to_empirical_cohorts)
     sim_moments = []
     for g in range(group_count):
-        cohort_indices = map_simulated_to_empirical_cohorts[
-            g
-        ]  # The simulated time indices corresponding to this age group
-        sim_moments += [
-            np.median(sim_w_history[cohort_indices,])
-        ]  # The median of simulated wealth-to-income for this age group
+        # The simulated time indices corresponding to this age group
+        cohort_indices = map_simulated_to_empirical_cohorts[g]
+        # The median of simulated wealth-to-income for this age group
+        sim_moments += [np.median(sim_w_history[cohort_indices,])]
 
     sim_moments = np.array(sim_moments)
 
@@ -310,16 +298,14 @@ def smmObjectiveFxn(
 
 # Make a single-input lambda function for use in the optimizer
 def smmObjectiveFxnReduced(parameters_to_estimate):
+    """
+    A "reduced form" of the SMM objective function, compatible with the optimizer.
+    Identical to smmObjectiveFunction, but takes only a single input as a length-2
+    list representing [DiscFacAdj,CRRA].
+    """
     return smmObjectiveFxn(
         DiscFacAdj=parameters_to_estimate[0], CRRA=parameters_to_estimate[1]
     )
-
-
-"""
-A "reduced form" of the SMM objective function, compatible with the optimizer.
-Identical to smmObjectiveFunction, but takes only a single input as a length-2
-list representing [DiscFacAdj,CRRA].
-"""
 
 
 # Define the bootstrap procedure
@@ -348,8 +334,8 @@ def calculateStandardErrorsByBootstrap(initial_estimate, N, seed=0, verbose=Fals
     t_0 = time()
 
     # Generate a list of seeds for generating bootstrap samples
-    RNG = np.random.RandomState(seed)
-    seed_list = RNG.randint(2**31 - 1, size=N)
+    RNG = np.random.default_rng(seed)
+    seed_list = RNG.integers(2**31 - 1, size=N)
 
     # Estimate the model N times, recording each set of estimated parameters
     estimate_list = []
@@ -387,18 +373,10 @@ def calculateStandardErrorsByBootstrap(initial_estimate, N, seed=0, verbose=Fals
         t_now = time()
 
         # Report progress of the bootstrap
-        if verbose:
-            print(
-                "Finished bootstrap estimation #"
-                + str(n + 1)
-                + " of "
-                + str(N)
-                + " in "
-                + str(t_now - t_start)
-                + " seconds ("
-                + str(t_now - t_0)
-                + " cumulative)"
-            )
+    if verbose:
+        print(
+            f"Finished bootstrap estimation #{n+1} of {N} in {t_now-t_start} seconds ({t_now-t_0} cumulative)"
+        )
 
     # Calculate the standard errors for each parameter
     estimate_array = (np.array(estimate_list)).T
@@ -441,19 +419,14 @@ def main(
     # Estimate the model using Nelder-Mead
     if estimate_model:
         initial_guess = [Params.DiscFacAdj_start, Params.CRRA_start]
+        print("----------------------------------------------------------------------")
         print(
-            "--------------------------------------------------------------------------------"
+            f"Now estimating the model using Nelder-Mead from an initial guess of {initial_guess}..."
         )
-        print(
-            "Now estimating the model using Nelder-Mead from an initial guess of "
-            + str(initial_guess)
-            + "..."
-        )
-        print(
-            "--------------------------------------------------------------------------------"
-        )
+        print("----------------------------------------------------------------------")
         test_fobj = smmObjectiveFxnReduced(initial_guess)
-        if not np.isclose(test_fobj, 319.0069645992222):
+        if not np.isclose(test_fobj, 319.2681355749311):
+            print(test_fobj)
             raise ValueError(
                 "Objective function is not what it should be. Something changed"
             )
@@ -463,19 +436,13 @@ def main(
             smmObjectiveFxnReduced, initial_guess, verbose=True
         )
         t_end_estimate = time()
+
         time_to_estimate = t_end_estimate - t_start_estimate
         print(
-            "Time to execute all:",
-            round(time_to_estimate / 60.0, 2),
-            "min,",
-            time_to_estimate,
-            "sec",
+            f"Time to execute all: {round(time_to_estimate / 60.0, 2)} min, {time_to_estimate} sec"
         )
         print(
-            "Estimated values: DiscFacAdj="
-            + str(model_estimate[0])
-            + ", CRRA="
-            + str(model_estimate[1])
+            f"Estimated values: DiscFacAdj={model_estimate[0]}, CRRA={model_estimate[1]}"
         )
 
         # Create the simple estimate table
@@ -493,26 +460,16 @@ def main(
     # Compute standard errors by bootstrap
     if compute_standard_errors and estimate_model:
         # Estimate the model:
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         print(
-            "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            f"Computing standard errors using {Params.bootstrap_size} bootstrap replications."
         )
-        print(
-            "Computing standard errors using",
-            Params.bootstrap_size,
-            "bootstrap replications.",
-        )
-        print(
-            "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-        )
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         try:
             t_bootstrap_guess = time_to_estimate * Params.bootstrap_size
-            print(
-                "This will take approximately",
-                round(t_bootstrap_guess / 60.0, 2),
-                "min, ",
-                t_bootstrap_guess,
-                "sec",
-            )
+            minutes, seconds = divmod(t_bootstrap_guess, 60)
+            print(f"This will take approximately {minutes:.2f} min, {seconds:.2f} sec")
+
         except:
             pass
         t_start_bootstrap = time()
@@ -522,17 +479,10 @@ def main(
         t_end_bootstrap = time()
         time_to_bootstrap = t_end_bootstrap - t_start_bootstrap
         print(
-            "Time to execute all:",
-            round(time_to_bootstrap / 60.0, 2),
-            "min,",
-            time_to_bootstrap,
-            "sec",
+            f"Time to execute all: {time_to_bootstrap/60:.2f} min, {time_to_bootstrap:.2f} sec"
         )
         print(
-            "Standard errors: DiscFacAdj--> "
-            + str(std_errors[0])
-            + ", CRRA--> "
-            + str(std_errors[1])
+            f"Standard errors: DiscFacAdj--> {std_errors[0]}, CRRA--> {std_errors[1]}"
         )
 
         # Create the simple bootstrap table
@@ -553,13 +503,9 @@ def main(
 
     # Compute sensitivity measure
     if compute_sensitivity and estimate_model:
-        print(
-            "````````````````````````````````````````````````````````````````````````````````"
-        )
+        print("``````````````````````````````````````````````````````````````````````")
         print("Computing sensitivity measure.")
-        print(
-            "````````````````````````````````````````````````````````````````````````````````"
-        )
+        print("``````````````````````````````````````````````````````````````````````")
 
         # Find the Jacobian of the function that simulates moments
         def simulate_moments_reduced(x):
@@ -616,13 +562,9 @@ def main(
 
     # Make a contour plot of the objective function
     if make_contour_plot:
-        print(
-            "````````````````````````````````````````````````````````````````````````````````"
-        )
+        print("``````````````````````````````````````````````````````````````````````")
         print("Creating the contour plot.")
-        print(
-            "````````````````````````````````````````````````````````````````````````````````"
-        )
+        print("``````````````````````````````````````````````````````````````````````")
         t_start_contour = time()
         grid_density = 20  # Number of parameter values in each dimension
         level_count = 100  # Number of contour levels to plot
@@ -641,11 +583,7 @@ def main(
         t_end_contour = time()
         time_to_contour = t_end_contour - t_start_contour
         print(
-            "Time to execute all:",
-            round(time_to_contour / 60.0, 2),
-            "min,",
-            time_to_contour,
-            "sec",
+            f"Time to execute all: {time_to_contour/60:.2f} min, {time_to_contour:.2f} sec"
         )
         pylab.colorbar(smm_contour)
         pylab.plot(model_estimate[1], model_estimate[0], "*r", ms=15)

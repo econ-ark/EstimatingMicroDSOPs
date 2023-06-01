@@ -2,9 +2,8 @@
 Specifies the full set of calibrated values required to estimate the SolvingMicroDSOPs
 model.  The empirical data is stored in a separate csv file and is loaded in SetupSCFdata.
 """
-from __future__ import print_function
 import numpy as np
-from HARK.Calibration.Income.IncomeTools import parse_income_spec, CGM_income
+from HARK.Calibration.Income.IncomeTools import CGM_income, parse_income_spec
 from HARK.datasets.life_tables.us_ssa.SSATools import parse_ssa_life_table
 
 # ---------------------------------------------------------------------------------
@@ -34,19 +33,17 @@ aXtraHuge = None  # A very large value of assets to add to the grid, not used
 aXtraExtra = None  # Some other value of assets to add to the grid, not used
 aXtraCount = 8  # Number of points in the grid of "assets above minimum"
 
-BoroCnstArt = 0.0  # Artificial borrowing constraint; imposed minimum level of end-of period assets
-CubicBool = (
-    True  # Use cubic spline interpolation when True, linear interpolation when False
-)
+# Artificial borrowing constraint; imposed minimum level of end-of period assets
+BoroCnstArt = 0.0
+# Use cubic spline interpolation when True, linear interpolation when False
+CubicBool = True
 vFuncBool = False  # Whether to calculate the value function during solution
 
 Rfree = 1.03  # Interest factor on assets
-PermShkCount = (
-    7  # Number of points in discrete approximation to permanent income shocks
-)
-TranShkCount = (
-    7  # Number of points in discrete approximation to transitory income shocks
-)
+# Number of points in discrete approximation to permanent income shocks
+PermShkCount = 7
+# Number of points in discrete approximation to transitory income shocks
+TranShkCount = 7
 UnempPrb = 0.005  # Probability of unemployment while working
 UnempPrbRet = 0.000  # Probability of "unemployment" while retired
 IncUnemp = 0.0  # Unemployment benefits replacement rate
@@ -58,16 +55,14 @@ initial_age = 25  # Age at which the consumer enters the model
 TT = final_age - initial_age  # Total number of periods in the model
 retirement_t = retirement_age - initial_age - 1
 
-CRRA_start = 4.0  # Initial guess of the coefficient of relative risk aversion during estimation (rho)
-DiscFacAdj_start = 0.99  # Initial guess of the adjustment to the discount factor during estimation (beth)
-DiscFacAdj_bound = [
-    0.0001,
-    15.0,
-]  # Bounds for beth; if violated, objective function returns "penalty value"
-CRRA_bound = [
-    0.0001,
-    15.0,
-]  # Bounds for rho; if violated, objective function returns "penalty value"
+# Initial guess of the coefficient of relative risk aversion during estimation (rho)
+CRRA_start = 4.0
+# Initial guess of the adjustment to the discount factor during estimation (beth)
+DiscFacAdj_start = 0.99
+# Bounds for beth; if violated, objective function returns "penalty value"
+DiscFacAdj_bound = [0.0001, 15.0]
+# Bounds for rho; if violated, objective function returns "penalty value"
+CRRA_bound = [0.0001, 15.0]
 
 # Income
 ss_variances = True
@@ -164,12 +159,10 @@ empirical_cohort_age_groups = [
     [56, 57, 58, 59, 60],
 ]
 
-initial_wealth_income_ratio_vals = np.array(
-    [0.17, 0.5, 0.83]
-)  # Three point discrete distribution of initial w
-initial_wealth_income_ratio_probs = np.array(
-    [0.33333, 0.33333, 0.33334]
-)  # Equiprobable discrete distribution of initial w
+# Three point discrete distribution of initial w
+initial_wealth_income_ratio_vals = np.array([0.17, 0.5, 0.83])
+# Equiprobable discrete distribution of initial w
+initial_wealth_income_ratio_probs = np.array([0.33333, 0.33333, 0.33334])
 num_agents = 10000  # Number of agents to simulate
 bootstrap_size = 50  # Number of re-estimations to do during bootstrap
 seed = 31382  # Just an integer to seed the estimation
