@@ -15,12 +15,14 @@ import os
 import sys
 from time import time  # Timing utility
 
-# Import modules from core HARK libraries:
-# The consumption-saving micro model
-import HARK.ConsumptionSaving.ConsIndShockModel as Model
 import matplotlib.pyplot as plt
 import numpy as np  # Numeric Python
 import pylab  # Python reproductions of some Matlab functions
+
+# Import modules from core HARK libraries:
+# The consumption-saving micro model
+from HARK.ConsumptionSaving.ConsIndShockModel import IndShockConsumerType
+from HARK.ConsumptionSaving.ConsPortfolioModel import PortfolioConsumerType
 
 # Method for sampling from a discrete distribution
 from HARK.distribution import DiscreteDistribution
@@ -68,35 +70,11 @@ local_make_contour_plot = True
 # =====================================================
 
 
-class TempConsumerType(Model.IndShockConsumerType):
+class TempConsumerType:
     """
     A very lightly edited version of IndShockConsumerType.  Uses an alternate method of making new
     consumers and specifies DiscFac as being age-dependent.  Called "temp" because only used here.
     """
-
-    def __init__(self, cycles=1, time_flow=True, **kwds):
-        """
-        Make a new consumer type.
-
-        Parameters
-        ----------
-        cycles : int
-            Number of times the sequence of periods should be solved.
-        time_flow : boolean
-            Whether time is currently "flowing" forward for this instance.
-
-        Returns
-        -------
-        None
-        """
-        # Initialize a basic AgentType
-        Model.IndShockConsumerType.__init__(
-            self, cycles=cycles, time_flow=time_flow, **kwds
-        )
-        # This estimation uses age-varying discount factors as
-        # estimated by Cagetti (2003), so switch from time_inv to time_vary
-        self.add_to_time_vary("DiscFac")
-        self.del_from_time_inv("DiscFac")
 
     def simBirth(self, which_agents):
         """
@@ -124,9 +102,47 @@ class TempConsumerType(Model.IndShockConsumerType):
         return None
 
 
+class IndShkLifeCycleConsumerType(TempConsumerType, IndShockConsumerType):
+    def __init__(self, cycles=1, time_flow=True, **kwds):
+        """
+        Make a new consumer type.
+
+        Parameters
+        ----------
+        cycles : int
+            Number of times the sequence of periods should be solved.
+        time_flow : boolean
+            Whether time is currently "flowing" forward for this instance.
+
+        Returns
+        -------
+        None
+        """
+        # Initialize a basic AgentType
+        IndShockConsumerType.__init__(self, cycles=cycles, time_flow=time_flow, **kwds)
+        # This estimation uses age-varying discount factors as
+        # estimated by Cagetti (2003), so switch from time_inv to time_vary
+        self.add_to_time_vary("DiscFac")
+        self.del_from_time_inv("DiscFac")
+
+
+class PortfolioLifeCycleConsumerType(TempConsumerType, PortfolioConsumerType):
+    def __init__(self, cycles=1, time_flow=True, **kwds):
+        PortfolioConsumerType.__init__(self, cycles=cycles, time_flow=time_flow, **kwds)
+        self.add_to_time_vary("DiscFac")
+        self.del_from_time_inv("DiscFac")
+
+    def check_restrictions(self):
+        return None
+
+    def post_solve(self):
+        for solution in self.solution:
+            solution.cFunc = solution.cFuncAdj
+
+
 # Make a lifecycle consumer to be used for estimation, including simulated shocks (plus an initial distribution of wealth)
 # Make a TempConsumerType for estimation
-EstimationAgent = TempConsumerType(**Params.init_consumer_objects)
+EstimationAgent = PortfolioLifeCycleConsumerType(**Params.init_consumer_objects)
 # Set the number of periods to simulate
 EstimationAgent.T_sim = EstimationAgent.T_cycle + 1
 # Choose to track bank balances as wealth
@@ -424,7 +440,7 @@ def main(
         )
         print("----------------------------------------------------------------------")
         test_fobj = smmObjectiveFxnReduced(initial_guess)
-        if not np.isclose(test_fobj, 319.2681355749311):
+        if not np.isclose(test_fobj, 928.1054754457323):
             print(test_fobj)
             raise ValueError(
                 "Objective function is not what it should be. Something changed"
@@ -565,10 +581,15 @@ def main(
         print("Creating the contour plot.")
         print("``````````````````````````````````````````````````````````````````````")
         t_start_contour = time()
+        DiscFac_star, CRRA_star = model_estimate
         grid_density = 20  # Number of parameter values in each dimension
         level_count = 100  # Number of contour levels to plot
-        DiscFacAdj_list = np.linspace(0.85, 1.05, grid_density)
-        CRRA_list = np.linspace(2, 8, grid_density)
+        DiscFacAdj_list = np.linspace(
+            max(DiscFac_star - 0.25, 0.5), min(DiscFac_star + 0.25, 1.05), grid_density
+        )
+        CRRA_list = np.linspace(
+            max(CRRA_star - 5, 2), min(CRRA_star + 5, 8), grid_density
+        )
         CRRA_mesh, DiscFacAdj_mesh = pylab.meshgrid(CRRA_list, DiscFacAdj_list)
         smm_obj_levels = np.empty([grid_density, grid_density])
         for j in range(grid_density):
