@@ -1,31 +1,27 @@
 """
 Sets up the SCF data for use in the SolvingMicroDSOPs estimation.
 """
-from __future__ import division  # Use new division function
-from __future__ import print_function
-from __future__ import absolute_import
-from builtins import zip
-from builtins import str
-from builtins import range
 
-import os, sys
+
+import os
+
+import numpy as np  # Numerical Python
+import pandas as pd
+
+from Calibration.EstimationParameters import empirical_cohort_age_groups, initial_age
 
 # Find pathname to this file:
 my_file_path = os.path.dirname(os.path.abspath(__file__))
 
 # Pathnames to the other files:
-calibration_dir = os.path.join(
-    my_file_path, "../Calibration/"
-)  # Relative directory for primitive parameter files
-tables_dir = os.path.join(
-    my_file_path, "../Tables/"
-)  # Relative directory for primitive parameter files
-figures_dir = os.path.join(
-    my_file_path, "../Figures/"
-)  # Relative directory for primitive parameter files
-code_dir = os.path.join(
-    my_file_path, "../Code/"
-)  # Relative directory for primitive parameter files
+# Relative directory for primitive parameter files
+calibration_dir = os.path.join(my_file_path, "../Calibration/")
+# Relative directory for primitive parameter files
+tables_dir = os.path.join(my_file_path, "../Tables/")
+# Relative directory for primitive parameter files
+figures_dir = os.path.join(my_file_path, "../Figures/")
+# Relative directory for primitive parameter files
+code_dir = os.path.join(my_file_path, "../Code/")
 
 
 # Need to rely on the manual insertion of pathnames to all files in do_all.py
@@ -33,18 +29,13 @@ code_dir = os.path.join(
 # copied from do_all.py to here
 
 # Import files first:
-from EstimationParameters import initial_age, empirical_cohort_age_groups
 
 
 # The following libraries are part of the standard python distribution
-import numpy as np  # Numerical Python
-import csv  # Comma-separated variable reader
-import pandas as pd
 
 # Set the path to the empirical data:
-scf_data_path = data_location = os.path.dirname(
-    os.path.abspath(__file__)
-)  # os.path.abspath('./')   #'./'
+# os.path.abspath('./')   #'./'
+scf_data_path = data_location = os.path.dirname(os.path.abspath(__file__))
 
 
 data = pd.read_csv(scf_data_path + "/SCFdata.csv")
