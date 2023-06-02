@@ -10,3 +10,7 @@ def test_low_resource():
 def test_medium_resource():
     print("Running medium-resource replication...")
     estimate(**medium_resource)
+
+def test_portfolio_medium_resource():
+    print("Running medium-resource replication...")
+    estimate(**medium_resource, estimation_agent="Portfolio")

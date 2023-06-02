@@ -140,6 +140,8 @@ class PortfolioLifeCycleConsumerType(TempConsumerType, PortfolioConsumerType):
     def post_solve(self):
         for solution in self.solution:
             solution.cFunc = solution.cFuncAdj
+            share = solution.ShareFuncAdj
+            solution.ShareFuncAdj = lambda m: np.clip(share(m), 0.0, 1.0)
 
 
 def weighted_median(values, weights):

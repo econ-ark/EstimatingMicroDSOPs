@@ -138,7 +138,6 @@ def run_replication():
     else:
         return
 
-    print(replication_specs)
     estimate(**replication_specs)
 
 
