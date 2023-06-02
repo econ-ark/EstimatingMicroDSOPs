@@ -57,6 +57,8 @@ sys.path.insert(0, os.path.abspath(calibration_dir))
 
 
 # Set booleans to determine which tasks should be done
+# Which agent type to estimate ("IndShock" or "Portfolio")
+local_estimation_agent = "IndShock"
 local_estimate_model = True  # Whether to estimate the model
 # Whether to get standard errors via bootstrap
 local_compute_standard_errors = False
@@ -140,22 +142,6 @@ class PortfolioLifeCycleConsumerType(TempConsumerType, PortfolioConsumerType):
             solution.cFunc = solution.cFuncAdj
 
 
-# Make a lifecycle consumer to be used for estimation, including simulated shocks (plus an initial distribution of wealth)
-# Make a TempConsumerType for estimation
-EstimationAgent = PortfolioLifeCycleConsumerType(**Params.init_consumer_objects)
-# Set the number of periods to simulate
-EstimationAgent.T_sim = EstimationAgent.T_cycle + 1
-# Choose to track bank balances as wealth
-EstimationAgent.track_vars = ["bNrm"]
-# Draw initial assets for each consumer
-EstimationAgent.aNrmInit = DiscreteDistribution(
-    Params.initial_wealth_income_ratio_probs,
-    Params.initial_wealth_income_ratio_vals,
-    seed=Params.seed,
-).draw(N=Params.num_agents)
-EstimationAgent.make_shock_history()
-
-
 def weighted_median(values, weights):
     inds = np.argsort(values)
     values = values[inds]
@@ -188,14 +174,11 @@ def get_targeted_moments(
     return tgt_moments
 
 
-targeted_moments = get_targeted_moments()
-
-
 # Define the objective function for the simulated method of moments estimation
 def simulate_moments(
     DiscFacAdj,
     CRRA,
-    agent=EstimationAgent,
+    agent,
     DiscFacAdj_bound=Params.DiscFacAdj_bound,
     CRRA_bound=Params.CRRA_bound,
     map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices,
@@ -244,10 +227,10 @@ def simulate_moments(
 def smmObjectiveFxn(
     DiscFacAdj,
     CRRA,
-    agent=EstimationAgent,
+    agent,
+    tgt_moments,
     DiscFacAdj_bound=Params.DiscFacAdj_bound,
     CRRA_bound=Params.CRRA_bound,
-    tgt_moments=targeted_moments,
     map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices,
 ):
     """
@@ -311,20 +294,10 @@ def smmObjectiveFxn(
     return loss
 
 
-# Make a single-input lambda function for use in the optimizer
-def smmObjectiveFxnReduced(parameters_to_estimate):
-    """
-    A "reduced form" of the SMM objective function, compatible with the optimizer.
-    Identical to smmObjectiveFunction, but takes only a single input as a length-2
-    list representing [DiscFacAdj,CRRA].
-    """
-    return smmObjectiveFxn(
-        DiscFacAdj=parameters_to_estimate[0], CRRA=parameters_to_estimate[1]
-    )
-
-
 # Define the bootstrap procedure
-def calculateStandardErrorsByBootstrap(initial_estimate, N, seed=0, verbose=False):
+def calculateStandardErrorsByBootstrap(
+    initial_estimate, N, agent, seed=0, verbose=False
+):
     """
     Calculates standard errors by repeatedly re-estimating the model with datasets
     resampled from the actual data.
@@ -378,6 +351,7 @@ def calculateStandardErrorsByBootstrap(initial_estimate, N, seed=0, verbose=Fals
             return smmObjectiveFxn(
                 DiscFacAdj=parameters_to_estimate[0],
                 CRRA=parameters_to_estimate[1],
+                agent=agent,
                 tgt_moments=bstrap_tgt_moments,
                 map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices,
             )
@@ -406,7 +380,8 @@ def calculateStandardErrorsByBootstrap(initial_estimate, N, seed=0, verbose=Fals
 # =================================================================
 
 
-def main(
+def estimate(
+    estimation_agent=local_estimation_agent,
     estimate_model=local_estimate_model,
     compute_standard_errors=local_compute_standard_errors,
     compute_sensitivity=local_compute_sensitivity,
@@ -431,6 +406,29 @@ def main(
     None
     """
 
+    if estimation_agent == "IndShock":
+        agent_type = IndShkLifeCycleConsumerType
+    elif estimation_agent == "Portfolio":
+        agent_type = PortfolioLifeCycleConsumerType
+
+    # Make a lifecycle consumer to be used for estimation, including simulated
+    # shocks (plus an initial distribution of wealth)
+    # Make a TempConsumerType for estimation
+    EstimationAgent = agent_type(**Params.init_consumer_objects)
+    # Set the number of periods to simulate
+    EstimationAgent.T_sim = EstimationAgent.T_cycle + 1
+    # Choose to track bank balances as wealth
+    EstimationAgent.track_vars = ["bNrm"]
+    # Draw initial assets for each consumer
+    EstimationAgent.aNrmInit = DiscreteDistribution(
+        Params.initial_wealth_income_ratio_probs,
+        Params.initial_wealth_income_ratio_vals,
+        seed=Params.seed,
+    ).draw(N=Params.num_agents)
+    EstimationAgent.make_shock_history()
+
+    targeted_moments = get_targeted_moments()
+
     # Estimate the model using Nelder-Mead
     if estimate_model:
         initial_guess = [Params.DiscFacAdj_start, Params.CRRA_start]
@@ -439,12 +437,20 @@ def main(
             f"Now estimating the model using Nelder-Mead from an initial guess of {initial_guess}..."
         )
         print("----------------------------------------------------------------------")
-        test_fobj = smmObjectiveFxnReduced(initial_guess)
-        # if not np.isclose(test_fobj, 319.2681355749311):
-        #     print(test_fobj)
-        #     raise ValueError(
-        #         "Objective function is not what it should be. Something changed"
-        #     )
+
+        # Make a single-input lambda function for use in the optimizer
+        def smmObjectiveFxnReduced(parameters_to_estimate):
+            """
+            A "reduced form" of the SMM objective function, compatible with the optimizer.
+            Identical to smmObjectiveFunction, but takes only a single input as a length-2
+            list representing [DiscFacAdj,CRRA].
+            """
+            return smmObjectiveFxn(
+                DiscFacAdj=parameters_to_estimate[0],
+                CRRA=parameters_to_estimate[1],
+                agent=EstimationAgent,
+                tgt_moments=targeted_moments,
+            )
 
         t_start_estimate = time()
         model_estimate = minimize_nelder_mead(
@@ -461,7 +467,9 @@ def main(
         )
 
         # Create the simple estimate table
-        estimate_results_file = os.path.join(tables_dir, "estimate_results.csv")
+        estimate_results_file = os.path.join(
+            tables_dir, estimation_agent + "_estimate_results.csv"
+        )
         with open(estimate_results_file, "wt") as f:
             writer = csv.writer(f)
             writer.writerow(["DiscFacAdj", "CRRA"])
@@ -489,7 +497,11 @@ def main(
             pass
         t_start_bootstrap = time()
         std_errors = calculateStandardErrorsByBootstrap(
-            model_estimate, N=Params.bootstrap_size, seed=Params.seed, verbose=True
+            model_estimate,
+            N=Params.bootstrap_size,
+            agent=EstimationAgent,
+            seed=Params.seed,
+            verbose=True,
         )
         t_end_bootstrap = time()
         time_to_bootstrap = t_end_bootstrap - t_start_bootstrap
@@ -501,7 +513,9 @@ def main(
         )
 
         # Create the simple bootstrap table
-        bootstrap_results_file = os.path.join(tables_dir, "bootstrap_results.csv")
+        bootstrap_results_file = os.path.join(
+            tables_dir, estimation_agent + "_bootstrap_results.csv"
+        )
         with open(bootstrap_results_file, "wt") as f:
             writer = csv.writer(f)
             writer.writerow(
@@ -570,8 +584,8 @@ def main(
         axs[1].set_ylabel("Sensitivity")
         axs[1].set_xlabel("Median W/Y Ratio")
 
-        plt.savefig(os.path.join(figures_dir, "Sensitivity.pdf"))
-        plt.savefig(os.path.join(figures_dir, "Sensitivity.png"))
+        plt.savefig(os.path.join(figures_dir, estimation_agent + "Sensitivity.pdf"))
+        plt.savefig(os.path.join(figures_dir, estimation_agent + "Sensitivity.png"))
 
         plt.show()
 
@@ -596,7 +610,12 @@ def main(
             DiscFacAdj = DiscFacAdj_list[j]
             for k in range(grid_density):
                 CRRA = CRRA_list[k]
-                smm_obj_levels[j, k] = smmObjectiveFxn(DiscFacAdj, CRRA)
+                smm_obj_levels[j, k] = smmObjectiveFxn(
+                    DiscFacAdj,
+                    CRRA,
+                    agent=EstimationAgent,
+                    tgt_moments=targeted_moments,
+                )
         smm_contour = pylab.contourf(
             CRRA_mesh, DiscFacAdj_mesh, smm_obj_levels, level_count
         )
@@ -609,10 +628,10 @@ def main(
         pylab.plot(model_estimate[1], model_estimate[0], "*r", ms=15)
         pylab.xlabel(r"coefficient of relative risk aversion $\rho$", fontsize=14)
         pylab.ylabel(r"discount factor adjustment $\beth$", fontsize=14)
-        pylab.savefig(os.path.join(figures_dir, "SMMcontour.pdf"))
-        pylab.savefig(os.path.join(figures_dir, "SMMcontour.png"))
+        pylab.savefig(os.path.join(figures_dir, estimation_agent + "SMMcontour.pdf"))
+        pylab.savefig(os.path.join(figures_dir, estimation_agent + "SMMcontour.png"))
         pylab.show()
 
 
 if __name__ == "__main__":
-    main()
+    estimate()

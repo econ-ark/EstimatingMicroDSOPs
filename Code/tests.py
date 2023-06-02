@@ -1,11 +1,12 @@
-from do_all import low_resource, medium_resource, struct
+from Code.StructEstimation import estimate
+from Calibration.Options import low_resource, medium_resource
 
 
 def test_low_resource():
     print("Running low-resource replication...")
-    struct.main(**low_resource)
+    estimate(**low_resource)
 
 
 def test_medium_resource():
     print("Running medium-resource replication...")
-    struct.main(**medium_resource)
+    estimate(**medium_resource)

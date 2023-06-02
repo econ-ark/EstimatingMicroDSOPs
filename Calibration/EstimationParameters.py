@@ -31,7 +31,7 @@ aXtraMin = 0.001  # Minimum end-of-period "assets above minimum" value
 aXtraMax = 20  # Maximum end-of-period "assets above minimum" value
 aXtraHuge = None  # A very large value of assets to add to the grid, not used
 aXtraExtra = None  # Some other value of assets to add to the grid, not used
-aXtraCount = 100  # Number of points in the grid of "assets above minimum"
+aXtraCount = 50  # Number of points in the grid of "assets above minimum"
 
 # Artificial borrowing constraint; imposed minimum level of end-of period assets
 BoroCnstArt = 0.0

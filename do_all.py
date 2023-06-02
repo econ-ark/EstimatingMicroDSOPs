@@ -50,7 +50,13 @@ still run.
 import os
 import sys
 
-import Code.StructEstimation as struct
+from Code.StructEstimation import estimate
+from Calibration.Options import (
+    low_resource,
+    medium_resource,
+    high_resource,
+    all_replications,
+)
 
 # Find pathname to this file:
 my_file_path = os.path.dirname(os.path.abspath(__file__))
@@ -78,52 +84,17 @@ sys.path.insert(0, my_file_path)
 # Manual import needed, should draw from first instance at start of Python
 # PATH added above:
 
-# Define settings for "main()" function in StructuralEstiamtion.py based on
-# resource requirements:
-
-low_resource = {
-    "estimate_model": True,
-    "make_contour_plot": False,
-    "compute_standard_errors": False,
-    "compute_sensitivity": False,
-}
-# Author note:
-# This takes approximately 90 seconds on a laptop with the following specs:
-# Linux, Ubuntu 14.04.1 LTS, 8G of RAM, Intel(R) Core(TM) i7-4700MQ CPU @ 2.40GHz
-
-medium_resource = {
-    "estimate_model": True,
-    "make_contour_plot": True,
-    "compute_standard_errors": False,
-    "compute_sensitivity": True,
-}
-# Author note:
-# This takes approximately 7 minutes on a laptop with the following specs:
-# Linux, Ubuntu 14.04.1 LTS, 8G of RAM, Intel(R) Core(TM) i7-4700MQ CPU @ 2.40GHz
-
-high_resource = {
-    "estimate_model": True,
-    "make_contour_plot": False,
-    "compute_standard_errors": True,
-    "compute_sensitivity": True,
-}
-# Author note:
-# This takes approximately 30 minutes on a laptop with the following specs:
-# Linux, Ubuntu 14.04.1 LTS, 8G of RAM, Intel(R) Core(TM) i7-4700MQ CPU @ 2.40GHz
-
-all_replications = {
-    "estimate_model": True,
-    "make_contour_plot": True,
-    "compute_standard_errors": True,
-    "compute_sensitivity": True,
-}
-# Author note:
-# This takes approximately 40 minutes on a laptop with the following specs:
-# Linux, Ubuntu 14.04.1 LTS, 8G of RAM, Intel(R) Core(TM) i7-4700MQ CPU @ 2.40GHz
-
 
 # Ask the user which replication to run, and run it:
 def run_replication():
+    which_model = input(
+        """Which model would you like to run?
+        
+        [1] IndShockConsumerType
+        
+        2   PortfolioConsumerType \n\n"""
+    )
+
     which_replication = input(
         """Which replication would you like to run? (See documentation in do_all.py for details.) Please enter the option number to run that option; default is in brackets:
 
@@ -138,27 +109,37 @@ def run_replication():
          q  quit: exit without executing.\n\n"""
     )
 
+    replication_specs = {}
+
+    if which_model == "1" or which_model == "":
+        replication_specs["estimation_agent"] = "IndShock"
+    elif which_model == "2":
+        replication_specs["estimation_agent"] = "Portfolio"
+
     if which_replication == "q":
         return
 
     elif which_replication == "1" or which_replication == "":
         print("Running low-resource replication...")
-        struct.main(**low_resource)
+        replication_specs.update(**low_resource)
 
     elif which_replication == "2":
         print("Running medium-resource replication...")
-        struct.main(**medium_resource)
+        replication_specs.update(**medium_resource)
 
     elif which_replication == "3":
         print("Running high-resource replication...")
-        struct.main(**high_resource)
+        replication_specs.update(**high_resource)
 
     elif which_replication == "4":
         print("Running all replications...")
-        struct.main(**all_replications)
+        replication_specs.update(**all_replications)
 
     else:
         return
+
+    print(replication_specs)
+    estimate(**replication_specs)
 
 
 if __name__ == "__main__":
