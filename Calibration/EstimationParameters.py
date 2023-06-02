@@ -26,17 +26,17 @@ show_PermGroFacAgg_error = False
 # - Define all of the model parameters for SolvingMicroDSOPs and ConsumerExamples -
 # ---------------------------------------------------------------------------------
 
-exp_nest = 3  # Number of times to "exponentially nest" when constructing a_grid
+exp_nest = 2  # Number of times to "exponentially nest" when constructing a_grid
 aXtraMin = 0.001  # Minimum end-of-period "assets above minimum" value
 aXtraMax = 20  # Maximum end-of-period "assets above minimum" value
 aXtraHuge = None  # A very large value of assets to add to the grid, not used
 aXtraExtra = None  # Some other value of assets to add to the grid, not used
-aXtraCount = 8  # Number of points in the grid of "assets above minimum"
+aXtraCount = 100  # Number of points in the grid of "assets above minimum"
 
 # Artificial borrowing constraint; imposed minimum level of end-of period assets
 BoroCnstArt = 0.0
 # Use cubic spline interpolation when True, linear interpolation when False
-CubicBool = True
+CubicBool = False
 vFuncBool = False  # Whether to calculate the value function during solution
 
 Rfree = 1.03  # Interest factor on assets
@@ -56,9 +56,9 @@ TT = final_age - initial_age  # Total number of periods in the model
 retirement_t = retirement_age - initial_age - 1
 
 # Initial guess of the coefficient of relative risk aversion during estimation (rho)
-CRRA_start = 4.0
+CRRA_start = 5.0
 # Initial guess of the adjustment to the discount factor during estimation (beth)
-DiscFacAdj_start = 0.99
+DiscFacAdj_start = 0.90
 # Bounds for beth; if violated, objective function returns "penalty value"
 DiscFacAdj_bound = [0.0001, 15.0]
 # Bounds for rho; if violated, objective function returns "penalty value"
