@@ -26,9 +26,9 @@ show_PermGroFacAgg_error = False
 # - Define all of the model parameters for SolvingMicroDSOPs and ConsumerExamples -
 # ---------------------------------------------------------------------------------
 
-exp_nest = 2  # Number of times to "exponentially nest" when constructing a_grid
+exp_nest = 3  # Number of times to "exponentially nest" when constructing a_grid
 aXtraMin = 0.001  # Minimum end-of-period "assets above minimum" value
-aXtraMax = 20  # Maximum end-of-period "assets above minimum" value
+aXtraMax = 50  # Maximum end-of-period "assets above minimum" value
 aXtraHuge = None  # A very large value of assets to add to the grid, not used
 aXtraExtra = None  # Some other value of assets to add to the grid, not used
 aXtraCount = 50  # Number of points in the grid of "assets above minimum"
