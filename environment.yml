@@ -6,3 +6,6 @@ dependencies:
   - econ-ark=0.13
   - matplotlib
   - numpy
+  - pip
+  - pip:
+      - git+https://github.com/econ-ark/HARK@master
