@@ -92,7 +92,13 @@ def run_replication():
         
         [1] IndShockConsumerType
         
-        2   PortfolioConsumerType \n\n"""
+        2   PortfolioConsumerType 
+        
+        3   BequestWarmGlowConsumerType
+        
+        4   BequestWarmGlowPortfolioType
+        
+        5   WealthPortfolioConsumerType \n\n"""
     )
 
     which_replication = input(
@@ -115,6 +121,15 @@ def run_replication():
         replication_specs["estimation_agent"] = "IndShock"
     elif which_model == "2":
         replication_specs["estimation_agent"] = "Portfolio"
+    elif which_model == "3":
+        replication_specs["estimation_agent"] = "WarmGlow"
+    elif which_model == "4":
+        replication_specs["estimation_agent"] = "WarmGlowPortfolio"
+    elif which_model == "5":
+        replication_specs["estimation_agent"] = "WealthPortfolio"
+    else:
+        print("Invalid model choice.")
+        return
 
     if which_replication == "q":
         return
@@ -136,6 +151,7 @@ def run_replication():
         replication_specs.update(**all_replications)
 
     else:
+        print("Invalid replication choice.")
         return
 
     estimate(**replication_specs)

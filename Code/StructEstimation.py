@@ -34,6 +34,11 @@ from scipy.optimize import approx_fprime
 # Parameters for the consumer type and the estimation
 import Calibration.EstimationParameters as Params
 import Calibration.SetupSCFdata as Data  # SCF 2004 data on household wealth
+from HARK.ConsumptionSaving.ConsBequestModel import (
+    BequestWarmGlowConsumerType,
+    BequestWarmGlowPortfolioType,
+)
+from Code.ConsWealthPortfolioModel import WealthPortfolioConsumerType
 
 # Find pathname to this file:
 my_file_path = os.path.dirname(os.path.abspath(__file__))
@@ -95,6 +100,9 @@ class TempConsumerType:
         self.add_to_time_vary("DiscFac")
         self.del_from_time_inv("DiscFac")
 
+    def check_restrictions(self):
+        return None
+
     def simBirth(self, which_agents):
         """
         Alternate method for simulating initial states for simulated agents, drawing from a finite
@@ -134,14 +142,44 @@ class PortfolioLifeCycleConsumerType(TempConsumerType, PortfolioConsumerType):
     consumers and specifies DiscFac as being age-dependent.  Called "temp" because only used here.
     """
 
-    def check_restrictions(self):
-        return None
+    def post_solve(self):
+        for solution in self.solution:
+            solution.cFunc = solution.cFuncAdj
+            share = solution.ShareFuncAdj
+            solution.ShareFuncAdj = lambda m: np.clip(share(m), 0.0, 1.0)
+
+
+class BequestWarmGlowLifeCycleConsumerType(
+    TempConsumerType, BequestWarmGlowConsumerType
+):
+    """
+    A very lightly edited version of BequestWarmGlowConsumerType.  Uses an alternate method of making new
+    consumers and specifies DiscFac as being age-dependent.  Called "temp" because only used here.
+    """
+
+
+class BequestWarmGlowLifeCyclePortfolioType(
+    TempConsumerType, BequestWarmGlowPortfolioType
+):
+    """
+    A very lightly edited version of BequestWarmGlowPortfolioType.  Uses an alternate method of making new
+    consumers and specifies DiscFac as being age-dependent.  Called "temp" because only used here.
+    """
 
     def post_solve(self):
         for solution in self.solution:
             solution.cFunc = solution.cFuncAdj
             share = solution.ShareFuncAdj
             solution.ShareFuncAdj = lambda m: np.clip(share(m), 0.0, 1.0)
+
+
+class WealthPortfolioLifeCycleConsumerType(
+    TempConsumerType, WealthPortfolioConsumerType
+):
+    """
+    A very lightly edited version of WealthPortfolioConsumerType.  Uses an alternate method of making new
+    consumers and specifies DiscFac as being age-dependent.  Called "temp" because only used here.
+    """
 
 
 def weighted_median(values, weights):
@@ -204,7 +242,7 @@ def simulate_moments(
     # Solve the model for these parameters, then simulate wealth data
     agent.solve()  # Solve the microeconomic model
     # "Unpack" the consumption function for convenient access
-    agent.unpack("cFunc")
+    # agent.unpack("cFunc")
     max_sim_age = max([max(ages) for ages in map_simulated_to_empirical_cohorts]) + 1
     # Initialize the simulation by clearing histories, resetting initial values
     agent.initialize_sim()
@@ -412,6 +450,12 @@ def estimate(
         agent_type = IndShkLifeCycleConsumerType
     elif estimation_agent == "Portfolio":
         agent_type = PortfolioLifeCycleConsumerType
+    elif estimation_agent == "WarmGlow":
+        agent_type = BequestWarmGlowLifeCycleConsumerType
+    elif estimation_agent == "WarmGlowPortfolio":
+        agent_type = BequestWarmGlowLifeCyclePortfolioType
+    elif estimation_agent == "WealthPortfolio":
+        agent_type = WealthPortfolioLifeCycleConsumerType
 
     # Make a lifecycle consumer to be used for estimation, including simulated
     # shocks (plus an initial distribution of wealth)
