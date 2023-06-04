@@ -7,7 +7,7 @@ from HARK.ConsumptionSaving.ConsPortfolioModel import (
     PortfolioConsumerType,
     init_portfolio,
 )
-from HARK.core import MetricObject, make_one_period_oo_solver
+from HARK.core import make_one_period_oo_solver
 from HARK.distribution import DiscreteDistribution, calc_expectation
 from HARK.interpolation import (
     BilinearInterp,
@@ -16,6 +16,7 @@ from HARK.interpolation import (
     MargValueFuncCRRA,
     ValueFuncCRRA,
 )
+from HARK.metric import MetricObject
 from HARK.rewards import CRRAutilityP_inv
 from HARK.utilities import NullFunc
 from scipy.optimize import fixed_point, minimize_scalar, root
@@ -40,13 +41,15 @@ class WealthPortfolioConsumerType(PortfolioConsumerType):
     time_inv_ = deepcopy(PortfolioConsumerType.time_inv_)
     time_inv_ = time_inv_ + ["WealthShare", "method"]
 
-    def __init__(self, **kwds):
+    def __init__(self, method="root", **kwds):
         params = init_wealth_portfolio.copy()
         params.update(kwds)
         kwds = params
 
         # Initialize a basic portfolio consumer type
         super().__init__(**kwds)
+
+        self.method = method
 
         solver = ConsWealthPortfolioSolver
 
@@ -85,6 +88,16 @@ class WealthPortfolioConsumerType(PortfolioConsumerType):
             vFunc=vFunc_terminal,
             vPfunc=vPfunc_terminal,
         )
+
+    def post_solve(self):
+        super().post_solve()
+
+        for solution in self.solution:
+            solution.cFuncAdj = solution.cFunc
+            solution.cFuncFxd = lambda m, s: solution.cFunc(m)
+            share = solution.shareFunc
+            solution.ShareFuncAdj = lambda m: np.clip(share(m), 0.0, 1.0)
+            solution.ShareFuncFxd = lambda m, s: np.clip(share(m), 0.0, 1.0)
 
 
 @dataclass
@@ -201,7 +214,7 @@ class ConsWealthPortfolioSolver(ConsPortfolioSolver):
         if self.zero_bound:
             # insert a point at zero
             return BilinearInterp(
-                np.insert(f_values, 0, 0.0), np.append(0.0, x_list), y_list
+                np.insert(f_values, 0, 0.0, axis=0), np.append(0.0, x_list), y_list
             )
         else:
             # already includes zero
