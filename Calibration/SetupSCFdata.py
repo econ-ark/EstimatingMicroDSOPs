@@ -2,7 +2,6 @@
 Sets up the SCF data for use in the SolvingMicroDSOPs estimation.
 """
 
-
 import os
 
 import numpy as np  # Numerical Python
@@ -23,7 +22,6 @@ figures_dir = os.path.join(my_file_path, "../Figures/")
 # Relative directory for primitive parameter files
 code_dir = os.path.join(my_file_path, "../Code/")
 
-
 # Need to rely on the manual insertion of pathnames to all files in do_all.py
 # NOTE sys.path.insert(0, os.path.abspath(tables_dir)), etc. may need to be
 # copied from do_all.py to here
@@ -36,7 +34,6 @@ code_dir = os.path.join(my_file_path, "../Code/")
 # Set the path to the empirical data:
 # os.path.abspath('./')   #'./'
 scf_data_path = data_location = os.path.dirname(os.path.abspath(__file__))
-
 
 data = pd.read_csv(scf_data_path + "/SCFdata.csv")
 
@@ -66,12 +63,10 @@ empirical_groups = np.concatenate(empirical_groups)
 # Generate a single array of SCF data, useful for resampling for bootstrap
 scf_data_array = np.array([w_to_y_data, empirical_groups, empirical_weights]).T
 
-
 # Generate a mapping between the real ages in the groups and the indices of simulated data
 simulation_map_cohorts_to_age_indices = []
 for ages in empirical_cohort_age_groups:
     simulation_map_cohorts_to_age_indices.append(np.array(ages) - initial_age)
-
 
 if __name__ == "__main__":
     print("Sorry, SetupSCFdata doesn't actually do anything on its own.")

@@ -2,7 +2,6 @@
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/econ-ark/SolvingMicroDSOPs/HEAD)
 
-
 To reproduces all the results in the repository first clone this repository locally:
 
 ```
@@ -13,7 +12,8 @@ $ git clone https://github.com/econ-ark/SolvingMicroDSOPs
 $ cd SolvingMicroDSOPs
 ```
 
-Then you can either use a local virtual env(conda) or [nbreproduce](https://github.com/econ-ark/nbreproduce) to reproduce to the results.
+Then you can either use a local virtual env(conda) or [nbreproduce](https://github.com/econ-ark/nbreproduce) to
+reproduce to the results.
 
 #### A local conda environment and execute the do_all.py file.
 
@@ -33,7 +33,6 @@ $ pip install nbreproduce
 # Reproduce all results using nbreproduce
 $ nbreproduce
 ```
-
 
 ## References
 

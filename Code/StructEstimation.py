@@ -9,7 +9,6 @@ consumption-saving model with idiosyncratic shocks to permanent and transitory
 income as defined in ConsIndShockModel.
 """
 
-
 import csv
 import os
 import sys
@@ -71,6 +70,7 @@ local_compute_standard_errors = False
 local_compute_sensitivity = True
 # Whether to make a contour map of the objective function
 local_make_contour_plot = True
+
 
 # =====================================================
 # Define objects and functions used for the estimation
@@ -404,7 +404,7 @@ def calculateStandardErrorsByBootstrap(
         # Report progress of the bootstrap
     if verbose:
         print(
-            f"Finished bootstrap estimation #{n+1} of {N} in {t_now-t_start} seconds ({t_now-t_0} cumulative)"
+            f"Finished bootstrap estimation #{n + 1} of {N} in {t_now - t_start} seconds ({t_now - t_0} cumulative)"
         )
 
     # Calculate the standard errors for each parameter
@@ -552,7 +552,7 @@ def estimate(
         t_end_bootstrap = time()
         time_to_bootstrap = t_end_bootstrap - t_start_bootstrap
         print(
-            f"Time to execute all: {time_to_bootstrap/60:.2f} min, {time_to_bootstrap:.2f} sec"
+            f"Time to execute all: {time_to_bootstrap / 60:.2f} min, {time_to_bootstrap:.2f} sec"
         )
         print(
             f"Standard errors: DiscFacAdj--> {std_errors[0]}, CRRA--> {std_errors[1]}"
@@ -668,7 +668,7 @@ def estimate(
         t_end_contour = time()
         time_to_contour = t_end_contour - t_start_contour
         print(
-            f"Time to execute all: {time_to_contour/60:.2f} min, {time_to_contour:.2f} sec"
+            f"Time to execute all: {time_to_contour / 60:.2f} min, {time_to_contour:.2f} sec"
         )
         pylab.colorbar(smm_contour)
         pylab.plot(model_estimate[1], model_estimate[0], "*r", ms=15)

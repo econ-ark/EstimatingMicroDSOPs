@@ -46,17 +46,16 @@ Python PATH with the locations of the MicroDSOP directory structure so it can
 still run.
 """
 
-
 import os
 import sys
 
-from Code.StructEstimation import estimate
 from Calibration.Options import (
     low_resource,
     medium_resource,
     high_resource,
     all_replications,
 )
+from Code.StructEstimation import estimate
 
 # Find pathname to this file:
 my_file_path = os.path.dirname(os.path.abspath(__file__))
@@ -71,7 +70,6 @@ figures_dir = os.path.join(my_file_path, "Figures")
 # Relative directory for primitive parameter files
 code_dir = os.path.join(my_file_path, "Code")
 
-
 # manually add the pathnames to the various files directly to the beginning
 # of the Python path. This will be needed for all files that will run in
 # lower directories.
@@ -80,6 +78,7 @@ sys.path.insert(0, tables_dir)
 sys.path.insert(0, figures_dir)
 sys.path.insert(0, code_dir)
 sys.path.insert(0, my_file_path)
+
 
 # Manual import needed, should draw from first instance at start of Python
 # PATH added above:

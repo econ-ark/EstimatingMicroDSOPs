@@ -616,7 +616,6 @@ init_wealth_portfolio["PermShkStd"] = [0.0]
 init_wealth_portfolio["UnempPrb"] = 0.0
 init_wealth_portfolio["WealthShare"] = 1 / 3
 
-
 # from TRP specs
 init_wealth_portfolio["RiskyAvg"] = 1.0486
 init_wealth_portfolio["RiskyStd"] = 0.1375
