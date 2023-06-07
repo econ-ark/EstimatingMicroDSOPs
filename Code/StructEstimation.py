@@ -18,6 +18,10 @@ from time import time  # Timing utility
 import matplotlib.pyplot as plt
 import numpy as np  # Numeric Python
 import pylab  # Python reproductions of some Matlab functions
+from HARK.ConsumptionSaving.ConsBequestModel import (
+    BequestWarmGlowConsumerType,
+    BequestWarmGlowPortfolioType,
+)
 
 # Import modules from core HARK libraries:
 # The consumption-saving micro model
@@ -32,12 +36,8 @@ from HARK.estimation import bootstrap_sample_from_data, minimize_nelder_mead
 from scipy.optimize import approx_fprime
 
 # Parameters for the consumer type and the estimation
-import Calibration.EstimationParameters as Params
-import Calibration.SetupSCFdata as Data  # SCF 2004 data on household wealth
-from HARK.ConsumptionSaving.ConsBequestModel import (
-    BequestWarmGlowConsumerType,
-    BequestWarmGlowPortfolioType,
-)
+import Calibration.EstimationParameters as parameters
+import Calibration.SetupSCFdata as data  # SCF 2004 data on household wealth
 from Code.ConsWealthPortfolioModel import WealthPortfolioConsumerType
 
 # Find pathname to this file:
@@ -196,10 +196,10 @@ def weighted_median(values, weights):
 
 
 def get_targeted_moments(
-    empirical_data=Data.w_to_y_data,
-    empirical_weights=Data.empirical_weights,
-    empirical_groups=Data.empirical_groups,
-    map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices,
+    empirical_data=data.w_to_y_data,
+    empirical_weights=data.empirical_weights,
+    empirical_groups=data.empirical_groups,
+    map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
 ):
     # Initialize
     group_count = len(map_simulated_to_empirical_cohorts)
@@ -219,9 +219,9 @@ def simulate_moments(
     DiscFacAdj,
     CRRA,
     agent,
-    DiscFacAdj_bound=Params.DiscFacAdj_bound,
-    CRRA_bound=Params.CRRA_bound,
-    map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices,
+    DiscFacAdj_bound=parameters.DiscFacAdj_bound,
+    CRRA_bound=parameters.CRRA_bound,
+    map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
 ):
     """
     A quick check to make sure that the parameter values are within bounds.
@@ -237,7 +237,7 @@ def simulate_moments(
         return 1e30 * np.ones(len(map_simulated_to_empirical_cohorts))
 
     # Update the agent with a new path of DiscFac based on this DiscFacAdj (and a new CRRA)
-    agent.DiscFac = [b * DiscFacAdj for b in Params.DiscFac_timevary]
+    agent.DiscFac = [b * DiscFacAdj for b in parameters.DiscFac_timevary]
     agent.CRRA = CRRA
     # Solve the model for these parameters, then simulate wealth data
     agent.solve()  # Solve the microeconomic model
@@ -269,9 +269,9 @@ def smmObjectiveFxn(
     CRRA,
     agent,
     tgt_moments,
-    DiscFacAdj_bound=Params.DiscFacAdj_bound,
-    CRRA_bound=Params.CRRA_bound,
-    map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices,
+    DiscFacAdj_bound=parameters.DiscFacAdj_bound,
+    CRRA_bound=parameters.CRRA_bound,
+    map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
 ):
     """
     The objective function for the SMM estimation.  Given values of discount factor
@@ -372,7 +372,7 @@ def calculateStandardErrorsByBootstrap(
 
         # Bootstrap a new dataset by resampling from the original data
         bootstrap_data = (
-            bootstrap_sample_from_data(Data.scf_data_array, seed=seed_list[n])
+            bootstrap_sample_from_data(data.scf_data_array, seed=seed_list[n])
         ).T
         w_to_y_data_bootstrap = bootstrap_data[0,]
         empirical_groups_bootstrap = bootstrap_data[1,]
@@ -383,7 +383,7 @@ def calculateStandardErrorsByBootstrap(
             empirical_data=w_to_y_data_bootstrap,
             empirical_weights=empirical_weights_bootstrap,
             empirical_groups=empirical_groups_bootstrap,
-            map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices,
+            map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
         )
 
         # Make a temporary function for use in this estimation run
@@ -393,7 +393,7 @@ def calculateStandardErrorsByBootstrap(
                 CRRA=parameters_to_estimate[1],
                 agent=agent,
                 tgt_moments=bstrap_tgt_moments,
-                map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices,
+                map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
             )
 
         # Estimate the model with the bootstrap data and add to list of estimates
@@ -460,24 +460,24 @@ def estimate(
     # Make a lifecycle consumer to be used for estimation, including simulated
     # shocks (plus an initial distribution of wealth)
     # Make a TempConsumerType for estimation
-    EstimationAgent = agent_type(**Params.init_consumer_objects)
+    EstimationAgent = agent_type(**parameters.init_consumer_objects)
     # Set the number of periods to simulate
     EstimationAgent.T_sim = EstimationAgent.T_cycle + 1
     # Choose to track bank balances as wealth
     EstimationAgent.track_vars = ["bNrm"]
     # Draw initial assets for each consumer
     EstimationAgent.aNrmInit = DiscreteDistribution(
-        Params.initial_wealth_income_ratio_probs,
-        Params.initial_wealth_income_ratio_vals,
-        seed=Params.seed,
-    ).draw(N=Params.num_agents)
+        parameters.initial_wealth_income_ratio_probs,
+        parameters.initial_wealth_income_ratio_vals,
+        seed=parameters.seed,
+    ).draw(N=parameters.num_agents)
     EstimationAgent.make_shock_history()
 
     targeted_moments = get_targeted_moments()
 
     # Estimate the model using Nelder-Mead
     if estimate_model:
-        initial_guess = [Params.DiscFacAdj_start, Params.CRRA_start]
+        initial_guess = [parameters.DiscFacAdj_start, parameters.CRRA_start]
         print("----------------------------------------------------------------------")
         print(
             f"Now estimating the model using Nelder-Mead from an initial guess of {initial_guess}..."
@@ -531,11 +531,11 @@ def estimate(
         # Estimate the model:
         print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         print(
-            f"Computing standard errors using {Params.bootstrap_size} bootstrap replications."
+            f"Computing standard errors using {parameters.bootstrap_size} bootstrap replications."
         )
         print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         try:
-            t_bootstrap_guess = time_to_estimate * Params.bootstrap_size
+            t_bootstrap_guess = time_to_estimate * parameters.bootstrap_size
             minutes, seconds = divmod(t_bootstrap_guess, 60)
             print(f"This will take approximately {minutes:.2f} min, {seconds:.2f} sec")
 
@@ -544,9 +544,9 @@ def estimate(
         t_start_bootstrap = time()
         std_errors = calculateStandardErrorsByBootstrap(
             model_estimate,
-            N=Params.bootstrap_size,
+            N=parameters.bootstrap_size,
             agent=EstimationAgent,
-            seed=Params.seed,
+            seed=parameters.seed,
             verbose=True,
         )
         t_end_bootstrap = time()
@@ -588,14 +588,14 @@ def estimate(
                 x[0],
                 x[1],
                 agent=EstimationAgent,
-                DiscFacAdj_bound=Params.DiscFacAdj_bound,
-                CRRA_bound=Params.CRRA_bound,
-                map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices,
+                DiscFacAdj_bound=parameters.DiscFacAdj_bound,
+                CRRA_bound=parameters.CRRA_bound,
+                map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
             )
 
             return moments
 
-        n_moments = len(Data.simulation_map_cohorts_to_age_indices)
+        n_moments = len(data.simulation_map_cohorts_to_age_indices)
         jac = np.array(
             [
                 approx_fprime(
@@ -613,7 +613,7 @@ def estimate(
         # Create lables for moments in the plots
         moment_labels = [
             "[" + str(min(x)) + "," + str(max(x)) + "]"
-            for x in Data.empirical_cohort_age_groups
+            for x in data.empirical_cohort_age_groups
         ]
 
         # Plot
