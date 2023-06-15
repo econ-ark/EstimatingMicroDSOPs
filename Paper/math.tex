@@ -1,0 +1,34 @@
+\begin{align}
+    \vFunc_{t}(\pLvl_{t},\mLvl_{t}) & =    \max_{\{\cFunc\}_{t}^{T}}~~ \uFunc(\cLvl_{t})+\Ex_{t}\left[\sum_{n=1}^{T-t} {\beth}^{n} \Alive_{t}^{t+n}\hat{\DiscFac}_{t}^{t+n} \uFunc(\cLvl_{t+n}) \right]   \label{eq:lifecyclemax}
+\end{align}
+
+\begin{align}
+    \aLvl_{t} & = \mLvl_{t}-\cLvl_{t}
+    \\  \pLvl_{t+1}  & = \PermGroFac_{t+1}\pLvl_{t}\Psi_{t+1}
+    \\  \yLvl_{t+1}  & = \pLvl_{t+1}\TranShkEmp _{t+1}
+    \\  \mLvl_{t+1}  & = \Rfree \aLvl_{t}+\yLvl_{t+1}
+\end{align}
+
+\begin{align}
+    \Alive _{t}^{t+n} & : & \text{probability to }\Alive\text{ive until age $t+n$ given alive at age $t$}
+    \\  \hat{\DiscFac}_{t}^{t+n} &:&\text{age-varying discount factor between ages $t$ and $t+n$}
+    \\     \Psi_{t} &:&\text{mean-one shock to permanent income}
+    \\     \beth &:&\text{time-invariant `pure' discount factor}
+\end{align}
+
+\begin{align}
+    {\vFunc}_{t}({m}_{t}) & = \max_{{c}_{t}}~~~ \uFunc({c}_{t})+\beth\Alive_{t+1}\hat{\DiscFac}_{t+1}
+    \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})]                                 \\
+                          & \text{s.t.}                                                               & \nonumber \\
+    {a}_{t}               & = {m}_{t}-{c}_{t} \nonumber
+    \\  {m}_{t+1}  & = {a}_{t}\underbrace{\left(\frac{\Rfree}{\PermShk_{t+1}\PermGroFac_{t+1}}\right)}_{\equiv \RNrm_{t+1}}+ ~\TranShkEmp_{t+1}
+\end{align}
+
+\begin{align}
+    \Xi_{s}           & =
+    \begin{cases}
+        0\phantom{/\pZero}     & \text{with probability $\pZero>0$}                                                                                                            \\
+        \TranShkEmp_{s}/\pZero & \text{with probability $(1-\pZero)$, where $\log \TranShkEmp_{s}\thicksim \mathcal{N}(-\sigma_{\TranShkEmp}^{2}/2,\sigma_{\TranShkEmp}^{2})$} \\
+    \end{cases} \\
+    \log \PermShk_{s} & \thicksim \mathcal{N}(-\sigma_{\PermShk}^{2}/2,\sigma_{\PermShk}^{2})
+\end{align}
