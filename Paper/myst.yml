@@ -1,0 +1,9 @@
+# See docs at: https://myst-tools.org/docs/mystjs/frontmatter
+version: 1
+project:
+  title: Structural Estimation of Life Cycle Models with Wealth in the Utility
+  # description:
+  keywords: []
+  authors: [Alan Lujan]
+  github: https://github.com/econ-ark/SolvingMicroDSOPs-LifeCycle
+  # bibliography: []

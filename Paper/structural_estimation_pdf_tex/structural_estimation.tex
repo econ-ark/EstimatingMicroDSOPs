@@ -1,0 +1,171 @@
+% Created with jtex v.0.1.15
+\documentclass{article}
+\usepackage{arxiv}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{datetime}       % show dates in the title block
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{doi}
+\usepackage{xcolor}
+
+
+
+\hypersetup{colorlinks = true,
+linkcolor = purple,
+urlcolor  = blue,
+citecolor = cyan,
+anchorcolor = black}
+
+\title{Structural Estimation of Life Cycle Models with Wealth in the Utility}
+
+\newdate{articleDate}{15}{6}{2023}
+\date{\displaydate{articleDate}}
+
+\makeatletter
+\let\@fnsymbol\@arabic
+\makeatother
+
+\author{Alan Lujan\footnotemark[1]\\
+Ohio State University\\Econ-ARK\\}
+
+% Uncomment to override  the `A preprint' in the header
+\renewcommand{\headeright}{Economics}
+\renewcommand{\undertitle}{}
+\renewcommand{\shorttitle}{StructEst}
+
+%% Add PDF metadata to help others organize their library
+%% Once the PDF is generated, you can check the metadata with
+%% $ pdfinfo template.pdf
+\hypersetup{
+pdftitle={\@title},
+pdfsubject={},
+pdfauthor={\@author},
+pdfkeywords={structural estimation,life-cycle,wealth in the utility},
+addtopdfcreator={Written in Curvenote}
+}
+
+\begin{document}
+\maketitle
+\footnotetext[1]{Correspondence to: alanlujan91@gmail.com}
+
+\begin{abstract}
+Abstract
+\end{abstract}
+
+\keywords{structural estimation, life-cycle, wealth in the utility}
+
+Acknowledgements
+
+\section{How to MyST, without being mystified 🧙}\label{How to MyST, without being mystified 🧙}
+
+A tutorial to evolve markdown documents and notebooks into structured data
+
+\textbf{Authors:} Rowan Cockett1,2 \newline
+\textbf{Affiliations:} 1Executable Books, 2 Curvenote \newline
+\textbf{License:} CC-BY
+
+\textbf{Abstract}
+
+We introduce, a set of open-source, community-driven tools for MyST Markdown (\href{https://myst.tools}{myst.tools}) designed for scientific communication, including a powerful authoring framework that supports blogs, online books, scientific papers, reports and journals articles.
+
+\subsection{Background}\label{Background}
+
+Scientific communication today is designed around print documents and pay-walled access to content. Over the last decade, the open-science movement has accelerated the use of pre-print services and data archives that are vastly improving the accessibility of scientific content. However, these systems are not designed for communicating modern scientific outputs, which encompasses \textbf{so much more} than a paper-centric model of the scholarly literature.
+
+\begin{quote}
+We believe how we share and communicate scientific knowledge should evolve past the status quo of print-based publishing and all the limitations of paper.
+\end{quote}
+
+The communication and collaboration tools that we are building in the ExecutableBooks project are built to follow the FORCE11 recommendations (Bourne \textit{et al.}, 2012). Specifically:
+
+\begin{enumerate}
+\item rethink the unit and form of scholarly publication;
+\item develop tools and technologies to better support the scholarly lifecycle; and
+\item add data, software, and workflows as first-class research objects.
+\end{enumerate}
+
+By bringing professional, high-quality tools for science communication into the research lifecycle, we believe we can improve the collection and preservation of scholarly metadata (citations, cross-references, annotations, etc.) as well as open up new ways to communicate science with interactive figures \& equations, computation, and reactivity.
+
+The tools that are being built by the ExecutableBooks project are focused on introducing a new Markup language, MyST (Markedly Structured Text), that works seamlessly with the Jupyter community to enhance and promote a new path to document creation and publishing for next-generation scientific textbooks, blogs, and lectures. Our team is currently supported by the \href{https://sloan.org}{Sloan Foundation}, (\href{https://sloan.org/grant-detail/9231}{Grant \#9231}).
+
+MyST enables rich content generation and is a powerful format for scientific and technical communication. JupyterBook uses MyST and has broad adoption in publishing tutorials and educational content focused around Jupyter Notebooks.
+
+\begin{quote}
+The components behind Jupyter Book are downloaded 30,000 times a day, with 750K downloads last month.
+\end{quote}
+
+The current toolchain used by \href{https://jupyterbook.org/}{JupyterBook} is based on \href{https://www.sphinx-doc.org/}{Sphinx}, which is an open-source documentation system used in many software projects, especially in the Python ecosystem. \texttt{mystjs} is a similar tool to \href{https://www.sphinx-doc.org/}{Sphinx}, however, designed specifically for scientific communication. In addition to building websites, \texttt{mystjs} can also help you create scientific PDFs, Microsoft Word documents, and JATS XML (used in scientific publishing).
+
+\texttt{mystjs} uses existing, modern web-frameworks in place of the \href{https://www.sphinx-doc.org/}{Sphinx} build system. These tools come out-of-the-box with prefetching for faster navigation, smaller network payloads through modern web-bundlers, image optimization, partial-page refresh through single-page application. Many of these features, performance and accessibility improvements are difficult, if not impossible, to create inside of the \href{https://www.sphinx-doc.org/}{Sphinx} build system.
+
+In 2022, the Executable Books team started work to document the specification behind the markup language, called \href{https://github.com/executablebooks/myst-spec}{myst-spec}, this work has enabled other tools and implementations in the scientific ecosystem to build on MyST (e.g. \href{https://curvenote.com/for/writing}{scientific authoring tools}, and \href{https://blog.readthedocs.com/jupyter-book-read-the-docs/}{documentation systems}).
+
+The \texttt{mystjs} ecosystem was developed as a collaboration between \href{https://curvenote.com}{Curvenote}, \href{https://2i2c.org/}{2i2c} and the \href{https://executablebooks.org/}{ExecutableBooks} team. The initial version of \texttt{mystjs} was originally release by \href{https://curvenote.com}{Curvenote} as the \href{https://curvenote.com/docs/cli}{Curvenote CLI} under the MIT license, and transferred to the \href{https://executablebooks.org/}{ExecutableBooks} team in October 2022. The goal of the project is to enable the same rich content and authoring experiences that \href{https://www.sphinx-doc.org/}{Sphinx} allows for software documentation, with a focus on web-first technologies (Javascript), interactivity, accessibility, scientific references (e.g. DOIs and other persistent IDs), professional PDF outputs, and JATS XML documents for scientific archiving.
+
+\subsection{MyST Project}\label{MyST Project}
+
+In this paper we introduce \texttt{mystjs}, which allows the popular MyST Markdown syntax to be run directly in a web browser, opening up new workflows for components to be used in web-based editors, \href{https://github.com/executablebooks/jupyterlab-myst}{directly in Jupyter} and in JupyterLite. The libraries work with current MyST Markdown documents/projects and can export to \href{https://myst.tools/docs/mystjs/creating-pdf-documents}{LaTeX/PDF}, \href{https://myst.tools/docs/mystjs/creating-word-documents}{Microsoft Word} and \href{https://myst.tools/docs/mystjs/creating-jats-xml}{JATS} as well as multiple website templates using a \href{https://myst.tools/docs/mystjs/accessibility-and-performance}{modern} React-based renderer. There are currently over 400 scientific journals that are supported through \href{https://github.com/myst-templates}{templates}, with \href{https://myst.tools/docs/jtex/create-a-latex-template}{new LaTeX templates} that can be added easily using a Jinja-based templating package, called \href{https://myst.tools/docs/jtex}{jtex}.
+
+In our paper we will give an overview of the MyST ecosystem, how to use MyST tools in conjunction with existing Jupyter Notebooks, markdown documents, and JupyterBooks to create professional PDFs and interactive websites, books, blogs and scientific articles. We give special attention to the additions around structured data, standards in publishing (e.g. efforts in representing Notebooks as JATS XML), rich \href{https://myst.tools/docs/mystjs/frontmatter}{frontmatter} and bringing \href{https://myst.tools/docs/mystjs/cross-references}{cross-references} and \href{https://myst.tools/docs/mystjs/external-references}{persistent IDs} to life with interactive hover-tooltips (\href{https://myst.tools/docs/mystjs/frontmatter}{ORCID, RoR}, \href{https://myst.tools/docs/mystjs/external-references\#research-resource-identifiers}{RRIDs}, \href{https://myst.tools/docs/mystjs/citations}{DOIs}, \href{https://myst.tools/docs/mystjs/external-references\#intersphinx}{intersphinx}, \href{https://myst.tools/docs/mystjs/external-references\#wikipedia-links}{wikipedia}, \href{https://myst.tools/docs/mystjs/typography}{JATS}, \href{https://myst.tools/docs/mystjs/external-references\#github-links}{GitHub code}, and more!). This rich metadata and structured content can be used directly to improve science communication both through self-publishing books, blogs, and lab websites --- as well as journals that incorporate Jupyter Notebooks.
+
+\subsection{Features of MyST}\label{Features of MyST}
+
+MyST is focused on scientific writing, and ensuring that citations are first class both for writing and for reading (see Figure 1).
+
+\includegraphics[width=0.7\linewidth]{files/citations-247e59f2c61c5d74e5662f1d045cb263.png}
+
+
+\textbf{Figure 1}: Citations are rendered with a popup directly inline.
+
+MyST aims to show as much information in context as possible, for example, Figure 2 shows a reading experience for a referenced equation: you can immediately \textbf{click on the reference}, see the equation, all without loosing any context -- ultimately saving you time. Head \textit{et al.} (2021) found that these ideas both improved the overall reading experience of articles as well as allowed researchers to answer questions about an article \textbf{26\% faster} when compared to a traditional PDF!
+
+\includegraphics[width=0.7\linewidth]{files/equations-30139d464ba14bca8632041fcf62fb11.png}
+
+
+\textbf{Figure 2}: In context cross-references improve the reading experience.
+
+One of the important underlying goals of practicing reproducibility, sharing more of the methods and data behind a scientific work so that other researchers can both verify as well as build upon your findings. One of the exciting ways to pull for reproducibility is to make documents directly linked to data and computation! In Figure 3, we are showing outputs from a Jupyter Notebook directly part of the published scientific narrative.
+
+\includegraphics[width=0.7\linewidth]{files/interactive-b7ae9d0be86fc51f47cbba5886978eb5.png}
+
+
+\textbf{Figure 3}: Embedding data, interactivity and computation into a MyST article.
+
+To drive all of these features, the contents of a MyST document needs to be well defined. This is critical for powering interactive hovers, linked citations, and compatibility with scientific publishing standards like the Journal Article Metadata Tag Suite (JATS). We have an emerging specification for MyST, \href{https://spec.myst.tools}{\texttt{myst-spec}}, that aims to capture this information and transform it between many different formats, like PDF, Word, JSON, and JATS XML (Figure 4). This specification is arrived at through a community-centric MyST Enhancement Proposal (\href{https://compass.executablebooks.org/en/latest/meps.html}{MEP}) process.
+
+\includegraphics[width=0.7\linewidth]{files/structured-data-3fb4d80f05297279d52cac07cf34e65e.png}
+
+
+\textbf{Figure 4}: The data behind MyST is \textbf{structured}, which means we can transform it into many different document types and use it to power all sorts of exciting features!
+
+One of the common forms of scientific communication today is through PDF documents. MyST has excellent support for creating PDF documents, using a data-driven templating library called \texttt{jtex}. The document in Figure 5 was created using MyST!
+
+\includegraphics[width=0.7\linewidth]{files/pdf-two-column-f91a6c7c58563320a11a31070a8c0337.png}
+
+
+\textbf{Figure 5}: A PDF rendering through MyST.
+
+\subsection{Conclusion}\label{Conclusion}
+
+There are many opportunities to improve open-science communication, to make it more interactive, accessible, more reproducible, and both produce and use structured data throughout the research-writing process. The \texttt{mystjs} ecosystem of tools is designed with structured data at its core. We would love if you gave it a try -- learn to get started at \url{https://myst.tools}.
+
+\subsection{References}\label{References}
+
+Bourne, Philip E., Clark, Timothy W., Dale, Robert, De Waard, Anita, Herman, Ivan, Hovy, Eduard H., Shotton, David. (2012)"Improving The Future of Research Communications and e-Scholarship". FORCE11. doi:10.4230/DAGMAN.1.1.41
+
+Head, A., Lo, K., Kang, D., Fok, R., Skjonsberg, S., Weld, D. S., \& Hearst, M. A. (2021, May). Augmenting Scientific Papers with Just-in-Time, Position-Sensitive Definitions of Terms and Symbols. Proceedings of the 2021 CHI Conference on Human Factors in Computing Systems. 10.1145/3411764.3445648
+
+
+
+\bibliographystyle{unsrtnat}
+\bibliography{main.bib}
+
+\end{document}
