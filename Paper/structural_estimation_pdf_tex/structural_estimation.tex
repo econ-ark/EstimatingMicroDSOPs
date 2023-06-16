@@ -20,21 +20,34 @@
 %%%%%%%%%%%%%%%%%%%%  imports  %%%%%%%%%%%%%%%%%%%
 \usepackage{amsmath}
 %%%%%%%%%%%%%%%%%  math commands  %%%%%%%%%%%%%%%%
-\newcommand{\CRRA}{\rho}
 \newcommand{\DiscFac}{\beta}
-\newcommand{\PermGroFac}{\pmb{\Phi}}
 \newcommand{\uFunc}{\mathrm{u}}
-\newcommand{\vFunc}{\mathrm{v}}
-\newcommand{\Rfree}{\mathsf{R}}
 \newcommand{\Alive}{\mathcal{L}}
 \newcommand{\h}{h}
-\newcommand{\PermShk}{\mathbf{\Psi}}
-\newcommand{\TranShk}{\pmb{\xi}}
-\newcommand{\RNrm}{\mathcal{R}}
-\newcommand{\TranShkEmp}{\pmb{\theta}}
+\newcommand{\cLvl}{\mathbf{c}}
 \newcommand{\Ex}{\mathbb{E}}
 \newcommand{\beth}{\mathcal{B}}
+\newcommand{\CRRA}{\rho}
+\newcommand{\PermGroFac}{\pmb{\Phi}}
+\newcommand{\vFunc}{\mathrm{v}}
+\newcommand{\Rfree}{\mathsf{R}}
+\newcommand{\PermShk}{\mathbf{\Psi}}
+\newcommand{\TranShk}{\pmb{\xi}}
+\newcommand{\aNrm}{a}
+\newcommand{\cNrm}{c}
+\newcommand{\RNrm}{\mathcal{R}}
+\newcommand{\TranShkEmp}{\pmb{\theta}}
 \newcommand{\pZero}{\wp}
+\newcommand{\thicksim}{\sim}
+\newcommand{\aFunc}{\mathrm{a}}
+\newcommand{\kapShare}{\alpha}
+\newcommand{\wealth}{o}
+\newcommand{\kap}{k}
+\newcommand{\wealthShare}{\delta}
+\newcommand{\wFunc}{\mathrm{w}}
+\newcommand{\aRat}{a}
+\newcommand{\mRat}{m}
+\newcommand{\xFer}{\chi}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \hypersetup{colorlinks = true,
@@ -43,7 +56,7 @@ urlcolor  = blue,
 citecolor = cyan,
 anchorcolor = black}
 
-\title{Structural Estimation of Life Cycle Models with Wealth in the Utility}
+\title{Structural Estimation of Life Cycle Models with Wealth in the Utility Function}
 
 \newdate{articleDate}{15}{6}{2023}
 \date{\displaydate{articleDate}}
@@ -58,7 +71,7 @@ Ohio State University\\Econ-ARK\\}
 % Uncomment to override  the `A preprint' in the header
 \renewcommand{\headeright}{Economics}
 \renewcommand{\undertitle}{}
-\renewcommand{\shorttitle}{Structural Estimation using HARK}
+\renewcommand{\shorttitle}{Structural Estimation}
 
 %% Add PDF metadata to help others organize their library
 %% Once the PDF is generated, you can check the metadata with
@@ -76,33 +89,49 @@ addtopdfcreator={Written in Curvenote}
 \footnotetext[1]{Correspondence to: alanlujan91@gmail.com}
 
 \begin{abstract}
-Heterogeneous Agent Models (HAMs) are a powerful tool for understanding the effects of monetary and fiscal policy on the economy. However, state of the art frameworks such as HANK have been unable to replicate the observed hoarding of wealth at the very top of the distribution and generally lack important life cycle properties such as time-varying mortality and income risk. On the one hand, the inability to pin down wealth at the tail of the distribution has been a problem for HANK models precisely because it has implications for the transmission of monetary and fiscal policy. On the other hand, agents in HANK are generally conceived as perpetual youths with infinite horizons without age-specific profiles of mortality and income risk. This is problematic as it ignores the effects of these policies on potentially more affected communities, such as young families with children or the low-wealth elderly. In this paper, I investigate the effects of both life cycle considerations as well as wealth in the utility on the structural estimation of HAMs. Structural estimation is the first step in evaluating the effect of monetary and fiscal policies in a HANK framework, and my hope is that this paper will lead to better models of the economy that can be used to inform policy..
+Heterogeneous Agent Models (HAM) are a powerful tool for understanding the effects of monetary and fiscal policy on the economy. However, state of the art frameworks such as Heterogeneous Agent New Keynsian (HANK) models have been unable to replicate the observed hoarding of wealth at the very top of the distribution and generally lack important life cycle properties such as time-varying mortality and income risk. On the one hand, the inability to pin down wealth at the tail of the distribution has been a problem for HANK models precisely because it has implications for the transmission of monetary and fiscal policy. On the other hand, agents in HANK are generally conceived as perpetual youth with infinite horizons and without age-specific profiles of mortality and income risk. This is problematic as it ignores the effects of these policies on potentially more affected communities, such as young families with children or the low-wealth elderly. In this paper, I investigate the effects of both life cycle considerations as well as wealth in the utility on the structural estimation of HAMs. Structural estimation is the first step in evaluating the effect of monetary and fiscal policies in a HANK framework, and my hope is that this paper will lead to better models of the economy that can be used to inform policy..
 \end{abstract}
 
 \keywords{structural estimation, life cycle, wealth in the utility}
 
-I would like to thank my advisor, Chris Carroll, for his guidance and support throughout this project, as well as the members of the Econ-ARK team for their support and for providing a great community to work in.
+I would like to thank my advisor, Chris Carroll, for his guidance and support throughout this project, as well as the members of the Econ-ARK team for providing a great collaborative community to work in.
 
 \section{Introduction}\label{Introduction}
 
 \section{Life Cycle Models}\label{Life Cycle Models}
 
+\subsection{The Baseline Model}\label{The Baseline Model}
+
+The agent's objective is to maximize present discounted utility from consumption over a last cycle with a terminal period of $T$:
+
+\begin{equation}
+\label{eq:MaxProb}
+\max ~ \uFunc({\cLvl}_{t}) + \Ex_{t}\left[ \sum_{n=1}^{T-t} {\beth}^{n} \Alive_{t}^{t+n}\hat{\DiscFac}_{t}^{t+n} \uFunc({\cLvl}_{t+n})\right].
+\end{equation}
+
+where
+
 \begin{equation}
 \begin{align}
-  {\vFunc}_{t}({m}_{t}) & = \max_{{c}_{t}}~~~ \uFunc({c}_{t})+\beth\Alive_{t+1}\hat{\DiscFac}_{t+1}
-  \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})]                                 \\
-                        & \text{s.t.}                                                               & \nonumber \\
-  {a}_{t}               & = {m}_{t}-{c}_{t} \nonumber
-  \\  {m}_{t+1}  & = {a}_{t}\underbrace{\left(\frac{\Rfree}{\PermShk_{t+1}\PermGroFac_{t+1}}\right)}_{\equiv \RNrm_{t+1}}+ ~\TranShkEmp_{t+1}
+       \beth &:&\text{time-invariant `pure' discount factor}
+       \\ \Alive _{t}^{t+n} & : & \text{probability to }\Alive\text{ive until age $t+n$ given alive at age $t$}
+  \\  \hat{\DiscFac}_{t}^{t+n} &:&\text{age-varying discount factor between ages $t$ and $t+n$}
 \end{align}
 \end{equation}
 
 \begin{equation}
 \begin{align}
-  \Alive _{t}^{t+n} & : & \text{probability to }\Alive\text{ive until age $t+n$ given alive at age $t$}
-  \\  \hat{\DiscFac}_{t}^{t+n} &:&\text{age-varying discount factor between ages $t$ and $t+n$}
-  \\     \Psi_{t} &:&\text{mean-one shock to permanent income}
-  \\     \beth &:&\text{time-invariant `pure' discount factor}
+  {\vFunc}_{t}({m}_{t}) & = \max_{\cNrm_{t}} ~  \uFunc(\cNrm_{t})+\beth\Alive_{t+1}\hat{\DiscFac}_{t+1}
+  \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})]                                 \\
+                        & \text{s.t.}                                                               & \nonumber \\
+  \aNrm_{t}               & = {m}_{t}-\cNrm_{t} \nonumber
+  \\  {m}_{t+1}  & = \aNrm_{t}\underbrace{\left(\frac{\Rfree}{\PermShk_{t+1}\PermGroFac_{t+1}}\right)}_{\equiv \RNrm_{t+1}}+ ~\TranShkEmp_{t+1}
+\end{align}
+\end{equation}
+
+\begin{equation}
+\begin{align}
+      \Psi_{t} &:&\text{mean-one shock to permanent income}
 \end{align}
 \end{equation}
 
@@ -119,11 +148,53 @@ I would like to thank my advisor, Chris Carroll, for his guidance and support th
 
 \subsection{Wealth in the Utility Function}\label{Wealth in the Utility Function}
 
+\begin{equation}
+\begin{align}
+  {\vFunc}_{t}({m}_{t}) & = \max_{\cNrm_{t}} ~  \uFunc(\cNrm_{t}, \aNrm_{t})+\beth\Alive_{t+1}\hat{\DiscFac}_{t+1}
+  \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})]                                 \\
+                        & \text{s.t.}                                                               & \nonumber \\
+  \aNrm_{t}               & = {m}_{t}-\cNrm_{t} \nonumber
+  \\  {m}_{t+1}  & = \aNrm_{t}\RNrm_{t+1}+ ~\TranShkEmp_{t+1}
+\end{align}
+\end{equation}
+
 \subsubsection{Separable Utility}\label{Separable Utility}
+
+\begin{equation}
+\uFunc(\cNrm_{t}, \aNrm_{t}) = \frac{\cNrm_{t}^{1-\CRRA}}{1-\CRRA} + \kapShare_{t} \frac{(\aFunc_{t} - \underline\aNrm)^{1-\wealthShare}}{1-\wealthShare}
+\end{equation}
 
 \subsubsection{Non-separable Utility}\label{Non-separable Utility}
 
+\begin{equation}
+\uFunc(\cNrm_{t}, \aNrm_{t}) = \frac{(\cNrm_{t}^{1-\wealthShare} (\aNrm_{t}- \underline\aNrm)^\wealthShare)^{1-\CRRA}}{(1-\CRRA)}
+\end{equation}
+
 \subsubsection{Generalized Endogenous Grid Method}\label{Generalized Endogenous Grid Method}
+
+\begin{equation}
+\begin{align}
+  \vFunc(\mRat) & = \max_{\cNrm} ~ \uFunc(\cNrm, \aNrm) + \DiscFac \wFunc(\aRat) 
+  \\ & \text{s.t.} 
+  \\ \aNrm & = \mRat-\cNrm
+\end{align}
+\end{equation}
+
+\begin{equation}
+\uFunc_{c}'(\cNrm^*, \aNrm^*) - \uFunc_{a}'(\cNrm^*, \aNrm^*) = \DiscFac \wFunc'(\aNrm^*)
+\end{equation}
+
+\begin{equation}
+f_{a}(\cNrm) = \uFunc_{c}'(\cNrm, \aNrm) - \uFunc_{a}'(\cNrm, \aNrm) = \xFer_{a}
+\end{equation}
+
+\begin{equation}
+f_{a}^{-1}(\xFer_{a}) = \cNrm
+\end{equation}
+
+\begin{equation}
+g(\aNrm^*) = f_{a^*}^{-1} \big( \DiscFac \wFunc'(\aNrm^*) \big) = \cNrm^*
+\end{equation}
 
 \section{Calibration and Estimation}\label{Calibration and Estimation}
 
@@ -138,6 +209,7 @@ I would like to thank my advisor, Chris Carroll, for his guidance and support th
 \cite{Mian_2020}
 \cite{Kaplan_2018}
 \cite{Auclert_2020}
+\cite{Cagetti_2003}
 
 
 
