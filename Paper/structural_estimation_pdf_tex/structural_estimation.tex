@@ -21,15 +21,18 @@
 \usepackage{amsmath}
 %%%%%%%%%%%%%%%%%  math commands  %%%%%%%%%%%%%%%%
 \newcommand{\DiscFac}{\beta}
+\newcommand{\cFunc}{\mathrm{c}}
 \newcommand{\uFunc}{\mathrm{u}}
+\newcommand{\vFunc}{\mathrm{v}}
 \newcommand{\Alive}{\mathcal{L}}
 \newcommand{\h}{h}
 \newcommand{\cLvl}{\mathbf{c}}
+\newcommand{\mLvl}{\mathbf{m}}
+\newcommand{\pLvl}{\mathbf{p}}
 \newcommand{\Ex}{\mathbb{E}}
 \newcommand{\beth}{\mathcal{B}}
 \newcommand{\CRRA}{\rho}
 \newcommand{\PermGroFac}{\pmb{\Phi}}
-\newcommand{\vFunc}{\mathrm{v}}
 \newcommand{\Rfree}{\mathsf{R}}
 \newcommand{\PermShk}{\mathbf{\Psi}}
 \newcommand{\TranShk}{\pmb{\xi}}
@@ -37,6 +40,7 @@
 \newcommand{\cNrm}{c}
 \newcommand{\RNrm}{\mathcal{R}}
 \newcommand{\TranShkEmp}{\pmb{\theta}}
+\newcommand{\mNrm}{m}
 \newcommand{\pZero}{\wp}
 \newcommand{\thicksim}{\sim}
 \newcommand{\aFunc}{\mathrm{a}}
@@ -49,7 +53,7 @@
 \newcommand{\mRat}{m}
 \newcommand{\aMat}{[\mathrm{a}]}
 \newcommand{\mMat}{[\mathrm{m}]}
-\newcommand{\mNrm}{m}
+\newcommand{\cMat}{[\mathrm{\cNrm}]}
 \newcommand{\xFer}{\chi}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -101,76 +105,98 @@ I would like to thank my advisor, Chris Carroll, for his guidance and support th
 
 \section{Introduction}\label{Introduction}
 
-\section{Life Cycle Models}\label{Life Cycle Models}
+\section{Life Cycle Incomplete Markets Models}\label{Life Cycle Incomplete Markets Models}
+
+An important extension to the Standard Incomplete Markets (SIM) model is the Life Cycle Incomplete Markets (LCIM) model as in \cite{Cagetti_2003}, \cite{Gourinchas_2002}, and \cite{Palumbo_1999}, among others. The LCIM model is a natural extension to the SIM model that allows for age-specific profiles of preferences, mortality, and income risk.
 
 \subsection{The Baseline Model}\label{The Baseline Model}
 
-The agent's objective is to maximize present discounted utility from consumption over a last cycle with a terminal period of $T$:
+The agent's objective is to maximize present discounted utility from consumption over the life cycle with a terminal period of $T$:
 
 \begin{equation}
-\label{eq:MaxProb}
-\max ~ \uFunc({\cLvl}_{t}) + \Ex_{t}\left[ \sum_{n=1}^{T-t} {\beth}^{n} \Alive_{t}^{t+n}\hat{\DiscFac}_{t}^{t+n} \uFunc({\cLvl}_{t+n})\right]
+\label{eq:lifecyclemax}
+\vFunc_{t}(\pLvl_{t},\mLvl_{t})  =    \max_{\{\cFunc\}_{t}^{T}} ~ \uFunc(\cLvl_{t})+\Ex_{t}\left[\sum_{n=1}^{T-t} {\beth}^{n} \Alive_{t}^{t+n}\hat{\DiscFac}_{t}^{t+n} \uFunc(\cLvl_{t+n}) \right]
 \end{equation}
 
-where
+where $\pLvl_{t}$ is the permanent income level, $\mLvl_{t}$ is total market resources, $\cLvl_{t}$ is consumption, and
 
 \begin{equation}
 \begin{align}
-       \beth &:&\text{time-invariant `pure' discount factor}
-       \\ \Alive _{t}^{t+n} & : & \text{probability to }\Alive\text{ive until age $t+n$ given alive at age $t$}
-  \\  \hat{\DiscFac}_{t}^{t+n} &:&\text{age-varying discount factor between ages $t$ and $t+n$}
+    \beth & :  \text{time-invariant `pure' discount factor}
+    \\ \Alive _{t}^{t+n} & :  \text{probability to }\Alive\text{ive until age $t+n$ given alive at age $t$}
+    \\ \hat{\DiscFac}_{t}^{t+n} & :  \text{age-varying discount factor between ages $t$ and $t+n$.}
 \end{align}
 \end{equation}
 
-\begin{equation}
-\begin{align}
-  {\vFunc}_{t}({m}_{t}) & = \max_{\cNrm_{t}} ~  \uFunc(\cNrm_{t})+\beth\Alive_{t+1}\hat{\DiscFac}_{t+1}
-  \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})]                                 \\
-                        & \text{s.t.}                                                               & \nonumber \\
-  \aNrm_{t}               & = {m}_{t}-\cNrm_{t} \nonumber
-  \\  {m}_{t+1}  & = \aNrm_{t}\underbrace{\left(\frac{\Rfree}{\PermShk_{t+1}\PermGroFac_{t+1}}\right)}_{\equiv \RNrm_{t+1}}+ ~\TranShkEmp_{t+1}
-\end{align}
-\end{equation}
+It will be convenient to work with the problem in permanent-income-normalized form as in \cite{Carroll_2004}, which allows us to reduce a 2 dimensional problem of permanent income and wealth into a 1 dimensional problem of wealth normalized by permanent income. The recursive Bellman equation can be expressed as:
 
 \begin{equation}
 \begin{align}
-      \Psi_{t} &:&\text{mean-one shock to permanent income}
+    {\vFunc}_{t}({m}_{t}) & = \max_{\cNrm_{t}} ~ \uFunc(\cNrm_{t})+\beth\Alive_{t+1}\hat{\DiscFac}_{t+1}
+    \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})]
+    \\ & \text{s.t.} & \nonumber
+    \\ \aNrm_{t} & = {m}_{t}-\cNrm_{t} \nonumber
+    \\ {m}_{t+1} & = \aNrm_{t}\underbrace{\left(\frac{\Rfree}{\PermShk_{t+1}\PermGroFac_{t+1}}\right)}_{\equiv \RNrm_{t+1}}
+    + ~\TranShkEmp_{t+1}
 \end{align}
 \end{equation}
 
+where $\cNrm$, $\aNrm$, and $\mNrm$ are consumption, assets, and market resources normalized by permanent income, respectively, and
+
 \begin{equation}
 \begin{align}
-  \Xi_{s}           & =
-  \begin{cases}
-      0\phantom{/\pZero}     & \text{with probability $\pZero>0$}                                                                                                            \\
-      \TranShkEmp_{s}/\pZero & \text{with probability $(1-\pZero)$, where $\log \TranShkEmp_{s}\thicksim \mathcal{N}(-\sigma_{\TranShkEmp}^{2}/2,\sigma_{\TranShkEmp}^{2})$} \\
-  \end{cases} \\
-  \log \PermShk_{s} & \thicksim \mathcal{N}(-\sigma_{\PermShk}^{2}/2,\sigma_{\PermShk}^{2})
+  \PermShk_{t+1} & :  \text{mean-one shock to permanent income}
+    \\ \PermGroFac_{t+1} & :  \text{permanent income growth factor}
+    \\ \TranShkEmp_{t+1} & :  \text{transitory shock to permanent income}
+    \\ \RNrm_{t+1} & :  \text{permanent income growth normalized return factor}
 \end{align}
+\end{equation}
+
+and all other variables are defined as above. The transitory and permanent shocks to income are defined as:
+
+\begin{equation}
+\begin{align}
+\TranShkEmp_{s}  = &
+    \begin{cases}
+        0\phantom{/\pZero} & \text{with probability $\pZero>0$}
+        \\ \xi_{s}/\pZero & \text{with probability $(1-\pZero)$, where
+            $\log \xi{s}\thicksim \mathcal{N}(-\sigma_{\xi}^{2}/2,\sigma_{\xi}^{2})$}
+    \end{cases}
+    \\ \phantom{/\pZero} \\ & \text{and }  \log \PermShk_{s}   \thicksim \mathcal{N}(-\sigma_{\PermShk}^{2}/2,\sigma_{\PermShk}^{2}).
+  \end{align}
 \end{equation}
 
 \subsection{Wealth in the Utility Function}\label{Wealth in the Utility Function}
 
+A simple extension to the Life Cycle Incomplete Markets (LCIM) model is to include wealth in the utility function. \cite{Carroll_1998} argues that models in which the only driver of wealth accumulation is consumption smoothing are not consistent with the saving behavior of the wealthiest households. Instead, they propose a model in which households derive utility from their level of wealth itself or they derive a flow of services from political power and social status, calling it the `Capitalist Spirit' model. In turn, we can add this feature to the LCIM model by adding a utility function with consumption and wealth as follows:
+
 \begin{equation}
 \begin{align}
-  {\vFunc}_{t}({m}_{t}) & = \max_{\cNrm_{t}} ~  \uFunc(\cNrm_{t}, \aNrm_{t})+\beth\Alive_{t+1}\hat{\DiscFac}_{t+1}
-  \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})]                                 \\
-                        & \text{s.t.}                                                               & \nonumber \\
-  \aNrm_{t}               & = {m}_{t}-\cNrm_{t} \nonumber
-  \\  {m}_{t+1}  & = \aNrm_{t}\RNrm_{t+1}+ ~\TranShkEmp_{t+1}
+    {\vFunc}_{t}({m}_{t}) & = \max_{\cNrm_{t}} ~ \uFunc(\cNrm_{t}, \aNrm_{t})+\beth\Alive_{t+1}\hat{\DiscFac}_{t+1}
+    \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})]
+    \\ & \text{s.t.} & \nonumber
+    \\ \aNrm_{t} & = {m}_{t}-\cNrm_{t} \nonumber
+    \\ {m}_{t+1} & = \aNrm_{t}\RNrm_{t+1}+ ~\TranShkEmp_{t+1}
 \end{align}
 \end{equation}
 
 \subsubsection{Separable Utility}\label{Separable Utility}
 
+\cite{Carroll_1998} presents extensive empirical and informal evidence for a LCIM model with wealth in the utility function. Specifically, the paper uses a utility that is separable in consumption and wealth:
+
 \begin{equation}
-\uFunc(\cNrm_{t}, \aNrm_{t}) = \frac{\cNrm_{t}^{1-\CRRA}}{1-\CRRA} + \kapShare_{t} \frac{(\aFunc_{t} - \underline\aNrm)^{1-\wealthShare}}{1-\wealthShare}
+\uFunc(\cNrm_{t}, \aNrm_{t}) = \frac{\cNrm_{t}^{1-\CRRA}}{1-\CRRA}
+    + \kapShare_{t} \frac{(\aFunc_{t} - \underline\aNrm)^{1-\wealthShare}}{1-\wealthShare}
 \end{equation}
+
+where $\kapShare$ is the relative weight of the utility of wealth and $\wealthShare$ is the relative risk aversion of wealth.
 
 \subsubsection{Non-separable Utility}\label{Non-separable Utility}
 
+A different model that we will explore is one in which the utility function is non-separable in consumption and wealth; i.e. consumption and wealth are complimentary goods. In the case of the LCIM model, this dynamic complementarity drives the accumulation of wealth not only for the sake of wealth itself, but also because it increases the marginal utility of consumption.
+
 \begin{equation}
-\uFunc(\cNrm_{t}, \aNrm_{t}) = \frac{(\cNrm_{t}^{1-\wealthShare} (\aNrm_{t}- \underline\aNrm)^\wealthShare)^{1-\CRRA}}{(1-\CRRA)}
+\uFunc(\cNrm_{t}, \aNrm_{t}) = \frac{(\cNrm_{t}^{1-\wealthShare} (\aNrm_{t} - \underline\aNrm)^\wealthShare)^{1-\CRRA}}{(1-\CRRA)}
 \end{equation}
 
 \section{Solution Methods}\label{Solution Methods}
@@ -179,10 +205,10 @@ For a brief departure, let's consider how we solve these problems generally. Def
 
 \begin{equation}
 \begin{align}
-\DiscFac_{t+1} \wFunc_{t}(\aNrm_{t}) & = \beth\Alive_{t+1}\hat{\DiscFac}_{t+1}
-\Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})]  
-\\ & \text{s.t.} 
-  \\  {m}_{t+1}  & = \aNrm_{t}\RNrm_{t+1}+ ~\TranShkEmp_{t+1}
+    \DiscFac_{t+1} \wFunc_{t}(\aNrm_{t}) & = \beth\Alive_{t+1}\hat{\DiscFac}_{t+1}
+    \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})]
+    \\ & \text{s.t.}
+    \\ {m}_{t+1} & = \aNrm_{t}\RNrm_{t+1}+ ~\TranShkEmp_{t+1}
 \end{align}
 \end{equation}
 
@@ -190,9 +216,9 @@ For our purposes, it will be useful to simplify the notation a bit by dropping t
 
 \begin{equation}
 \begin{align}
-  \vFunc(\mRat) & = \max_{\cNrm} ~ \uFunc(\cNrm, \aNrm) + \DiscFac \wFunc(\aRat) 
-  \\ & \text{s.t.} 
-  \\ \aNrm & = \mRat-\cNrm
+    \vFunc(\mRat) & = \max_{\cNrm} ~ \uFunc(\cNrm, \aNrm) + \DiscFac \wFunc(\aRat)
+    \\ & \text{s.t.}
+    \\ \aNrm & = \mRat-\cNrm
 \end{align}
 \end{equation}
 
@@ -212,16 +238,16 @@ If the utility of consumption and wealth is additively separable, then the Euler
 
 When the utility of consumption and wealth is not additively separable, the Euler equation is not analytically invertible for the optimal consumption policy. The usual recourse is to use a root-finding algorithm to obtain the optimal consumption policy for each point on the grid of market resources, which turns out to be more efficient than grid search maximization. As far as I am aware, this is the first paper to avoid root-finding or grid search maximization by using an EGM-like approach to solve a problem with a non-invertible Euler equation.
 
-Holding $\aNrm$ constant, define a function $f_{a}$ as the difference between the marginal utility of consumption and the marginal utility of wealth, and using an \textit{exogenous} grid of $[\cNrm]$, label the difference as $[\xFer_{a}]$:
+Holding $\aNrm$ constant, define a function $f_{a}$ as the difference between the marginal utility of consumption and the marginal utility of wealth, and using an \textit{exogenous} grid of $\cMat$, label the difference as $[\xFer_{a}]$:
 
 \begin{equation}
-f_{a}([\cNrm]) = \uFunc_{c}'([\cNrm], \aNrm) - \uFunc_{a}'([\cNrm], \aNrm) = [\xFer_{a}]
+f_{a}(\cMat) = \uFunc_{c}'(\cMat, \aNrm) - \uFunc_{a}'(\cMat, \aNrm) = [\xFer_{a}]
 \end{equation}
 
 So far, we haven't done much, as $f_a$ is still not analytically invertible. However, as we have held $\aNrm$ constant, this is now a single variable function with a single output. We can easily create a linear interpolator for the inverse of this function by reversing output with input appropriately. This is the key step that allows us to avoid root-finding or grid search maximization. We will call this function $\hat{f}_{a}^{ -1}$, as it is an approximation of the inverse of $f_{a}$ which could still introduce some error\footnote{A main difference between EGM and GEGM is that EGM uses the exact inverse of the Euler equation, thereby giving the unique optimal consumption policy for each point on the grid of post-decision savings that exactly satisfies the Euler equation. GEGM uses an approximation of the inverse of the Euler equation, thereby giving an approximate optimal consumption policy for each point on the grid of market resources. With careful grid choice, the approximation error can be made arbitrarily small.}.
 
 \begin{equation}
-\hat{f}_{a}^{-1}([\xFer_{a}]) = [\cNrm]
+\hat{f}_{a}^{-1}([\xFer_{a}]) = \cMat
 \end{equation}
 
 We can now construct the function $g(\aNrm)$ as the composition of $\hat{f}_{a}^{ -1}$ and discounted marginal value of wealth $\DiscFac \wFunc'$, which should provide an approximation of the optimal consumption policy for each point on the grid of post-decision savings:
@@ -230,11 +256,15 @@ We can now construct the function $g(\aNrm)$ as the composition of $\hat{f}_{a}^
 g(\aNrm^*) = \hat{f}_{a^*}^{-1} \big( \DiscFac \wFunc'(\aNrm^*) \big) = \cNrm^*
 \end{equation}
 
-This completes the modified step in the Generalized Endogenous Grid Method (GEGM). If this looks familiar, it is because it exactly parallels the EGM method. In the SIM model, $f_a(\cNrm,\aNrm) = \uFunc'(\cNrm)$, which does not depend on $\aNrm$, so we can drop it. The inverse of this function is exactly $f^{ -1}(\xFer) = \uFunc'^{ -1}(\xFer)$, so we don't need an approximating interpolator. The composition of this function with the discounted marginal value of wealth  exactly  provides  the consumption policy as $g(\aNrm) = \uFunc'^{ -1} \big( \DiscFac \wFunc'(\aNrm) \big) = \cNrm$. GEGM is a generalization of EGM to the case where the Euler equation is not analytically invertible.
+This completes the modified step in the Generalized Endogenous Grid Method (GEGM). If this looks familiar, it is because it exactly parallels the EGM method. In the SIM model, $f_a(\cNrm,\aNrm) = \uFunc'(\cNrm)$, which does not depend on $\aNrm$, so we can drop it. The inverse of this function is exactly $f^{ -1}(\xFer) = \uFunc'^{ -1}(\xFer)$, so we don't need an approximating interpolator. The composition of this function with the discounted marginal value of wealth exactly provides the consumption policy as $g(\aNrm) = \uFunc'^{ -1} \big( \DiscFac \wFunc'(\aNrm) \big) = \cNrm$. GEGM is a generalization of EGM to the case where the Euler equation is not analytically invertible.
 
-An additional feature of GEGM is that the inverse interpolating function $\hat{f}_{a}^{ -1}$ only needs to be constructed once and can be used for all backward iterations, as long as the utility function isn't time-varying. This is because the inverse interpolating function only depends on the marginal utilities of consumption and wealth, whose parameters are constant in our specification. This also means that we can construct this interpolating function from the onset of our process to have arbitrary precission by optimally choosing the grid of $[\cNrm]$. Computationally, this adds just one additional step to the standard EGM at the beginning of the process, inheriting its substantial improvements in speed and accuracy relative to root finding and grid search maximization.
+An additional feature of GEGM is that the inverse interpolating function $\hat{f}_{a}^{ -1}$ only needs to be constructed once and can be used for all backward iterations, as long as the utility function isn't time-varying. This is because the inverse interpolating function only depends on the marginal utilities of consumption and wealth, whose parameters are constant in our specification. This also means that we can construct this interpolating function from the onset of our process to have arbitrary precision by optimally choosing the grid of $\cMat$. Computationally, this adds just one additional step to the standard EGM at the beginning of the process, inheriting its substantial improvements in speed and accuracy relative to root finding and grid search maximization\footnote{If additional precision is needed, the resulting $\hat{\cNrm}$ can be used as the initial guess for a root-finding algorithm with arbitrary precision, which should converge in few iterations due to the proximity of the initial guess to the true solution.}.
 
-\section{Calibration and Estimation}\label{Calibration and Estimation}
+\section{Quantitative Strategy}\label{Quantitative Strategy}
+
+\subsection{Calibration}\label{Calibration}
+
+\subsection{Estimation}\label{Estimation}
 
 \section{Conclusion}\label{Conclusion}
 
