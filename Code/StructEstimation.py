@@ -690,18 +690,18 @@ def estimate_all():
     ]
 
     agent_names = [
-        "Portfolio Choice",
-        "Separable Wealth in Utility",
-        "Portfolio Separable Wealth in Utility",
-        "Non-Separable Portfolio Wealth in Utility",
+        "(a) Portfolio Choice",
+        "(b) Separable Wealth in Utility",
+        "(c) Portfolio Separable Wealth in Utility",
+        "(d) Non-Separable Portfolio Wealth in Utility",
     ]
 
-    fig_sensitivity = plt.figure(layout="constrained", figsize=(12, 12))
+    fig_sensitivity = plt.figure(layout="constrained", figsize=(14, 12))
     fig_sensitivity.suptitle("Sensitivity of Moments to Parameters")
 
     subfigs_sensitivity = fig_sensitivity.subfigures(2, 2)
 
-    fig_contour = plt.figure(layout="constrained", figsize=(12, 12))
+    fig_contour = plt.figure(layout="constrained", figsize=(14, 12))
     fig_contour.suptitle("Contour Plots")
 
     subfigs_contour = fig_contour.subplots(2, 2)

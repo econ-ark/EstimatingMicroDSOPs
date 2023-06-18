@@ -68,13 +68,13 @@ It will be convenient to work with the problem in permanent-income-normalized fo
 \begin{align}
     {\vFunc}_{t}({m}_{t}) & = \max_{\cNrm_{t}} ~ \uFunc(\cNrm_{t})+\beth\Alive_{t+1}\hat{\DiscFac}_{t+1}
     \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})]
-    \\ & \text{s.t.} & \nonumber
-    \\ \aNrm_{t} & = {m}_{t}-\cNrm_{t} \nonumber
+    \\ & \text{s.t.} & 
+    \\ \aNrm_{t} & = {m}_{t}-\cNrm_{t} 
     \\ {m}_{t+1} & = \aNrm_{t}\underbrace{\left(\frac{\Rfree}{\PermShk_{t+1}\PermGroFac_{t+1}}\right)}_{\equiv \RNrm_{t+1}}
     + ~\TranShkEmp_{t+1}
 \end{align}
 
-where $\cNrm$, $\aNrm$, and $\mNrm$ are consumption, assets, and market resources normalized by permanent income, respectively, and
+where $\cNrm$, $\aNrm$, and $\mNrm$ are consumption, assets, and market resources normalized by permanent income, respectively, $\vFunc$ and $\uFunc$ are now the normalized value and utility functions,  and
 
 \begin{align}
   \PermShk_{t+1} & :  \text{mean-one shock to permanent income}
@@ -83,16 +83,16 @@ where $\cNrm$, $\aNrm$, and $\mNrm$ are consumption, assets, and market resource
     \\ \RNrm_{t+1} & :  \text{permanent income growth normalized return factor}
 \end{align}
 
-and all other variables are defined as above. The transitory and permanent shocks to income are defined as:
+with all other variables are defined as above. The transitory and permanent shocks to income are defined as:
 
 \begin{align}
 \TranShkEmp_{s}  = &
     \begin{cases}
         0\phantom{/\pZero} & \text{with probability $\pZero>0$}
         \\ \xi_{s}/\pZero & \text{with probability $(1-\pZero)$, where
-            $\log \xi{s}\thicksim \mathcal{N}(-\sigma_{\xi}^{2}/2,\sigma_{\xi}^{2})$}
+            $\log \xi_{s}\thicksim \mathcal{N}(-\sigma_{[\xi, t]}^{2}/2,\sigma_{[\xi, t]}^{2})$}
     \end{cases}
-    \\ \phantom{/\pZero} \\ & \text{and }  \log \PermShk_{s}   \thicksim \mathcal{N}(-\sigma_{\PermShk}^{2}/2,\sigma_{\PermShk}^{2}).
+    \\ \phantom{/\pZero} \\ & \text{and }  \log \PermShk_{s}   \thicksim \mathcal{N}(-\sigma_{[\PermShk, t]}^{2}/2,\sigma_{[\PermShk, t]}^{2}).
   \end{align}
 
 
@@ -103,8 +103,8 @@ A simple extension to the Life Cycle Incomplete Markets (LCIM) model is to inclu
 \begin{align}
     {\vFunc}_{t}({m}_{t}) & = \max_{\cNrm_{t}} ~ \uFunc(\cNrm_{t}, \aNrm_{t})+\beth\Alive_{t+1}\hat{\DiscFac}_{t+1}
     \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})]
-    \\ & \text{s.t.} & \nonumber
-    \\ \aNrm_{t} & = {m}_{t}-\cNrm_{t} \nonumber
+    \\ & \text{s.t.} & 
+    \\ \aNrm_{t} & = {m}_{t}-\cNrm_{t} 
     \\ {m}_{t+1} & = \aNrm_{t}\RNrm_{t+1}+ ~\TranShkEmp_{t+1}
 \end{align}
 
@@ -188,11 +188,15 @@ An additional feature of GEGM is that the inverse interpolating function $\hat{f
 
 # Quantitative Strategy
 
-This section describes the quantitative strategy used for estimating the Life Cycle Incomplete Markets model, following the works of [](doi:10.1198/073500103288619007), [](doi:10.1111/1467-937X.00092), and [](doi:10.1111/1468-0262.00269). The main objective is to look for a set of parameters that can best match the empirical moments of the data. 
+This section describes the quantitative strategy used for calibrating and estimating the Life Cycle Incomplete Markets model with and without Wealth in the Utility Function, following the works of [](doi:10.1198/073500103288619007), [](doi:10.1111/1467-937X.00092), [](doi:10.1111/1468-0262.00269), and [](doi:10.1016/j.jmoneco.2010.04.003), among others. The main objective is to find a set of parameters that can best match the empirical moments of some real-life data using simulation. 
 
 ## Calibration
 
-After careful calibration based on the Life Cycle Incomplete Markets literature, we can structurally estimate the remaining parameters $\beth$ and $\CRRA$. 
+The calibration of the Life Cycle Incomplete Markets model necessitates a richness not present in the SIM model precisely because we are interested in the heterogeneity of agents across different stages of the life cycle, such as the early working period, parenthood, saving for retirement, and retirement. To calibrate this model, we need to identify important patterns in preferences, mortality, and income risk across the life cycle. The first and perhaps most important departure from SIM is that life is finite and agents don't life forever; moreover, the terminal age is not certain as the probability of staying alive decreases with age. In this model, households start their life cycle at age $t = 25$ and live with certainty until retirement at age $t = 65$. After retirement, the probability of staying alive decreases with age, and the terminal age is set to $t = 91$. During their early adulthood, their utility of consumption might need to be adjusted by the arrival and subsequent departure of children. This is handled by a `household-size-adjusted' discount factor that is greater than 1.0 in the presence of children. This is the rationale for parameters $\Alive_{t}$ and $\hat{\DiscFac}_{t}$ in the model, whose values we take from [](doi:10.1198/073500103288619007) directly. 
+
+The unemployment probability is taken from [](doi:10.2307/2534582) to be $\pZero = 0.5$ which represents a long run equilibrium of 5\% unemployment in the United States. The remaining life cycle attributes for the distribution of shocks to income ($\PermGroFac_{t}, \ \sigma_{[\PermShk, t]}, \ \sigma_{[\xi, t]}$) are taken from [](doi:10.1016/j.jmoneco.2010.04.003). In their paper, they analyze the variability of labor earnings growth rates between the 80's and 90's and find evidence for the "Great Moderation", a decline in variability of earnings across all age groups. 
+
+After careful calibration based on the Life Cycle Incomplete Markets literature, we can structurally estimate the remaining parameters $\beth$ and $\CRRA$ to match specific empirical moments of the wealth distribution. 
 
 ## Estimation
 
@@ -214,6 +218,8 @@ Contour plot of the objective function for the structural estimation of the Life
 
 
 ## Sensitivity Analysis
+
+For our sensitivity analysis, we use the methods introduced by [](doi:10.1093/qje/qjx023).
 
 ```{figure}  ../Figures/IndShockSensitivity.*
 :name: fig:IndShockSensitivity
@@ -247,6 +253,7 @@ Sensitivity analysis of the structural estimation of the Life Cycle Incomplete M
 [](doi:10.1198/073500103288619007)
 [](doi:10.1093/qje/qjx023)
 [](doi:10.1080/07350015.1999.10524794)  <!-- Humps and Bumps in Lifetime Consumption -->
+
 
 [Econ-ARK]: https://econ-ark.org/
 [Econ-ARK/HARK]: https://github.com/econ-ark/HARK
