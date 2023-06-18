@@ -632,6 +632,7 @@ def estimate(
 
         plt.savefig(os.path.join(figures_dir, estimation_agent + "Sensitivity.pdf"))
         plt.savefig(os.path.join(figures_dir, estimation_agent + "Sensitivity.png"))
+        plt.savefig(os.path.join(figures_dir, estimation_agent + "Sensitivity.svg"))
 
         plt.show()
 
@@ -676,7 +677,208 @@ def estimate(
         pylab.ylabel(r"discount factor adjustment $\beth$", fontsize=14)
         pylab.savefig(os.path.join(figures_dir, estimation_agent + "SMMcontour.pdf"))
         pylab.savefig(os.path.join(figures_dir, estimation_agent + "SMMcontour.png"))
+        pylab.savefig(os.path.join(figures_dir, estimation_agent + "SMMcontour.svg"))
         pylab.show()
+
+
+def estimate_all():
+    agent_types = [
+        PortfolioLifeCycleConsumerType,
+        BequestWarmGlowLifeCycleConsumerType,
+        BequestWarmGlowLifeCyclePortfolioType,
+        WealthPortfolioLifeCycleConsumerType,
+    ]
+
+    agent_names = [
+        "Portfolio Choice",
+        "Separable Wealth in Utility",
+        "Portfolio Separable Wealth in Utility",
+        "Non-Separable Portfolio Wealth in Utility",
+    ]
+
+    fig_sensitivity = plt.figure(layout="constrained", figsize=(12, 12))
+    fig_sensitivity.suptitle("Sensitivity of Moments to Parameters")
+
+    subfigs_sensitivity = fig_sensitivity.subfigures(2, 2)
+
+    fig_contour = plt.figure(layout="constrained", figsize=(12, 12))
+    fig_contour.suptitle("Contour Plots")
+
+    subfigs_contour = fig_contour.subplots(2, 2)
+
+    for count, agent_type in enumerate(agent_types):
+        # Make a lifecycle consumer to be used for estimation, including simulated
+        # shocks (plus an initial distribution of wealth)
+        # Make a TempConsumerType for estimation
+        EstimationAgent = agent_type(**parameters.init_consumer_objects)
+        # Set the number of periods to simulate
+        EstimationAgent.T_sim = EstimationAgent.T_cycle + 1
+        # Choose to track bank balances as wealth
+        EstimationAgent.track_vars = ["bNrm"]
+        # Draw initial assets for each consumer
+        EstimationAgent.aNrmInit = DiscreteDistribution(
+            parameters.initial_wealth_income_ratio_probs,
+            parameters.initial_wealth_income_ratio_vals,
+            seed=parameters.seed,
+        ).draw(N=parameters.num_agents)
+        EstimationAgent.make_shock_history()
+
+        targeted_moments = get_targeted_moments()
+
+        idx = np.unravel_index(count, (2, 2))
+
+        initial_guess = [parameters.DiscFacAdj_start, parameters.CRRA_start]
+        print("----------------------------------------------------------------------")
+        print(
+            f"Now estimating the model using Nelder-Mead from an initial guess of {initial_guess}..."
+        )
+        print("----------------------------------------------------------------------")
+
+        # Make a single-input lambda function for use in the optimizer
+        def smmObjectiveFxnReduced(parameters_to_estimate):
+            """
+            A "reduced form" of the SMM objective function, compatible with the optimizer.
+            Identical to smmObjectiveFunction, but takes only a single input as a length-2
+            list representing [DiscFacAdj,CRRA].
+            """
+            return smmObjectiveFxn(
+                DiscFacAdj=parameters_to_estimate[0],
+                CRRA=parameters_to_estimate[1],
+                agent=EstimationAgent,
+                tgt_moments=targeted_moments,
+            )
+
+        t_start_estimate = time()
+        model_estimate = minimize_nelder_mead(
+            smmObjectiveFxnReduced, initial_guess, verbose=True
+        )
+        t_end_estimate = time()
+
+        time_to_estimate = t_end_estimate - t_start_estimate
+        print(
+            f"Time to execute all: {round(time_to_estimate / 60.0, 2)} min, {time_to_estimate} sec"
+        )
+        print(
+            f"Estimated values: DiscFacAdj={model_estimate[0]}, CRRA={model_estimate[1]}"
+        )
+
+        print("``````````````````````````````````````````````````````````````````````")
+        print("Computing sensitivity measure.")
+        print("``````````````````````````````````````````````````````````````````````")
+
+        # Find the Jacobian of the function that simulates moments
+        def simulate_moments_reduced(x):
+            moments = simulate_moments(
+                x[0],
+                x[1],
+                agent=EstimationAgent,
+                DiscFacAdj_bound=parameters.DiscFacAdj_bound,
+                CRRA_bound=parameters.CRRA_bound,
+                map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
+            )
+
+            return moments
+
+        n_moments = len(data.simulation_map_cohorts_to_age_indices)
+        jac = np.array(
+            [
+                approx_fprime(
+                    model_estimate,
+                    lambda x: simulate_moments_reduced(x)[j],
+                    epsilon=0.01,
+                )
+                for j in range(n_moments)
+            ]
+        )
+
+        # Compute sensitivity measure. (all moments weighted equally)
+        sensitivity = np.dot(np.linalg.inv(np.dot(jac.T, jac)), jac.T)
+
+        # Create lables for moments in the plots
+        moment_labels = [
+            "[" + str(min(x)) + "," + str(max(x)) + "]"
+            for x in data.empirical_cohort_age_groups
+        ]
+
+        # Plot
+        subfigs_sensitivity[idx].suptitle(agent_names[count])
+        subfigsnest_sensitivity = subfigs_sensitivity[idx].subplots(2, 1)
+
+        subfigsnest_sensitivity[0].bar(
+            range(n_moments), sensitivity[0, :], tick_label=moment_labels
+        )
+        subfigsnest_sensitivity[0].set_title("DiscFacAdj")
+        subfigsnest_sensitivity[0].set_ylabel("Sensitivity")
+        subfigsnest_sensitivity[0].set_xlabel("Median W/Y Ratio")
+
+        subfigsnest_sensitivity[1].bar(
+            range(n_moments), sensitivity[1, :], tick_label=moment_labels
+        )
+        subfigsnest_sensitivity[1].set_title("CRRA")
+        subfigsnest_sensitivity[1].set_ylabel("Sensitivity")
+        subfigsnest_sensitivity[1].set_xlabel("Median W/Y Ratio")
+
+        print("``````````````````````````````````````````````````````````````````````")
+        print("Creating the contour plot.")
+        print("``````````````````````````````````````````````````````````````````````")
+        t_start_contour = time()
+        DiscFac_star, CRRA_star = model_estimate
+        grid_density = 20  # Number of parameter values in each dimension
+        level_count = 100  # Number of contour levels to plot
+        DiscFacAdj_list = np.linspace(
+            max(DiscFac_star - 0.25, 0.5), min(DiscFac_star + 0.25, 1.05), grid_density
+        )
+        CRRA_list = np.linspace(
+            max(CRRA_star - 5, 2), min(CRRA_star + 5, 8), grid_density
+        )
+        CRRA_mesh, DiscFacAdj_mesh = pylab.meshgrid(CRRA_list, DiscFacAdj_list)
+        smm_obj_levels = np.empty([grid_density, grid_density])
+        for j in range(grid_density):
+            DiscFacAdj = DiscFacAdj_list[j]
+            for k in range(grid_density):
+                CRRA = CRRA_list[k]
+                smm_obj_levels[j, k] = smmObjectiveFxn(
+                    DiscFacAdj,
+                    CRRA,
+                    agent=EstimationAgent,
+                    tgt_moments=targeted_moments,
+                )
+
+        # Create figure and axes objects
+
+        # Plot the contour
+        subfigs_contour[idx].set_title(agent_names[count])
+        contour = subfigs_contour[idx].contourf(
+            CRRA_mesh, DiscFacAdj_mesh, smm_obj_levels, level_count
+        )
+        cbar = fig_sensitivity.colorbar(contour)
+
+        # Plot the model estimate
+        subfigs_contour[idx].plot(model_estimate[1], model_estimate[0], "*r", ms=15)
+
+        # Set axis labels and title
+        subfigs_contour[idx].set_xlabel(
+            r"coefficient of relative risk aversion $\rho$", fontsize=14
+        )
+        subfigs_contour[idx].set_ylabel(
+            r"discount factor adjustment $\beth$", fontsize=14
+        )
+
+        # Print time to execute
+        t_end_contour = time()
+        time_to_contour = t_end_contour - t_start_contour
+        print(
+            f"Time to execute all: {time_to_contour / 60:.2f} min, {time_to_contour:.2f} sec"
+        )
+
+    fig_sensitivity.savefig(os.path.join(figures_dir, "AllSensitivity.pdf"))
+    fig_sensitivity.savefig(os.path.join(figures_dir, "AllSensitivity.png"))
+    fig_sensitivity.savefig(os.path.join(figures_dir, "AllSensitivity.svg"))
+
+    # Save and show the plot
+    fig_contour.savefig(os.path.join(figures_dir, "AllSMMcontour.pdf"))
+    fig_contour.savefig(os.path.join(figures_dir, "AllSMMcontour.png"))
+    fig_contour.savefig(os.path.join(figures_dir, "AllSMMcontour.svg"))
 
 
 if __name__ == "__main__":

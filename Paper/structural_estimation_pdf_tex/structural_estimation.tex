@@ -30,7 +30,6 @@
 \newcommand{\mLvl}{\mathbf{m}}
 \newcommand{\pLvl}{\mathbf{p}}
 \newcommand{\Ex}{\mathbb{E}}
-\newcommand{\beth}{\mathcal{B}}
 \newcommand{\CRRA}{\rho}
 \newcommand{\PermGroFac}{\pmb{\Phi}}
 \newcommand{\Rfree}{\mathsf{R}}
@@ -42,7 +41,6 @@
 \newcommand{\TranShkEmp}{\pmb{\theta}}
 \newcommand{\mNrm}{m}
 \newcommand{\pZero}{\wp}
-\newcommand{\thicksim}{\sim}
 \newcommand{\aFunc}{\mathrm{a}}
 \newcommand{\kapShare}{\alpha}
 \newcommand{\wealth}{o}
@@ -65,7 +63,7 @@ anchorcolor = black}
 
 \title{Structural Estimation of Life Cycle Models with Wealth in the Utility Function}
 
-\newdate{articleDate}{16}{6}{2023}
+\newdate{articleDate}{17}{6}{2023}
 \date{\displaydate{articleDate}}
 
 \makeatletter
@@ -96,12 +94,18 @@ addtopdfcreator={Written in Curvenote}
 \footnotetext[1]{Correspondence to: alanlujan91@gmail.com}
 
 \begin{abstract}
-Heterogeneous Agent Models (HAM) are a powerful tool for understanding the effects of monetary and fiscal policy on the economy. However, state of the art frameworks such as Heterogeneous Agent New Keynsian (HANK) models have been unable to replicate the observed hoarding of wealth at the very top of the distribution and generally lack important life cycle properties such as time-varying mortality and income risk. On the one hand, the inability to pin down wealth at the tail of the distribution has been a problem for HANK models precisely because it has implications for the transmission of monetary and fiscal policy. On the other hand, agents in HANK are generally conceived as perpetual youth with infinite horizons and without age-specific profiles of mortality and income risk. This is problematic as it ignores the effects of these policies on potentially more affected communities, such as young families with children or the low-wealth elderly. In this paper, I investigate the effects of both life cycle considerations as well as wealth in the utility on the structural estimation of HAMs. Structural estimation is the first step in evaluating the effect of monetary and fiscal policies in a HANK framework, and my hope is that this paper will lead to better models of the economy that can be used to inform policy..
+Heterogeneous Agent Models (HAM) are a powerful tool for understanding the effects of monetary and fiscal policy on the economy. However, current state-of-the-art frameworks such as Heterogeneous Agent New Keynesian (HANK) models have limitations that hinder their ability to accurately replicate real-world economic phenomena. Specifically, HANK models struggle to account for the observed hoarding of wealth at the very top of the distribution and lack important life cycle properties such as time-varying mortality and income risk. On the one hand, the inability to pin down wealth at the tail of the distribution has been a problem for HANK models precisely because it has implications for the transmission of monetary and fiscal policy. On the other hand, agents in HANK are generally conceived as perpetual youth with infinite horizons and without age-specific profiles of mortality and income risk. This is problematic as it ignores the effects of these policies on potentially more affected communities, such as young families with children or the low-wealth elderly. In this paper, I investigate the effects of both life cycle considerations as well as wealth in the utility on the structural estimation of HAMs. Structural estimation is the first step in evaluating the effect of monetary and fiscal policies in a HANK framework, and my hope is that this paper will lead to better models of the economy that can be used to inform policy.
 \end{abstract}
 
 \keywords{structural estimation, life cycle, wealth in the utility}
 
-I would like to thank my advisor, Chris Carroll, for his guidance and support throughout this project, as well as the members of the Econ-ARK team for providing a great collaborative community to work in.
+%  Heterogeneous Agent Models (HAM) have become a popular tool for understanding the effects of monetary and fiscal policy on the economy. However, current state-of-the-art frameworks such as Heterogeneous Agent New Keynesian (HANK) models have limitations that hinder their ability to accurately replicate real-world economic phenomena. Specifically, HANK models struggle to account for the observed hoarding of wealth at the very top of the distribution and lack important life cycle properties such as time-varying mortality and income risk. These limitations are problematic because they affect the transmission of monetary and fiscal policy and ignore the effects of these policies on potentially more affected communities, such as young families with children or the low-wealth elderly.
+% 
+% To address these limitations, this paper investigates the effects of both life cycle considerations and wealth in the utility on the structural estimation of HAMs. By incorporating these factors into the model, we aim to provide a more accurate representation of the economy and its response to monetary and fiscal policy. Our research methodology involves using a combination of theoretical analysis and empirical data to estimate the parameters of the model.
+% 
+% Our findings suggest that incorporating life cycle considerations and wealth in the utility can significantly improve the accuracy of HAMs. This has important implications for policymakers who rely on these models to inform their decisions. By providing a more accurate representation of the economy, our research can help policymakers make better-informed decisions that benefit all members of society. Overall, we hope that our research will contribute to the development of better models of the economy that can be used to inform policy.
+
+I would like to thank my advisor, Chris Carroll, for his guidance and support throughout this project. His expertise and mentorship have been invaluable in shaping my work. Additionally, I would like to extend my appreciation to the members of the \href{https://econ-ark.org/}{Econ-ARK} team for fostering a dynamic and collaborative community that has greatly enriched my experience. Their contributions and feedback have been instrumental in helping me achieve my goals. All remaining errors are my own. The figures in this paper were generated using the \href{https://github.com/econ-ark/HARK}{Econ-ARK/HARK} toolkit.
 
 \section{Introduction}\label{Introduction}
 
@@ -180,9 +184,7 @@ A simple extension to the Life Cycle Incomplete Markets (LCIM) model is to inclu
 \end{align}
 \end{equation}
 
-\subsubsection{Separable Utility}\label{Separable Utility}
-
-\cite{Carroll_1998} presents extensive empirical and informal evidence for a LCIM model with wealth in the utility function. Specifically, the paper uses a utility that is separable in consumption and wealth:
+\textbf{Separable Utility} \cite{Carroll_1998} presents extensive empirical and informal evidence for a LCIM model with wealth in the utility function. Specifically, the paper uses a utility that is separable in consumption and wealth:
 
 \begin{equation}
 \uFunc(\cNrm_{t}, \aNrm_{t}) = \frac{\cNrm_{t}^{1-\CRRA}}{1-\CRRA}
@@ -191,9 +193,7 @@ A simple extension to the Life Cycle Incomplete Markets (LCIM) model is to inclu
 
 where $\kapShare$ is the relative weight of the utility of wealth and $\wealthShare$ is the relative risk aversion of wealth.
 
-\subsubsection{Non-separable Utility}\label{Non-separable Utility}
-
-A different model that we will explore is one in which the utility function is non-separable in consumption and wealth; i.e. consumption and wealth are complimentary goods. In the case of the LCIM model, this dynamic complementarity drives the accumulation of wealth not only for the sake of wealth itself, but also because it increases the marginal utility of consumption.
+\textbf{Non-separable Utility} A different model that we will explore is one in which the utility function is non-separable in consumption and wealth; i.e. consumption and wealth are complimentary goods. In the case of the LCIM model, this dynamic complementarity drives the accumulation of wealth not only for the sake of wealth itself, but also because it increases the marginal utility of consumption.
 
 \begin{equation}
 \uFunc(\cNrm_{t}, \aNrm_{t}) = \frac{(\cNrm_{t}^{1-\wealthShare} (\aNrm_{t} - \underline\aNrm)^\wealthShare)^{1-\CRRA}}{(1-\CRRA)}
@@ -262,14 +262,49 @@ An additional feature of GEGM is that the inverse interpolating function $\hat{f
 
 \section{Quantitative Strategy}\label{Quantitative Strategy}
 
+This section describes the quantitative strategy used for estimating the Life Cycle Incomplete Markets model, following the works of \cite{Cagetti_2003}, \cite{Palumbo_1999}, and \cite{Gourinchas_2002}. The main objective is to look for a set of parameters that can best match the empirical moments of the data.
+
 \subsection{Calibration}\label{Calibration}
 
+After careful calibration based on the Life Cycle Incomplete Markets literature, we can structurally estimate the remaining parameters $\beth$ and $\CRRA$.
+
 \subsection{Estimation}\label{Estimation}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.7\linewidth]{files/IndShockSMMcontour-5bc9bdda8e84d0a122a59cf513a35efa.pdf}
+\caption{Contour plot of the objective function for the structural estimation of the Life Cycle Incomplete Markets model. The red dot represents the estimated parameters.}
+\label{fig:IndShockSMMcontour}
+\end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.7\linewidth]{files/AllSMMcontour-bc92bd404a880bb8c4177b4cb7404d89.pdf}
+\caption{Contour plot of the objective function for the structural estimation of the Life Cycle Incomplete Markets model. The red dot represents the estimated parameters.}
+\label{fig:AllSMMcontour}
+\end{figure}
+
+\subsection{Sensitivity Analysis}\label{Sensitivity Analysis}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.7\linewidth]{files/IndShockSensitivity-31c3ae80fe69d6f8e1d2a4185c94daaf.pdf}
+\caption{Sensitivity analysis of the structural estimation of the Life Cycle Incomplete Markets model. The red dot represents the estimated parameters.}
+\label{fig:IndShockSensitivity}
+\end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.7\linewidth]{files/AllSensitivity-a63c5b85e2d4829b3c4f779b23c98f82.pdf}
+\caption{Sensitivity analysis of the structural estimation of the Life Cycle Incomplete Markets model. The red dot represents the estimated parameters.}
+\label{fig:AllSensitivity}
+\end{figure}
 
 \section{Conclusion}\label{Conclusion}
 
 \section{References}\label{References}
 
+\cite{Palumbo_1999}
 \cite{Carroll_2000}
 \cite{Carroll_1998}
 \cite{Michaillat_2021}
@@ -278,6 +313,9 @@ An additional feature of GEGM is that the inverse interpolating function $\hat{f
 \cite{Kaplan_2018}
 \cite{Auclert_2020}
 \cite{Cagetti_2003}
+\cite{Andrews_2017}
+\cite{Attanasio_1999}  
+%  Humps and Bumps in Lifetime Consumption
 
 
 

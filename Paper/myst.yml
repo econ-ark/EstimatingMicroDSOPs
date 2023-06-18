@@ -818,6 +818,4 @@ project:
     '\risky': '\mathbf{r}'
     '\Seniority': '\mathsf{X}'
     '\seniority': '\mathsf{x}'
-    '\beth': '\mathcal{B}'
     '\wealthShare': '\delta'
-    '\thicksim': '\sim'
