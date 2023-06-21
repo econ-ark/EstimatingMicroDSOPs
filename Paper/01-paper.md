@@ -156,35 +156,7 @@ In the presence of wealth in the utility function, the Euler equation is more co
 
 If the utility of consumption and wealth is additively separable, then the Euler equation can be written as $\uFunc_{c}'(\cNrm) = \uFunc_{a}'(\aNrm) + \DiscFac \wFunc'(\aNrm)$. This makes sense, as the agent will equalize the marginal utility of consumption with the marginal utility of wealth today plus the discounted marginal value of wealth tomorrow. In this case, the EGM is simple: we can invert the Euler equation to obtain the optimal consumption policy as $\cNrm(\aNrm) = \uFunc_{c}'^{-1}\big(\uFunc_{a}'(\aNrm) + \DiscFac \wFunc'(\aNrm)\big)$. We can proceed with EGM as usual, using the budget constraint to obtain the endogenous grid of market resources $\mNrm(\aMat) = \aMat + \cNrm(\aMat)$.
 
-## Generalized Endogenous Grid Method
 
-When the utility of consumption and wealth is not additively separable, the Euler equation is not analytically invertible for the optimal consumption policy. The usual recourse is to use a root-finding algorithm to obtain the optimal consumption policy for each point on the grid of market resources, which turns out to be more efficient than grid search maximization. As far as I am aware, this is the first paper to avoid root-finding or grid search maximization by using an EGM-like approach to solve a problem with a non-invertible Euler equation.
-
-Holding $\aNrm$ constant, define a function $f_{a}$ as the difference between the marginal utility of consumption and the marginal utility of wealth, and using an _exogenous_ grid of $\cMat$, label the difference as $[\xFer_{a}]$:
-
-\begin{equation}
-    f_{a}(\cMat) = \uFunc_{c}'(\cMat, \aNrm) - \uFunc_{a}'(\cMat, \aNrm) = [\xFer_{a}]
-\end{equation}
-
-So far, we haven't done much, as $f_a$ is still not analytically invertible. However, as we have held $\aNrm$ constant, this is now a single variable function with a single output. We can easily create a linear interpolator for the inverse of this function by reversing output with input appropriately. This is the key step that allows us to avoid root-finding or grid search maximization. We will call this function $\hat{f}_{a}^{-1}$, as it is an approximation of the inverse of $f_{a}$ which could still introduce some error[^f_error].
-
-[^f_error]: A main difference between EGM and GEGM is that EGM uses the exact inverse of the Euler equation, thereby giving the unique optimal consumption policy for each point on the grid of post-decision savings that exactly satisfies the Euler equation. GEGM uses an approximation of the inverse of the Euler equation, thereby giving an approximate optimal consumption policy for each point on the grid of market resources. With careful grid choice, the approximation error can be made arbitrarily small.
-
-\begin{equation}
-    \hat{f}_{a}^{-1}([\xFer_{a}]) = \cMat
-\end{equation}
-
-We can now construct the function $g(\aNrm)$ as the composition of $\hat{f}_{a}^{-1}$ and discounted marginal value of wealth $\DiscFac \wFunc'$, which should provide an approximation of the optimal consumption policy for each point on the grid of post-decision savings:
-
-\begin{equation}
-    g(\aNrm^*) = \hat{f}_{a^*}^{-1} \big( \DiscFac \wFunc'(\aNrm^*) \big) = \cNrm^*
-\end{equation}
-
-This completes the modified step in the Generalized Endogenous Grid Method (GEGM). If this looks familiar, it is because it exactly parallels the EGM method. In the SIM model, $f_a(\cNrm,\aNrm) = \uFunc'(\cNrm)$, which does not depend on $\aNrm$, so we can drop it. The inverse of this function is exactly $f^{-1}(\xFer) = \uFunc'^{-1}(\xFer)$, so we don't need an approximating interpolator. The composition of this function with the discounted marginal value of wealth exactly provides the consumption policy as $g(\aNrm) = \uFunc'^{-1} \big( \DiscFac \wFunc'(\aNrm) \big) = \cNrm$. GEGM is a generalization of EGM to the case where the Euler equation is not analytically invertible.
-
-An additional feature of GEGM is that the inverse interpolating function $\hat{f}_{a}^{-1}$ only needs to be constructed once and can be used for all backward iterations, as long as the utility function isn't time-varying. This is because the inverse interpolating function only depends on the marginal utilities of consumption and wealth, whose parameters are constant in our specification. This also means that we can construct this interpolating function from the onset of our process to have arbitrary precision by optimally choosing the grid of $\cMat$. Computationally, this adds just one additional step to the standard EGM at the beginning of the process, inheriting its substantial improvements in speed and accuracy relative to root finding and grid search maximization[^speed].
-
-[^speed]: If additional precision is needed, the resulting $\hat{\cNrm}$ can be used as the initial guess for a root-finding algorithm with arbitrary precision, which should converge in few iterations due to the proximity of the initial guess to the true solution.
 
 # Quantitative Strategy
 
