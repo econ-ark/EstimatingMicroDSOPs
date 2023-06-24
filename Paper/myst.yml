@@ -11,7 +11,7 @@ project:
         - Econ-ARK
       email: alanlujan91@gmail.com
   github: https://github.com/econ-ark/SolvingMicroDSOPs-LifeCycle
-  # bibliography: []
+  bibliography: main.bib
   math:
     '\CARA': '\alpha'
     '\CRRA': '\rho'
