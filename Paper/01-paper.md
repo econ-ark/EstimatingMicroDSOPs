@@ -241,7 +241,40 @@ where $\varsigma^{\tau}$ is the empirical moment of the wealth distribution at a
 Contour plot of the objective function for the structural estimation of the Life Cycle Incomplete Markets model. The red dot represents the estimated parameters.
 ```
 
-**Results for WUFIM models** 
+```{list-table} WUFIM Estimation Results
+:header-rows: 1
+:name: WUFIMestimation
+
+* - Model
+  - $\beth$
+  - $\CRRA$
+* - LCIM w/ Portfolio Choice
+  - 0.866
+  - 3.756
+* - 
+  - (0.0011)
+  - (0.0313)
+* - Separable WUFIM
+  - 0.876
+  - 3.506
+* - 
+  - (0.0012)
+  - (0.0254)
+* - Separable WUFIM w/ Portfolio
+  - 0.864
+  - 3.806
+* - 
+  - (0.0012)
+  - (0.0263)
+* - Non-Separable WUFIM
+  - 0.601
+  - 5.032
+* - 
+  - (0.0026)
+  - (0.0634)
+```
+
+**Results for WUFIM models** We can see the estimated parameters for our alternative specifications of the LCIM with Wealth in the Utility Function (WUFIM) in {numref}`WUFIMestimation`. The estimated values for $\beth$ and $\CRRA$ are 0.866 and 3.756, respectively, for the LCIM with portfolio choice, 0.876 and 3.506, respectively, for the separable WUFIM, 0.864 and 3.806, respectively, for the separable WUFIM with portfolio choice, and 0.601 and 5.032, respectively, for the non-separable WUFIM. The standard errors are estimated via the bootstrap. Additionally, {numref}`fig:AllSMMcontour` shows a contour plot of the objective function for the structural estimation exercise where the red star represents the estimated parameters. From these results, a clear pattern emerges which is worth discussion and further analysis. The estimated parameters for the Separable WUFIM model are not very different from those in LCIM model, which perhaps points at the inability of warm glow bequest models to resolve many of the issues of the SIM and LCIM model. The separable WUFIM model does not produce significant differences in the accumulation of wealth over the life cycle beyond a simple shifting out of the savings function. When we add a portfolio choice to either model, the pure discount factor $\beth$ becomes slightly lower and the coefficient of risk aversion $\CRRA$ increases by a few decimal points. This is because, as the portfolio choice model exposes agents to more risk, they become both more risk averse and more patient. Finally, the non-separable WUFIM model produces a much lower estimate of the pure discount factor $\beth$ and a much higher estimate of the coefficient of risk aversion $\CRRA$. This could be because of the dynamic complementarity between consumption and savings, which causes agents to save more in order to enjoy their consumption even more. This is an important result that requires further exploration. 
 
 ```{figure} ../Figures/AllSMMcontour.*
 :name: fig:AllSMMcontour
@@ -279,7 +312,6 @@ Sensitivity analysis of the structural estimation of the Life Cycle Incomplete M
 
 # Conclusion
 
-# References
 
 [Econ-ARK]: https://econ-ark.org/
 [Econ-ARK/HARK]: https://github.com/econ-ark/HARK

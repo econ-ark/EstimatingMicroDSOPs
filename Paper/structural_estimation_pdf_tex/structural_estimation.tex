@@ -62,7 +62,7 @@ anchorcolor = black}
 
 \title{Structural Estimation of Life Cycle Models with Wealth in the Utility Function}
 
-\newdate{articleDate}{24}{6}{2023}
+\newdate{articleDate}{25}{6}{2023}
 \date{\displaydate{articleDate}}
 
 \makeatletter
@@ -264,7 +264,7 @@ If the utility of consumption and wealth is additively separable, then the Euler
 
 When the utility of consumption and wealth is not additively separable, the Euler equation is not analytically invertible for the optimal consumption policy. The usual recourse is to use a root-finding algorithm to obtain the optimal consumption policy for each point on the grid of market resources, which turns out to be more efficient than grid search maximization.
 
-Holding $\mNrm$ constant, define a function $f_{m}$ as the difference between the marginal utility of consumption and the marginal utility of wealth:
+Holding $\mNrm$ constant, we can define a function $f_{m}$ as the difference between the marginal utility of consumption and the marginal utility of wealth:
 
 \begin{equation}
 f_{m}(\cNrm) = \uFunc_{c}'(\cNrm, \mNrm - \cNrm) - \uFunc_{a}'(\cNrm, \mNrm - \cNrm) - \DiscFac \wFunc'(\mNrm - \cNrm)
@@ -322,7 +322,27 @@ $\beth$ & $\CRRA$ \\
 \label{fig:IndShockSMMcontour}
 \end{figure}
 
-\textbf{Results for WUFIM models}
+\begin{table}
+\centering
+\caption{WUFIM Estimation Results}
+\label{WUFIMestimation}
+\begin{tabular}{p{\dimexpr 0.333\linewidth-2\tabcolsep}p{\dimexpr 0.333\linewidth-2\tabcolsep}p{\dimexpr 0.333\linewidth-2\tabcolsep}}
+\toprule
+Model & $\beth$ & $\CRRA$ \\
+\hline
+LCIM w/ Portfolio Choice & 0.866 & 3.756 \\
+ & (0.0011) & (0.0313) \\
+Separable WUFIM & 0.876 & 3.506 \\
+ & (0.0012) & (0.0254) \\
+Separable WUFIM w/ Portfolio & 0.864 & 3.806 \\
+ & (0.0012) & (0.0263) \\
+Non-Separable WUFIM & 0.601 & 5.032 \\
+ & (0.0026) & (0.0634) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Results for WUFIM models} We can see the estimated parameters for our alternative specifications of the LCIM with Wealth in the Utility Function (WUFIM) in Table~\ref{WUFIMestimation}. The estimated values for $\beth$ and $\CRRA$ are 0.866 and 3.756, respectively, for the LCIM with portfolio choice, 0.876 and 3.506, respectively, for the separable WUFIM, 0.864 and 3.806, respectively, for the separable WUFIM with portfolio choice, and 0.601 and 5.032, respectively, for the non-separable WUFIM. The standard errors are estimated via the bootstrap. Additionally, Figure~\ref{fig:AllSMMcontour} shows a contour plot of the objective function for the structural estimation exercise where the red star represents the estimated parameters. From these results, a clear pattern emerges which is worth discussion and further analysis. The estimated paramters for the Separable WUFIM model are not very different from those in LCIM model, which perhaps points at the inability of warm glow bequest models to resolve many of the issues of the SIM and LCIM model. The separable WUFIM model does not produce significant differences in the accumulation of wealth over the life cycle beyond a simple shifting out of the savings function. When we add a portfolio choice to either model, the pure discount factor $\beth$ becomes slightly lower and the coefficient of risk aversion $\CRRA$ increases by a few decimal points. This is because, as the portfolio choice model exposes agents to more risk, they become both more risk averse and more patient. Finally, the non-separable WUFIM model produces a much lower estimate of the pure discount factor $\beth$ and a much higher estimate of the coefficient of risk aversion $\CRRA$. This could be because of the dynamic complementarity between consumption and savings, which causes agents to save more in order to enjoy their consumption even more. This is an important result that requires further exploration.
 
 \begin{figure}[!htbp]
 \centering
@@ -337,12 +357,16 @@ $\beth$ & $\CRRA$ \\
 
 For our sensitivity analysis, we use the methods introduced by \cite{Andrews_2017}.
 
+\textbf{Results for LCIM model}
+
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.7\linewidth]{files/IndShockSensitivity-9046783d8c17a2fc3e39f5fb5ebcf6c7.pdf}
 \caption{Sensitivity analysis of the structural estimation of the Life Cycle Incomplete Markets model. The red dot represents the estimated parameters.}
 \label{fig:IndShockSensitivity}
 \end{figure}
+
+\textbf{Results for WUFIM models}
 
 \begin{figure}[!htbp]
 \centering
@@ -352,8 +376,6 @@ For our sensitivity analysis, we use the methods introduced by \cite{Andrews_201
 \end{figure}
 
 \section{Conclusion}\label{Conclusion}
-
-\section{References}\label{References}
 
 
 
