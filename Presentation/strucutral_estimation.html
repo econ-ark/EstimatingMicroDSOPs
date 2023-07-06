@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Structural Estimation of Life Cycle Models</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Alan E. Lujan Solis" />
+    <meta name="date" content="2023-07-06" />
+    <script src="libs/header-attrs-2.23/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Structural Estimation of Life Cycle Models
+]
+.subtitle[
+## with Welth in the Utility Function
+]
+.author[
+### Alan E. Lujan Solis
+]
+.institute[
+### Ohio State University <br> Econ-ARK
+]
+.date[
+### 2023-07-06
+]
+
+---
+
+
+$$
+\newcommand{\DiscFac}{\beta}
+\newcommand{\cFunc}{\mathrm{c}}
+\newcommand{\uFunc}{\mathrm{u}}
+\newcommand{\vFunc}{\mathrm{v}}
+\newcommand{\Alive}{\mathcal{L}}
+\newcommand{\h}{h}
+\newcommand{\cLvl}{\mathbf{c}}
+\newcommand{\mLvl}{\mathbf{m}}
+\newcommand{\pLvl}{\mathbf{p}}
+\newcommand{\Ex}{\mathbb{E}}
+\newcommand{\CRRA}{\rho}
+\newcommand{\PermGroFac}{\pmb{\Phi}}
+\newcommand{\Rfree}{\mathsf{R}}
+\newcommand{\PermShk}{\mathbf{\Psi}}
+\newcommand{\TranShk}{\pmb{\xi}}
+\newcommand{\aNrm}{a}
+\newcommand{\cNrm}{c}
+\newcommand{\RNrm}{\mathcal{R}}
+\newcommand{\TranShkEmp}{\pmb{\theta}}
+\newcommand{\mNrm}{m}
+\newcommand{\pZero}{\wp}
+\newcommand{\aFunc}{\mathrm{a}}
+\newcommand{\kapShare}{\alpha}
+\newcommand{\wealth}{o}
+\newcommand{\kap}{k}
+\newcommand{\wealthShare}{\delta}
+\newcommand{\wFunc}{\mathrm{w}}
+\newcommand{\aRat}{a}
+\newcommand{\mRat}{m}
+\newcommand{\aMat}{[\mathrm{a}]}
+\newcommand{\mMat}{[\mathrm{m}]}
+\newcommand{\weight}{\omega}
+$$
+
+The agent's objective is to maximize present discounted utility from consumption over the life cycle with a terminal period of `\(T\)`:
+
+`$$\begin{equation}
+\label{eq:lifecyclemax}
+\vFunc_{t}(\pLvl_{t},\mLvl_{t})  =    \max_{\{\cFunc\}_{t}^{T}} ~ \uFunc(\cLvl_{t})+\Ex_{t}\left[\sum_{n=1}^{T-t} {\beth}^{n} \Alive_{t}^{t+n}\hat{\DiscFac}_{t}^{t+n} \uFunc(\cLvl_{t+n}) \right]
+\end{equation}$$`
+
+where `\(\pLvl_{t}\)` is the permanent income level, `\(\mLvl_{t}\)` is total market resources, `\(\cLvl_{t}\)` is consumption, and
+
+`$$\begin{equation}
+\begin{align}
+    \beth &amp; :  \text{time-invariant pure discount factor}
+    \\ \Alive _{t}^{t+n} &amp; :  \text{probability to }\Alive\text{ive until age t+n given alive at age t}
+    \\ \hat{\DiscFac}_{t}^{t+n} &amp; :  \text{age-varying discount factor between ages t and t+n.}
+\end{align}
+\end{equation}$$`
+
+---
+
+`$$\begin{equation}
+\begin{align}
+    {\vFunc}_{t}({m}_{t}) &amp; = \max_{\cNrm_{t}} ~ \uFunc(\cNrm_{t})+\beth\Alive_{t+1}\hat{\DiscFac}_{t+1}
+    \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})]
+    \\ &amp; \text{s.t.} &amp; 
+    \\ \aNrm_{t} &amp; = {m}_{t}-\cNrm_{t} 
+    \\ {m}_{t+1} &amp; = \aNrm_{t}\underbrace{\left(\frac{\Rfree}{\PermShk_{t+1}\PermGroFac_{t+1}}\right)}_{\equiv \RNrm_{t+1}}
+    + ~\TranShkEmp_{t+1}
+\end{align}
+\end{equation}$$`
+
+where `\(\cNrm\)`, `\(\aNrm\)`, and `\(\mNrm\)` are consumption, assets, and market resources normalized by permanent income, respectively, `\(\vFunc\)` and `\(\uFunc\)` are now the normalized value and utility functions,  and
+
+`$$\begin{equation}
+\begin{align}
+  \PermShk_{t+1} &amp; :  \text{mean-one shock to permanent income}
+    \\ \PermGroFac_{t+1} &amp; :  \text{permanent income growth factor}
+    \\ \TranShkEmp_{t+1} &amp; :  \text{transitory shock to permanent income}
+    \\ \RNrm_{t+1} &amp; :  \text{permanent income growth normalized return factor}
+\end{align}
+\end{equation}$$`
+
+with all other variables are defined as above. The transitory and permanent shocks to income are defined as:
+
+`$$\begin{equation}
+\begin{align}
+\TranShkEmp_{s}  = &amp;
+    \begin{cases}
+        0\phantom{/\pZero} &amp; \text{with probability `\(\pZero&gt;0\)`}
+        \\ \xi_{s}/\pZero &amp; \text{with probability `\((1-\pZero)\)`, where
+            `\(\log \xi_{s}\thicksim \mathcal{N}(-\sigma_{[\xi, t]}^{2}/2,\sigma_{[\xi, t]}^{2})\)`}
+    \end{cases}
+    \\ \phantom{/\pZero} \\ &amp; \text{and }  \log \PermShk_{s}   \thicksim \mathcal{N}(-\sigma_{[\PermShk, t]}^{2}/2,\sigma_{[\PermShk, t]}^{2}).
+  \end{align}
+\end{equation}$$`
+
+---
+
+`$$\begin{equation}
+\begin{align}
+    {\vFunc}_{t}({m}_{t}) &amp; = \max_{\cNrm_{t}} ~ \uFunc(\cNrm_{t}, \aNrm_{t})+\beth\Alive_{t+1}\hat{\DiscFac}_{t+1}
+    \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})]
+    \\ &amp; \text{s.t.} &amp; 
+    \\ \aNrm_{t} &amp; = {m}_{t}-\cNrm_{t} 
+    \\ {m}_{t+1} &amp; = \aNrm_{t}\RNrm_{t+1}+ ~\TranShkEmp_{t+1}
+\end{align}
+\end{equation}$$`
+
+---
+
+\textbf{Separable Utility} \cite{Carroll_1998} presents extensive empirical and informal evidence for a LCIM model with wealth in the utility function. Specifically, the paper uses a utility that is separable in consumption and wealth:
+
+`$$\begin{equation}
+\uFunc(\cNrm_{t}, \aNrm_{t}) = \frac{\cNrm_{t}^{1-\CRRA}}{1-\CRRA}
+    + \kapShare_{t} \frac{(\aFunc_{t} - \underline\aNrm)^{1-\wealthShare}}{1-\wealthShare}
+\end{equation}$$`
+
+
+`$$\begin{equation}
+\uFunc(\cNrm_{t}, \aNrm_{t}) = \frac{(\cNrm_{t}^{1-\wealthShare} (\aNrm_{t} - \underline\aNrm)^\wealthShare)^{1-\CRRA}}{(1-\CRRA)}
+\end{equation}$$`
+
+---
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
