@@ -27,15 +27,9 @@ abbreviations:
 
 +++ {"part": "abstract"}
 
-Heterogeneous Agent Models (HAM) are a powerful tool for understanding the effects of monetary and fiscal policy on the economy. However, current state-of-the-art frameworks such as Heterogeneous Agent New Keynesian (HANK) models have limitations that hinder their ability to accurately replicate real-world economic phenomena. Specifically, HANK models struggle to account for the observed hoarding of wealth at the very top of the distribution and lack important life cycle properties such as time-varying preferences, mortality, and income risk. On the one hand, the inability to pin down wealth at the tail of the distribution has been a problem for HANK models precisely because it has implications for the transmission of monetary and fiscal policy. On the other hand, agents in HANK are generally conceived as perpetual youth with infinite horizons and without age-specific profiles of mortality and income risk. This is problematic as it ignores the effects of these policies on potentially more affected communities, such as young families with children or the low-wealth elderly. In this paper, I investigate the effects of both life cycle considerations as well as wealth in the utility on the structural estimation of HAMs. Structural estimation is the first step in evaluating the effect of monetary and fiscal policies in a HANK framework, and my hope is that this paper will lead to better models of the economy that can be used to inform policy.
+Heterogeneous Agent Models (HAM) are a powerful tool for understanding the effects of monetary and fiscal policy on the economy. However, current state-of-the-art frameworks such as Heterogeneous Agent New Keynesian (HANK) models have limitations that hinder their ability to accurately replicate real-world economic phenomena. Specifically, HANK models struggle to account for the observed accumulation of wealth at the very top of the distribution and lack important life cycle properties such as time-varying preferences, mortality, and income risk. On the one hand, the inability to pin down wealth at the tail of the distribution has been a problem for HANK models precisely because it has implications for the transmission of monetary and fiscal policy. On the other hand, agents in HANK are generally conceived as perpetual youth with infinite horizons and without age-specific profiles of mortality and income risk. This is problematic as it ignores the effects of these policies on potentially more affected communities, such as young families with children or the low-wealth elderly. In this paper, I investigate the effects of both life cycle considerations as well as wealth in the utility on the structural estimation of HAMs. Structural estimation is the first step in evaluating the effect of monetary and fiscal policies in a HANK framework, and my hope is that this paper will lead to better models of the economy that can be used to inform policy.
 
 +++
-
-<!-- Heterogeneous Agent Models (HAM) have become a popular tool for understanding the effects of monetary and fiscal policy on the economy. However, current state-of-the-art frameworks such as Heterogeneous Agent New Keynesian (HANK) models have limitations that hinder their ability to accurately replicate real-world economic phenomena. Specifically, HANK models struggle to account for the observed hoarding of wealth at the very top of the distribution and lack important life cycle properties such as time-varying mortality and income risk. These limitations are problematic because they affect the transmission of monetary and fiscal policy and ignore the effects of these policies on potentially more affected communities, such as young families with children or the low-wealth elderly.
-
-To address these limitations, this paper investigates the effects of both life cycle considerations and wealth in the utility on the structural estimation of HAMs. By incorporating these factors into the model, we aim to provide a more accurate representation of the economy and its response to monetary and fiscal policy. Our research methodology involves using a combination of theoretical analysis and empirical data to estimate the parameters of the model.
-
-Our findings suggest that incorporating life cycle considerations and wealth in the utility can significantly improve the accuracy of HAMs. This has important implications for policymakers who rely on these models to inform their decisions. By providing a more accurate representation of the economy, our research can help policymakers make better-informed decisions that benefit all members of society. Overall, we hope that our research will contribute to the development of better models of the economy that can be used to inform policy. -->
 
 +++ {"part": "acknowledgements"}
 
@@ -45,31 +39,22 @@ I would like to thank my advisor, Chris Carroll, for his guidance and support th
 
 # Introduction
 
-## HANK
+Increased computational power has allowed economists to focus on more complex models of household consumption and saving. In particular, Heterogeneous Agent Models (HAM) have become a popular tool to analyze households' response to aggregate economic shocks in the face of uncertainty. Nevertheless, current state-of-the-art models have struggled to replicate the distribution of wealth at the very top of the distribution and the extent of wealth inequality. A new class of models, the Heterogeneous Agent New Keynesian (HANK) models, have taken the literature by storm and become the standard for analyzing the effects of monetary and fiscal policy[^hank]. Even HANK models, however, inherit the inability to capture the distribution of wealth from their predecessors. Moreover, they also lack important life cycle properties such as time-varying preferences, household composition, and mortality and income risk. These limitations make the workhorse HANK models ill-suited for analyzing the effects of economic shocks and policy on the spectrum of households in the economy, from young families with children to retirees, and in particular, on the most vulnerable households among these subgroups. In this paper, I investigate the effects of both life cycle considerations as well as wealth in the utility on the structural estimation of HAMs. Thorough this effort, we hope to contribute to the development of better models of the economy that can be used to inform policy.
 
-[](doi:10.1257/aer.20160042) Monetary policy according to HANK
-[](doi:10.3982/ECTA16409) Understanding HANK: Insights from a PRANK
-[](doi:10.1093/jeea/jvaa028) Macroeconomic Fluctuations with HANK & SAM: An Analytical Approach
-[](doi:10.3386/w26647) Micro Jumps, Macro Humps: Monetary Policy and Business Cycles in an Estimated HANK Model
+[^hank]: See [](doi:10.1257/aer.20160042), [](doi:10.3982/ECTA16409), [](doi:10.1093/jeea/jvaa028), and [](doi:10.3386/w26647), among others. 
 
-## Wealth Accumulation
+[](doi:10.3386/w6549) demonstrates that the rich have higher lifetime savings rates[^savings] which can not be explained by models of consumption smoothing and precautionary savings alone. Instead, he argues that the simplest model that accounts for this is one with wealth in the utility function. This is because households either derive utility from the accumulation wealth itself or wealth provides a flow of services such as political power and social status. In either case, this pattern of higher savings can be modeled by putting wealth directly in the utility function. In his paper, he proposes the use of additively separable utility of wealth and consumption[^portfolios], which we will explore in this paper. Additionally, however, we will also explore the use of non-separable utility of consumption and wealth. With non-separability of utility, we obtain a model that allows for a marginal utility of consumption that is increasing in wealth even while it is decreasing in consumption. This dynamic complementarity between consumption and wealth is a key feature of our model that induces a strong savings motive for the rich.
 
-[](doi:10.3386/w7826) Portfolios of the Rich
-[](doi:10.3386/w6549) Why do the Rich save so much?
-[](doi:10.3386/w26941) The Saving Glut of the Rich
-[](doi:10.1086/381475) Do the Rich Save More?
+[^savings]: See also [](doi:10.1086/381475). 
+[^portfolios]: Also see [](doi:10.3386/w7826), which uses additively separable utility of wealth and consumption to explain the portfolio choices of the rich.
 
-## Life Cycle Models 
-[](doi:10.1111/1467-937X.00092) Uncertain Medical Expenses and Precautionary Saving Near the End of the Life Cycle
-[](doi:10.1198/073500103288619007) Wealth Accumulation Over the Life Cycle and Precautionary Savings
-[](doi:10.1080/07350015.1999.10524794)  Humps and Bumps in Lifetime Consumption 
-[](doi:10.1257/000282802320189393) The Importance of Bequests and Life-Cycle Saving in Capital Accumulation: A New Answer
-[](doi:10.1086/651674) Why Do the Elderly Save? The Role of Medical Expenses
+Wealth Inequality has been a persistent problem for the HAM literature[^surveys]. Models with entrepreneurship, preference heterogeneity, habit formation, bequest motives, human capital, and large earnings risk have had varying degrees of success in replicating the distribution of wealth. However, these models have been unable to account for the fat tail in the distribution. Recent research highlights the importance of savings among the richest in the United States and its distributional effects. [](doi:10.3386/w26941) find that the rise in savings by the richest households in the U.S. over the last 40 years is strongly associated with dissaving by the non-rich and the government, in the form of debt, which might have implications for the rise in household debt and declining interest rates in the last few decades. Similarly, [](doi:10.3386/w30900) find that as non-rich households spend down their excess savings, the incomes of the rich rise, which in turns leads to an increase in their excess savings. This movement of savings across the distribution leads to a prolonged increase in aggregate demand and can dampen the effects of monetary policy. [](doi:10.1162/rest_a_00893) present a similar model within the HANK literature that includes wealth in the utility function. However, because this paper uses continuous time methods, it is unable to capture the life cycle properties of more realistic models. 
 
-## Related papers/tools 
+[^surveys]: See [](doi:10.1017/S1365100507070150), [](doi:10.3386/w21106), [](doi:10.1016/j.red.2017.06.002), for surveys on the topic.
 
- Using the Sequence-Space Jacobian to Solve and Estimate Heterogeneous-Agent Models
-[](doi:10.1162/rest_a_00893) Resolving New Keynesian Anomalies with Wealth in the Utility Function 
+The purpose of this paper is to investigate the effects of wealth in the utility function as well as life-cycle properties on the structural estimation of HAMs. By using wealth in the utility function, we can better match the top of the wealth distribution and the motives for wealth accumulation. Also, by parameterizing a rich model of life cycle properties such as age-specific and household-size-adjusted preferences, and mortality and income risk, we can better understand the effects that economic shocks and policies have on young working families, workers saving toward retirement, and retirees. In particular, we can better understand the effects of monetary policy on the distribution of wealth and consumption across the life cycle. 
+
+The remainder of the paper is organized as follows. Section 2 provides the baseline models and alternative specifications with wealth in the utility function. Section 3 describes the solution methods used to solve these models. Section 4 describes the quantitative strategy used to calibrate and estimate the models, followed by sensitivity analysis of the results. Finally, Section 5 contains closing remarks and future directions.
 
 # Life Cycle Incomplete Markets Models
 
@@ -286,11 +271,7 @@ Contour plot of the objective function for the structural estimation of the Life
 
 ## Sensitivity Analysis
 
-[](doi:10.1093/qje/qjx023) Measuring the Sensitivity of Parameter Estimates to Estimation Moments
-
-For our sensitivity analysis, we use the methods introduced by [](doi:10.1093/qje/qjx023).
-
-**Results for LCIM model**
+**Results for LCIM model** For our sensitivity analysis, we use the methods introduced by [](doi:10.1093/qje/qjx023). {numref}`fig:IndShockSensitivity` shows the sensitivity of the pure discount factor $\beth$ and the coefficient of risk aversion $\CRRA$. As in [](doi:10.1093/qje/qjx023), the plots are inverses of each other, reflecting the trade-off between the two parameters in fitting lifetime consumption and wealth dynamics. Because the pure discount factor is a multiplicative adjustment on already calibrated life cycle discount factors, the sensitivity analysis has a different interpretation from the one in [](doi:10.1111/1468-0262.00269). In our analysis, the adjusted discount factor $\beth$ matters relatively more than $\CRRA$ up to age 40, indicating a potential overshot of the mortality risk and household-adjusted discount factors. For ages 40-50, the sensitivity of $\beth$ and $\CRRA$ is relatively low, indicating that the model is not very sensitive to the values of these parameters in this age range. Finally, from ages 50 and above, the coefficient of relative risk aversion $\CRRA$ matters relatively more than $\beth$. The differences between the sensitivity of this model and that in [](doi:10.1111/1468-0262.00269) are likely due to the fact that our model uses time-varying discount factors and applies the adjusted discount factor $\beth$ multiplicatively. Thus, it might be that the life cycle discount factors are imprecisely calibrated, which would explain the reversal of the sensitivity of $\beth$ and $\CRRA$ over the life cycle. MOre research is needed to understand this result.
 
 ```{figure}  ../Figures/IndShockSensitivity.*
 :name: fig:IndShockSensitivity
@@ -300,7 +281,7 @@ For our sensitivity analysis, we use the methods introduced by [](doi:10.1093/qj
 Sensitivity analysis of the structural estimation of the Life Cycle Incomplete Markets model. The red dot represents the estimated parameters.
 ```
 
-**Results for WUFIM models**
+**Results for WUFIM models** For completeness, {numref}`fig:AllSensitivity` shows the sensitivity analysis for the alternative specifications of the LCIM model. The sensitivity of the Non-Separable WUFIM model appears to diminish in the beginning of the lifecycle, from ages 26-40, and then increases significantly from ages 41-60. This is likely due to the fact that the non-separable WUFIM model has a much higher estimate of the coefficient of relative risk aversion $\CRRA$ than the other models.
 
 ```{figure} ../Figures/AllSensitivity.*
 :name: fig:AllSensitivity
@@ -312,6 +293,9 @@ Sensitivity analysis of the structural estimation of the Life Cycle Incomplete M
 
 # Conclusion
 
+In this paper, I estimate a Life Cycle Incomplete Markets model with separable and non-separable wealth in the utility function (WUFIM) using the method of simulated moments (SMM) and data from the Survey of Consumer Finances (SCF). I then compare the estimated parameters to those of the standard Life Cycle Incomplete Markets model (LCIM), which is known to be unable to match the distribution of wealth. I find that the estimated parameters for the separable WUFIM model are not very different from those in the LCIM model, which perhaps points at the inability of warm glow and accidental bequest motives to resolve many of the issues of the SIM and LCIM models. The non-separable WUFIM model produces a much lower estimate of the pure discount factor $\beth$ and a significantly higher estimate of the coefficient of risk aversion $\CRRA$. Finally, I conduct sensitivity analysis of the estimated models using the Jacobian of the objective function and find that the sensitivity of the models has the reverse pattern from what we expected. This is because our LCIM and WUFIM models already account for time-varying discount factors due to mortality risk and household size. Thus, the sensitivity analysis is likely picking up on the imprecision of the calibration of the life cycle discount factors.
+
+Further work is needed to understand the implications of these results. First, I will use the mean wealth of each age group instead of the median wealth as the WUFIM models are intended to better match the distribution of wealth. Second, I will evaluate the result of the objective function to see if the WUFIM models are able to match the distribution of wealth better than the LCIM and SIM models. Third, I will use a numerical approximation to the Jacobian of the objective function which will allow for both faster estimation and more accurate sensitivity analysis. Finally, I will use the estimated models to conduct policy analysis and evaluate the welfare implications of macroeconomic shocks. 
 
 [Econ-ARK]: https://econ-ark.org/
 [Econ-ARK/HARK]: https://github.com/econ-ark/HARK
