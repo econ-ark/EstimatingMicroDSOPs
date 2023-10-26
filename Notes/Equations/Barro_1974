@@ -2,7 +2,7 @@ The utility function of the member of the $i$th generation has the form
 
 \begin{equation}
 \begin{aligned}
-U_i \quad & U(c_{i}^{y}, c_{i}^{o}, U_{i+1}^{*} ) \\
+U_i =  U(c_{i}^{y}, c_{i}^{o}, U_{i+1}^{*} ) \\
 \end{aligned}
 \end{equation}
 
