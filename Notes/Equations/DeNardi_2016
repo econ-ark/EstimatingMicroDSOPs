@@ -1,0 +1,7 @@
+\begin{equation}
+\begin{aligned}
+\phi(b) = \phi_1 \bigg[(b + \phi_2)^{1-\gamma} - 1 \bigg] \\
+\end{aligned}
+\end{equation}
+
+where $\phi_1$ measures the strength of bequest motivess and $\phi_2$ measures the extent to which bequests are luxury goods. When $\phi_2 > 0$, the marginal utility of small bequests is bounded.  

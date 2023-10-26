@@ -1,0 +1,8 @@
+\begin{equation}
+\begin{aligned}
+\max \quad & U(c_1) + (1-p) \delta U(c_2) \\
+\text{s.t.} \quad & W = B + Y - T - c_1 \\
+\end{aligned}
+\end{equation}
+
+where $B$ is determined by (i) $R, W$, (ii) the number of children, $G$, and most importantly (iii) the number of periods the household has survived \textit{before} the terminal period \footnote{in which case, they consume everything because they don't care about leaving bequests.} .

@@ -1,0 +1,6 @@
+\begin{equation}
+\begin{aligned}
+\max_{c_t} \quad & u(c_T) + v(w_{T+1}) \\
+\text{s.t.} \quad & w_{T+1} = w_T - c_T \\
+\end{aligned}
+\end{equation}

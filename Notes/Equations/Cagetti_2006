@@ -1,0 +1,7 @@
+\begin{equation}
+\begin{aligned}
+W_{r}(a) = \max_{c,a'} \quad & \{ u(c) + \beta \pi_0 \mathbb{E} W_r(a') + \eta \beta (1 - \pi_0) \mathbb{E}V(a', y', \theta')  \} \\
+\end{aligned}
+\end{equation}
+
+where $\eta$ is the weight on the utility of the descendants. If $\eta = 1$, the household behaves as a dynasty.
