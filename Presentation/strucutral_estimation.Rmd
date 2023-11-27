@@ -1,0 +1,277 @@
+---
+title: "Structural Estimation of Life Cycle Models "
+subtitle: "with Welth in the Utility Function"
+author: "Alan E. Lujan Solis"
+institute: "Ohio State University <br> Econ-ARK"
+date: "July 7, 2023"
+output:
+  xaringan::moon_reader:
+    css: [default, metropolis, metropolis-fonts]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+# Motivation and Research Quesitions
+
+## Motivation
+
+- Wealth accumulation
+- Life Cycle Models
+- HANK
+  
+## Research Questions
+
+- How do we better fit the distribution of wealth at the top?
+- How much does wealth in the utility function matter?
+- What do we gain from Life Cycle models?
+
+$$
+\newcommand{\DiscFac}{\beta}
+\newcommand{\cFunc}{\mathrm{c}}
+\newcommand{\uFunc}{\mathrm{u}}
+\newcommand{\vFunc}{\mathrm{v}}
+\newcommand{\Alive}{\mathcal{L}}
+\newcommand{\h}{h}
+\newcommand{\cLvl}{\mathbf{c}}
+\newcommand{\mLvl}{\mathbf{m}}
+\newcommand{\pLvl}{\mathbf{p}}
+\newcommand{\Ex}{\mathbb{E}}
+\newcommand{\CRRA}{\rho}
+\newcommand{\PermGroFac}{\pmb{\Phi}}
+\newcommand{\Rfree}{\mathsf{R}}
+\newcommand{\PermShk}{\mathbf{\Psi}}
+\newcommand{\TranShk}{\pmb{\xi}}
+\newcommand{\aNrm}{a}
+\newcommand{\cNrm}{c}
+\newcommand{\RNrm}{\mathcal{R}}
+\newcommand{\TranShkEmp}{\pmb{\theta}}
+\newcommand{\mNrm}{m}
+\newcommand{\pZero}{\wp}
+\newcommand{\aFunc}{\mathrm{a}}
+\newcommand{\kapShare}{\alpha}
+\newcommand{\wealth}{o}
+\newcommand{\kap}{k}
+\newcommand{\wealthShare}{\delta}
+\newcommand{\wFunc}{\mathrm{w}}
+\newcommand{\aRat}{a}
+\newcommand{\mRat}{m}
+\newcommand{\aMat}{[\mathrm{a}]}
+\newcommand{\mMat}{[\mathrm{m}]}
+\newcommand{\weight}{\omega}
+$$
+
+---
+
+# Literature Review
+
+- Carroll [1998]
+  - the rich have higher lifetime savings rates
+  - models of consumption smoothing and precautionary savings can not explain this
+  - propose a model where wealth is in the utility function
+  - households derive utility from wealth itself OR 
+  - wealth provides a flow of services such as political power or social status
+
+--
+
+- HANK: Kaplan et al. [2018], Auclert et al. [2020]
+  - modern workhorse models for analyzing monetary and fiscal policy
+  - can not match distribution of wealth 
+  - infinitely lived agents with no life cycle considerations
+
+---
+
+# The baseline LCIM model
+
+#### Life Cycle Incomplete Markets Model
+
+The agent maximizes PDV of utility from consumption over  life cycle with  terminal period $T$:
+
+$$\begin{equation}
+\label{eq:lifecyclemax}
+\vFunc_{t}(\pLvl_{t},\mLvl_{t})  = \max_{\{\cFunc\}_{t}^{T}} ~ \uFunc(\cLvl_{t})+\Ex_{t}\left[\sum_{n=1}^{T-t} {\beth}^{n} \Alive_{t}^{t+n}\hat{\DiscFac}_{t}^{t+n} \uFunc(\cLvl_{t+n}) \right]
+\end{equation}$$
+
+where $\pLvl_{t}$ is permanent income level, $\mLvl_{t}$ is total market resources, $\cLvl_{t}$ is consumption, and
+
+$$\begin{aligned}
+    \beth & :  \text{time-invariant pure discount factor}
+    \\ \Alive _{t}^{t+n} & :  \text{probability to }\Alive\text{ive until age t+n given alive at age t}
+    \\ \hat{\DiscFac}_{t}^{t+n} & :  \text{age-varying discount factor between ages t and t+n.}
+\end{aligned}$$
+
+---
+
+# Recursive Bellman Equation
+
+$$\begin{aligned}
+    {\vFunc}_{t}({m}_{t}) & = \max_{\cNrm_{t}} ~ \uFunc(\cNrm_{t})+\beth\Alive_{t+1}\hat{\DiscFac}_{t+1}
+    \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})]
+    \\ & \text{s.t.} & 
+    \\ \aNrm_{t} & = {m}_{t}-\cNrm_{t} 
+    \\ {m}_{t+1} & = \aNrm_{t}\underbrace{\left(\frac{\Rfree}{\PermShk_{t+1}\PermGroFac_{t+1}}\right)}_{\equiv \RNrm_{t+1}} + \TranShkEmp_{t+1}
+\end{aligned}$$
+
+where $\vFunc(\cdot)$ and $\uFunc(\cdot)$ are now the normalized value and utility functions,  and
+
+$$\begin{aligned}
+  \CRRA & : \text{constant relative risk aversion parameter} \\
+  \mNrm_{t} & : \text{normalized market resources} \\
+  \cNrm_{t} & : \text{normalized consumption} \\
+  \aNrm_{t} & : \text{normalized liquid assets after consumption} \\
+  \Rfree & : \text{risk free interest rate}
+    \\ \RNrm_{t+1} & :  \text{permanent income growth normalized return factor}
+\end{aligned}$$
+
+---
+
+# Distribution of Shocks to Income
+
+The transitory and permanent shocks to income are defined as:
+
+$$\begin{aligned}
+  \PermShk_{t+1} & :  \text{mean-one shock to permanent income}
+    \\ \PermGroFac_{t+1} & :  \text{permanent income growth factor}
+    \\ \TranShkEmp_{t+1} & :  \text{mean-one transitory shock to permanent income}
+\end{aligned}$$
+
+where 
+
+$$\begin{aligned}
+\TranShkEmp_{s}  = & \begin{cases} 0  & \text{with probability } \pZero>0  \\ 
+\xi_{s}/\pZero & \text{with probability } (1-\pZero) \text{, where } \log \xi_{s}\thicksim \mathcal{N}(-\sigma_{[\xi, t]}^{2}/2,\sigma_{[\xi, t]}^{2}) \end{cases} \\
+\phantom{/\pZero} \\ & \text{and }  \log \PermShk_{s}   \thicksim \mathcal{N}(-\sigma_{[\PermShk, t]}^{2}/2,\sigma_{[\PermShk, t]}^{2}).
+\end{aligned}$$
+
+---
+
+# The WUFIM model
+
+#### Wealth in the Utility Function Incomplete Markets Model 
+
+$$\begin{aligned}
+    {\vFunc}_{t}({m}_{t}) & = \max_{\cNrm_{t}}  \uFunc(\cNrm_{t}, \aNrm_{t})+\beth\Alive_{t+1}\hat{\DiscFac}_{t+1}
+    \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})]
+    \\ & \text{s.t.} & 
+    \\ \aNrm_{t} & = {m}_{t}-\cNrm_{t} 
+    \\ {m}_{t+1} & = \aNrm_{t}\RNrm_{t+1}+ ~\TranShkEmp_{t+1}
+\end{aligned}$$
+
+--
+
+#### Separable Utility (as in Carroll [1998])
+
+$$\begin{equation}
+\uFunc(\cNrm_{t}, \aNrm_{t}) = \frac{\cNrm_{t}^{1-\CRRA}}{1-\CRRA} + \kapShare_{t} \frac{(\aFunc_{t} - \underline\aNrm)^{1-\wealthShare}}{1-\wealthShare}
+\end{equation}$$
+
+--
+
+#### Non-separable Utility
+
+$$\begin{equation}
+\uFunc(\cNrm_{t}, \aNrm_{t}) = \frac{(\cNrm_{t}^{1-\wealthShare} (\aNrm_{t} - \underline\aNrm)^\wealthShare)^{1-\CRRA}}{(1-\CRRA)}
+\end{equation}$$
+
+---
+
+# Calibration and Estimation
+
+Calibration 
+
+| Parameter | Description | Values |
+|----------|----------|----------|
+| $\sigma_{[\xi, t]}, \sigma_{[\PermShk, t]}$  | Std. dev. of trans. and perm. shocks |Sabelhaus and Song [2010] |
+| $\pZero = 0.005$ | Probability of zero income | Carroll [1992] | 
+| $\Alive_{t},\hat{\DiscFac}_{t}$ | Survival and discount factors | Caggetti [2003] |
+| $\Rfree = 1.03$ | Risk free interest rate | Caggetti [2003] |
+
+--
+
+.pull-left[
+Objective Function
+
+$$\begin{equation}
+g(\Theta) =  \sum_{\tau=1}^{7} \weight_{\tau} \lvert\varsigma^{\tau} -\mathbf{s}^{\tau}(\Theta)\lvert
+\end{equation}$$
+]
+
+--
+
+.pull-right[
+Baseline Results
+
+| | $\beth$  | $\CRRA$  |
+|----------|----------|----------|
+|Estimate| 0.878    | 3.516    |
+|Std. Error| (0.0018) | (0.0266) |
+]
+
+---
+class:center
+
+# Baseline Contour Plot
+
+![](../Figures/IndShockSMMcontour.svg)
+
+---
+
+# WUFIM Results
+
+| Model                        | $\beth$  | $\CRRA$  |
+|------------------------------|----------|----------|
+| LCIM w/ Portfolio Choice     | 0.866    | 3.756    |
+|                              | (0.0011) | (0.0313) |
+| Separable WUFIM              | 0.876    | 3.506    |
+|                              | (0.0012) | (0.0254) |
+| Separable WUFIM w/ Portfolio | 0.864    | 3.806    |
+|                              | (0.0012) | (0.0263) |
+| Non-Separable WUFIM          | 0.601    | 5.032    |
+|                              | (0.0026) | (0.0634) |
+
+---
+class:center
+
+# WUFIM Contour Plots
+
+<img src="../Figures/AllSMMcontour.svg" style="width: 80%" />
+
+---
+class:center
+
+# Sensitivity Analysis: Baseline
+
+From Andrews et al. [2017], using finite-difference Jacobians
+
+![](../Figures/IndShockSensitivity.svg)
+
+---
+class:center
+
+# Sensitivity Analysis: Alternatives
+
+<img src="../Figures/AllSensitivity.svg" style="width: 80%" />
+
+---
+
+# Conclusion and Future Work
+
+#### Conclusion
+
+- Need wealth in the utility function to better capture distribution of wealth 
+- Need life cycle structure to understand effect of policies on:
+  - young parents with children and low income
+  - working middle aged
+  - retirees with low wealth
+
+--
+
+#### Future Work
+  
+- Better estimation techniques such as Sequence Space Jacobians (Auclert et al. [2021])
+  - Will also help speed up sensitivity analysis
+- Implement policy experiments and derive impulse response functions by life cycle
+- Analyze the effect of policy experiments on different segments of the population
+- Evaluate optimal policy to minimize differential harm

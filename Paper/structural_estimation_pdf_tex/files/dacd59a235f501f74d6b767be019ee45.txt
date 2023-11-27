@@ -1,0 +1,1 @@
+<sympy.plotting.plot.Plot at 0x7fd589d195e0>

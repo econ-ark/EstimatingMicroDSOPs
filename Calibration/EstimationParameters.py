@@ -210,7 +210,6 @@ else:
     )
     init_consumer_objects["PermGroFacAgg"] = 1.0
 
-
 if __name__ == "__main__":
     print("Sorry, EstimationParameters doesn't actually do anything on its own.")
     print("This module is imported by StructEstimation, providing calibrated ")

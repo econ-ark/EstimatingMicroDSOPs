@@ -9,7 +9,6 @@ consumption-saving model with idiosyncratic shocks to permanent and transitory
 income as defined in ConsIndShockModel.
 """
 
-
 import csv
 import os
 import sys
@@ -18,6 +17,10 @@ from time import time  # Timing utility
 import matplotlib.pyplot as plt
 import numpy as np  # Numeric Python
 import pylab  # Python reproductions of some Matlab functions
+from HARK.ConsumptionSaving.ConsBequestModel import (
+    BequestWarmGlowConsumerType,
+    BequestWarmGlowPortfolioType,
+)
 
 # Import modules from core HARK libraries:
 # The consumption-saving micro model
@@ -32,8 +35,9 @@ from HARK.estimation import bootstrap_sample_from_data, minimize_nelder_mead
 from scipy.optimize import approx_fprime
 
 # Parameters for the consumer type and the estimation
-import Calibration.EstimationParameters as Params
-import Calibration.SetupSCFdata as Data  # SCF 2004 data on household wealth
+import Calibration.EstimationParameters as parameters
+import Calibration.SetupSCFdata as data  # SCF 2004 data on household wealth
+from Code.ConsWealthPortfolioModel import WealthPortfolioConsumerType
 
 # Find pathname to this file:
 my_file_path = os.path.dirname(os.path.abspath(__file__))
@@ -67,6 +71,7 @@ local_compute_sensitivity = True
 # Whether to make a contour map of the objective function
 local_make_contour_plot = True
 
+
 # =====================================================
 # Define objects and functions used for the estimation
 # =====================================================
@@ -94,6 +99,9 @@ class TempConsumerType:
         # estimated by Cagetti (2003), so switch from time_inv to time_vary
         self.add_to_time_vary("DiscFac")
         self.del_from_time_inv("DiscFac")
+
+    def check_restrictions(self):
+        return None
 
     def simBirth(self, which_agents):
         """
@@ -134,14 +142,44 @@ class PortfolioLifeCycleConsumerType(TempConsumerType, PortfolioConsumerType):
     consumers and specifies DiscFac as being age-dependent.  Called "temp" because only used here.
     """
 
-    def check_restrictions(self):
-        return None
+    def post_solve(self):
+        for solution in self.solution:
+            solution.cFunc = solution.cFuncAdj
+            share = solution.ShareFuncAdj
+            solution.ShareFuncAdj = lambda m: np.clip(share(m), 0.0, 1.0)
+
+
+class BequestWarmGlowLifeCycleConsumerType(
+    TempConsumerType, BequestWarmGlowConsumerType
+):
+    """
+    A very lightly edited version of BequestWarmGlowConsumerType.  Uses an alternate method of making new
+    consumers and specifies DiscFac as being age-dependent.  Called "temp" because only used here.
+    """
+
+
+class BequestWarmGlowLifeCyclePortfolioType(
+    TempConsumerType, BequestWarmGlowPortfolioType
+):
+    """
+    A very lightly edited version of BequestWarmGlowPortfolioType.  Uses an alternate method of making new
+    consumers and specifies DiscFac as being age-dependent.  Called "temp" because only used here.
+    """
 
     def post_solve(self):
         for solution in self.solution:
             solution.cFunc = solution.cFuncAdj
             share = solution.ShareFuncAdj
             solution.ShareFuncAdj = lambda m: np.clip(share(m), 0.0, 1.0)
+
+
+class WealthPortfolioLifeCycleConsumerType(
+    TempConsumerType, WealthPortfolioConsumerType
+):
+    """
+    A very lightly edited version of WealthPortfolioConsumerType.  Uses an alternate method of making new
+    consumers and specifies DiscFac as being age-dependent.  Called "temp" because only used here.
+    """
 
 
 def weighted_median(values, weights):
@@ -158,10 +196,10 @@ def weighted_median(values, weights):
 
 
 def get_targeted_moments(
-    empirical_data=Data.w_to_y_data,
-    empirical_weights=Data.empirical_weights,
-    empirical_groups=Data.empirical_groups,
-    map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices,
+    empirical_data=data.w_to_y_data,
+    empirical_weights=data.empirical_weights,
+    empirical_groups=data.empirical_groups,
+    map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
 ):
     # Initialize
     group_count = len(map_simulated_to_empirical_cohorts)
@@ -181,9 +219,9 @@ def simulate_moments(
     DiscFacAdj,
     CRRA,
     agent,
-    DiscFacAdj_bound=Params.DiscFacAdj_bound,
-    CRRA_bound=Params.CRRA_bound,
-    map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices,
+    DiscFacAdj_bound=parameters.DiscFacAdj_bound,
+    CRRA_bound=parameters.CRRA_bound,
+    map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
 ):
     """
     A quick check to make sure that the parameter values are within bounds.
@@ -199,12 +237,12 @@ def simulate_moments(
         return 1e30 * np.ones(len(map_simulated_to_empirical_cohorts))
 
     # Update the agent with a new path of DiscFac based on this DiscFacAdj (and a new CRRA)
-    agent.DiscFac = [b * DiscFacAdj for b in Params.DiscFac_timevary]
+    agent.DiscFac = [b * DiscFacAdj for b in parameters.DiscFac_timevary]
     agent.CRRA = CRRA
     # Solve the model for these parameters, then simulate wealth data
     agent.solve()  # Solve the microeconomic model
     # "Unpack" the consumption function for convenient access
-    agent.unpack("cFunc")
+    # agent.unpack("cFunc")
     max_sim_age = max([max(ages) for ages in map_simulated_to_empirical_cohorts]) + 1
     # Initialize the simulation by clearing histories, resetting initial values
     agent.initialize_sim()
@@ -231,9 +269,9 @@ def smmObjectiveFxn(
     CRRA,
     agent,
     tgt_moments,
-    DiscFacAdj_bound=Params.DiscFacAdj_bound,
-    CRRA_bound=Params.CRRA_bound,
-    map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices,
+    DiscFacAdj_bound=parameters.DiscFacAdj_bound,
+    CRRA_bound=parameters.CRRA_bound,
+    map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
 ):
     """
     The objective function for the SMM estimation.  Given values of discount factor
@@ -334,7 +372,7 @@ def calculateStandardErrorsByBootstrap(
 
         # Bootstrap a new dataset by resampling from the original data
         bootstrap_data = (
-            bootstrap_sample_from_data(Data.scf_data_array, seed=seed_list[n])
+            bootstrap_sample_from_data(data.scf_data_array, seed=seed_list[n])
         ).T
         w_to_y_data_bootstrap = bootstrap_data[0,]
         empirical_groups_bootstrap = bootstrap_data[1,]
@@ -345,7 +383,7 @@ def calculateStandardErrorsByBootstrap(
             empirical_data=w_to_y_data_bootstrap,
             empirical_weights=empirical_weights_bootstrap,
             empirical_groups=empirical_groups_bootstrap,
-            map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices,
+            map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
         )
 
         # Make a temporary function for use in this estimation run
@@ -355,7 +393,7 @@ def calculateStandardErrorsByBootstrap(
                 CRRA=parameters_to_estimate[1],
                 agent=agent,
                 tgt_moments=bstrap_tgt_moments,
-                map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices,
+                map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
             )
 
         # Estimate the model with the bootstrap data and add to list of estimates
@@ -366,7 +404,7 @@ def calculateStandardErrorsByBootstrap(
         # Report progress of the bootstrap
     if verbose:
         print(
-            f"Finished bootstrap estimation #{n+1} of {N} in {t_now-t_start} seconds ({t_now-t_0} cumulative)"
+            f"Finished bootstrap estimation #{n + 1} of {N} in {t_now - t_start} seconds ({t_now - t_0} cumulative)"
         )
 
     # Calculate the standard errors for each parameter
@@ -412,28 +450,34 @@ def estimate(
         agent_type = IndShkLifeCycleConsumerType
     elif estimation_agent == "Portfolio":
         agent_type = PortfolioLifeCycleConsumerType
+    elif estimation_agent == "WarmGlow":
+        agent_type = BequestWarmGlowLifeCycleConsumerType
+    elif estimation_agent == "WarmGlowPortfolio":
+        agent_type = BequestWarmGlowLifeCyclePortfolioType
+    elif estimation_agent == "WealthPortfolio":
+        agent_type = WealthPortfolioLifeCycleConsumerType
 
     # Make a lifecycle consumer to be used for estimation, including simulated
     # shocks (plus an initial distribution of wealth)
     # Make a TempConsumerType for estimation
-    EstimationAgent = agent_type(**Params.init_consumer_objects)
+    EstimationAgent = agent_type(**parameters.init_consumer_objects)
     # Set the number of periods to simulate
     EstimationAgent.T_sim = EstimationAgent.T_cycle + 1
     # Choose to track bank balances as wealth
     EstimationAgent.track_vars = ["bNrm"]
     # Draw initial assets for each consumer
     EstimationAgent.aNrmInit = DiscreteDistribution(
-        Params.initial_wealth_income_ratio_probs,
-        Params.initial_wealth_income_ratio_vals,
-        seed=Params.seed,
-    ).draw(N=Params.num_agents)
+        parameters.initial_wealth_income_ratio_probs,
+        parameters.initial_wealth_income_ratio_vals,
+        seed=parameters.seed,
+    ).draw(N=parameters.num_agents)
     EstimationAgent.make_shock_history()
 
     targeted_moments = get_targeted_moments()
 
     # Estimate the model using Nelder-Mead
     if estimate_model:
-        initial_guess = [Params.DiscFacAdj_start, Params.CRRA_start]
+        initial_guess = [parameters.DiscFacAdj_start, parameters.CRRA_start]
         print("----------------------------------------------------------------------")
         print(
             f"Now estimating the model using Nelder-Mead from an initial guess of {initial_guess}..."
@@ -487,11 +531,11 @@ def estimate(
         # Estimate the model:
         print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         print(
-            f"Computing standard errors using {Params.bootstrap_size} bootstrap replications."
+            f"Computing standard errors using {parameters.bootstrap_size} bootstrap replications."
         )
         print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         try:
-            t_bootstrap_guess = time_to_estimate * Params.bootstrap_size
+            t_bootstrap_guess = time_to_estimate * parameters.bootstrap_size
             minutes, seconds = divmod(t_bootstrap_guess, 60)
             print(f"This will take approximately {minutes:.2f} min, {seconds:.2f} sec")
 
@@ -500,15 +544,15 @@ def estimate(
         t_start_bootstrap = time()
         std_errors = calculateStandardErrorsByBootstrap(
             model_estimate,
-            N=Params.bootstrap_size,
+            N=parameters.bootstrap_size,
             agent=EstimationAgent,
-            seed=Params.seed,
+            seed=parameters.seed,
             verbose=True,
         )
         t_end_bootstrap = time()
         time_to_bootstrap = t_end_bootstrap - t_start_bootstrap
         print(
-            f"Time to execute all: {time_to_bootstrap/60:.2f} min, {time_to_bootstrap:.2f} sec"
+            f"Time to execute all: {time_to_bootstrap / 60:.2f} min, {time_to_bootstrap:.2f} sec"
         )
         print(
             f"Standard errors: DiscFacAdj--> {std_errors[0]}, CRRA--> {std_errors[1]}"
@@ -544,14 +588,14 @@ def estimate(
                 x[0],
                 x[1],
                 agent=EstimationAgent,
-                DiscFacAdj_bound=Params.DiscFacAdj_bound,
-                CRRA_bound=Params.CRRA_bound,
-                map_simulated_to_empirical_cohorts=Data.simulation_map_cohorts_to_age_indices,
+                DiscFacAdj_bound=parameters.DiscFacAdj_bound,
+                CRRA_bound=parameters.CRRA_bound,
+                map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
             )
 
             return moments
 
-        n_moments = len(Data.simulation_map_cohorts_to_age_indices)
+        n_moments = len(data.simulation_map_cohorts_to_age_indices)
         jac = np.array(
             [
                 approx_fprime(
@@ -569,7 +613,7 @@ def estimate(
         # Create lables for moments in the plots
         moment_labels = [
             "[" + str(min(x)) + "," + str(max(x)) + "]"
-            for x in Data.empirical_cohort_age_groups
+            for x in data.empirical_cohort_age_groups
         ]
 
         # Plot
@@ -588,6 +632,7 @@ def estimate(
 
         plt.savefig(os.path.join(figures_dir, estimation_agent + "Sensitivity.pdf"))
         plt.savefig(os.path.join(figures_dir, estimation_agent + "Sensitivity.png"))
+        plt.savefig(os.path.join(figures_dir, estimation_agent + "Sensitivity.svg"))
 
         plt.show()
 
@@ -624,7 +669,7 @@ def estimate(
         t_end_contour = time()
         time_to_contour = t_end_contour - t_start_contour
         print(
-            f"Time to execute all: {time_to_contour/60:.2f} min, {time_to_contour:.2f} sec"
+            f"Time to execute all: {time_to_contour / 60:.2f} min, {time_to_contour:.2f} sec"
         )
         pylab.colorbar(smm_contour)
         pylab.plot(model_estimate[1], model_estimate[0], "*r", ms=15)
@@ -632,7 +677,208 @@ def estimate(
         pylab.ylabel(r"discount factor adjustment $\beth$", fontsize=14)
         pylab.savefig(os.path.join(figures_dir, estimation_agent + "SMMcontour.pdf"))
         pylab.savefig(os.path.join(figures_dir, estimation_agent + "SMMcontour.png"))
+        pylab.savefig(os.path.join(figures_dir, estimation_agent + "SMMcontour.svg"))
         pylab.show()
+
+
+def estimate_all():
+    agent_types = [
+        PortfolioLifeCycleConsumerType,
+        BequestWarmGlowLifeCycleConsumerType,
+        BequestWarmGlowLifeCyclePortfolioType,
+        WealthPortfolioLifeCycleConsumerType,
+    ]
+
+    agent_names = [
+        "(a) Portfolio Choice",
+        "(b) Separable Wealth in Utility",
+        "(c) Portfolio Separable Wealth in Utility",
+        "(d) Non-Separable Portfolio Wealth in Utility",
+    ]
+
+    fig_sensitivity = plt.figure(layout="constrained", figsize=(14, 12))
+    fig_sensitivity.suptitle("Sensitivity of Moments to Parameters")
+
+    subfigs_sensitivity = fig_sensitivity.subfigures(2, 2)
+
+    fig_contour = plt.figure(layout="constrained", figsize=(14, 12))
+    fig_contour.suptitle("Contour Plots")
+
+    subfigs_contour = fig_contour.subplots(2, 2)
+
+    for count, agent_type in enumerate(agent_types):
+        # Make a lifecycle consumer to be used for estimation, including simulated
+        # shocks (plus an initial distribution of wealth)
+        # Make a TempConsumerType for estimation
+        EstimationAgent = agent_type(**parameters.init_consumer_objects)
+        # Set the number of periods to simulate
+        EstimationAgent.T_sim = EstimationAgent.T_cycle + 1
+        # Choose to track bank balances as wealth
+        EstimationAgent.track_vars = ["bNrm"]
+        # Draw initial assets for each consumer
+        EstimationAgent.aNrmInit = DiscreteDistribution(
+            parameters.initial_wealth_income_ratio_probs,
+            parameters.initial_wealth_income_ratio_vals,
+            seed=parameters.seed,
+        ).draw(N=parameters.num_agents)
+        EstimationAgent.make_shock_history()
+
+        targeted_moments = get_targeted_moments()
+
+        idx = np.unravel_index(count, (2, 2))
+
+        initial_guess = [parameters.DiscFacAdj_start, parameters.CRRA_start]
+        print("----------------------------------------------------------------------")
+        print(
+            f"Now estimating the model using Nelder-Mead from an initial guess of {initial_guess}..."
+        )
+        print("----------------------------------------------------------------------")
+
+        # Make a single-input lambda function for use in the optimizer
+        def smmObjectiveFxnReduced(parameters_to_estimate):
+            """
+            A "reduced form" of the SMM objective function, compatible with the optimizer.
+            Identical to smmObjectiveFunction, but takes only a single input as a length-2
+            list representing [DiscFacAdj,CRRA].
+            """
+            return smmObjectiveFxn(
+                DiscFacAdj=parameters_to_estimate[0],
+                CRRA=parameters_to_estimate[1],
+                agent=EstimationAgent,
+                tgt_moments=targeted_moments,
+            )
+
+        t_start_estimate = time()
+        model_estimate = minimize_nelder_mead(
+            smmObjectiveFxnReduced, initial_guess, verbose=True
+        )
+        t_end_estimate = time()
+
+        time_to_estimate = t_end_estimate - t_start_estimate
+        print(
+            f"Time to execute all: {round(time_to_estimate / 60.0, 2)} min, {time_to_estimate} sec"
+        )
+        print(
+            f"Estimated values: DiscFacAdj={model_estimate[0]}, CRRA={model_estimate[1]}"
+        )
+
+        print("``````````````````````````````````````````````````````````````````````")
+        print("Computing sensitivity measure.")
+        print("``````````````````````````````````````````````````````````````````````")
+
+        # Find the Jacobian of the function that simulates moments
+        def simulate_moments_reduced(x):
+            moments = simulate_moments(
+                x[0],
+                x[1],
+                agent=EstimationAgent,
+                DiscFacAdj_bound=parameters.DiscFacAdj_bound,
+                CRRA_bound=parameters.CRRA_bound,
+                map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
+            )
+
+            return moments
+
+        n_moments = len(data.simulation_map_cohorts_to_age_indices)
+        jac = np.array(
+            [
+                approx_fprime(
+                    model_estimate,
+                    lambda x: simulate_moments_reduced(x)[j],
+                    epsilon=0.01,
+                )
+                for j in range(n_moments)
+            ]
+        )
+
+        # Compute sensitivity measure. (all moments weighted equally)
+        sensitivity = np.dot(np.linalg.inv(np.dot(jac.T, jac)), jac.T)
+
+        # Create lables for moments in the plots
+        moment_labels = [
+            "[" + str(min(x)) + "," + str(max(x)) + "]"
+            for x in data.empirical_cohort_age_groups
+        ]
+
+        # Plot
+        subfigs_sensitivity[idx].suptitle(agent_names[count])
+        subfigsnest_sensitivity = subfigs_sensitivity[idx].subplots(2, 1)
+
+        subfigsnest_sensitivity[0].bar(
+            range(n_moments), sensitivity[0, :], tick_label=moment_labels
+        )
+        subfigsnest_sensitivity[0].set_title("DiscFacAdj")
+        subfigsnest_sensitivity[0].set_ylabel("Sensitivity")
+        subfigsnest_sensitivity[0].set_xlabel("Median W/Y Ratio")
+
+        subfigsnest_sensitivity[1].bar(
+            range(n_moments), sensitivity[1, :], tick_label=moment_labels
+        )
+        subfigsnest_sensitivity[1].set_title("CRRA")
+        subfigsnest_sensitivity[1].set_ylabel("Sensitivity")
+        subfigsnest_sensitivity[1].set_xlabel("Median W/Y Ratio")
+
+        print("``````````````````````````````````````````````````````````````````````")
+        print("Creating the contour plot.")
+        print("``````````````````````````````````````````````````````````````````````")
+        t_start_contour = time()
+        DiscFac_star, CRRA_star = model_estimate
+        grid_density = 20  # Number of parameter values in each dimension
+        level_count = 100  # Number of contour levels to plot
+        DiscFacAdj_list = np.linspace(
+            max(DiscFac_star - 0.25, 0.5), min(DiscFac_star + 0.25, 1.05), grid_density
+        )
+        CRRA_list = np.linspace(
+            max(CRRA_star - 5, 2), min(CRRA_star + 5, 8), grid_density
+        )
+        CRRA_mesh, DiscFacAdj_mesh = pylab.meshgrid(CRRA_list, DiscFacAdj_list)
+        smm_obj_levels = np.empty([grid_density, grid_density])
+        for j in range(grid_density):
+            DiscFacAdj = DiscFacAdj_list[j]
+            for k in range(grid_density):
+                CRRA = CRRA_list[k]
+                smm_obj_levels[j, k] = smmObjectiveFxn(
+                    DiscFacAdj,
+                    CRRA,
+                    agent=EstimationAgent,
+                    tgt_moments=targeted_moments,
+                )
+
+        # Create figure and axes objects
+
+        # Plot the contour
+        subfigs_contour[idx].set_title(agent_names[count])
+        contour = subfigs_contour[idx].contourf(
+            CRRA_mesh, DiscFacAdj_mesh, smm_obj_levels, level_count
+        )
+        cbar = fig_sensitivity.colorbar(contour)
+
+        # Plot the model estimate
+        subfigs_contour[idx].plot(model_estimate[1], model_estimate[0], "*r", ms=15)
+
+        # Set axis labels and title
+        subfigs_contour[idx].set_xlabel(
+            r"coefficient of relative risk aversion $\rho$", fontsize=14
+        )
+        subfigs_contour[idx].set_ylabel(
+            r"discount factor adjustment $\beth$", fontsize=14
+        )
+
+        # Print time to execute
+        t_end_contour = time()
+        time_to_contour = t_end_contour - t_start_contour
+        print(
+            f"Time to execute all: {time_to_contour / 60:.2f} min, {time_to_contour:.2f} sec"
+        )
+
+    fig_sensitivity.savefig(os.path.join(figures_dir, "AllSensitivity.pdf"))
+    fig_sensitivity.savefig(os.path.join(figures_dir, "AllSensitivity.png"))
+    fig_sensitivity.savefig(os.path.join(figures_dir, "AllSensitivity.svg"))
+
+    # Save and show the plot
+    fig_contour.savefig(os.path.join(figures_dir, "AllSMMcontour.pdf"))
+    fig_contour.savefig(os.path.join(figures_dir, "AllSMMcontour.png"))
+    fig_contour.savefig(os.path.join(figures_dir, "AllSMMcontour.svg"))
 
 
 if __name__ == "__main__":
