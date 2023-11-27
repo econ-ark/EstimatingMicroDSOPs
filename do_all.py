@@ -49,13 +49,13 @@ still run.
 import os
 import sys
 
-from calibration.Options import (
+from calibration.options import (
     low_resource,
     medium_resource,
     high_resource,
     all_replications,
 )
-from code.StructEstimation import estimate
+from code.estimation import estimate
 
 # Find pathname to this file:
 my_file_path = os.path.dirname(os.path.abspath(__file__))

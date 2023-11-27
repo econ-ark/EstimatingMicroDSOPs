@@ -212,6 +212,6 @@ else:
 
 if __name__ == "__main__":
     print("Sorry, estimation_parameters doesn't actually do anything on its own.")
-    print("This module is imported by StructEstimation, providing calibrated ")
+    print("This module is imported by estimation, providing calibrated ")
     print("parameters for the example estimation.  Please see that module if you ")
     print("want more interesting output.")

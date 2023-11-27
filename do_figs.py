@@ -1,4 +1,4 @@
-from code.StructEstimation import estimate_all
+from code.estimation import estimate_all
 
 if __name__ == "__main__":
     estimate_all()

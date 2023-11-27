@@ -70,6 +70,6 @@ for ages in empirical_cohort_age_groups:
 
 if __name__ == "__main__":
     print("Sorry, setup_scf_data doesn't actually do anything on its own.")
-    print("This module is imported by StructEstimation, providing data for")
+    print("This module is imported by estimation, providing data for")
     print("the example estimation.  Please see that module if you want more")
     print("interesting output.")
