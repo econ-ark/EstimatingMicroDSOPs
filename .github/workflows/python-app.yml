@@ -29,4 +29,4 @@ jobs:
           pip install git+https://github.com/econ-ark/HARK@master
       - name: Test with pytest
         run: |
-          pytest code/tests.py
+          pytest ./code/tests.py
