@@ -18,6 +18,6 @@
 format: jb-book
 root: README
 chapters:
-  - title: Code
+  - title: Paper
     sections:
-      - file: Code/README
+      - file: paper\01-paper

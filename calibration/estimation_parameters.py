@@ -1,6 +1,6 @@
 """
 Specifies the full set of calibrated values required to estimate the SolvingMicroDSOPs
-model.  The empirical data is stored in a separate csv file and is loaded in SetupSCFdata.
+model.  The empirical data is stored in a separate csv file and is loaded in setup_scf_data.
 """
 import numpy as np
 from HARK.Calibration.Income.IncomeTools import CGM_income, parse_income_spec
@@ -211,7 +211,7 @@ else:
     init_consumer_objects["PermGroFacAgg"] = 1.0
 
 if __name__ == "__main__":
-    print("Sorry, EstimationParameters doesn't actually do anything on its own.")
+    print("Sorry, estimation_parameters doesn't actually do anything on its own.")
     print("This module is imported by StructEstimation, providing calibrated ")
     print("parameters for the example estimation.  Please see that module if you ")
     print("want more interesting output.")

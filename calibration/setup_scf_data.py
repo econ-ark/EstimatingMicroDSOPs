@@ -7,20 +7,20 @@ import os
 import numpy as np  # Numerical Python
 import pandas as pd
 
-from Calibration.EstimationParameters import empirical_cohort_age_groups, initial_age
+from calibration.estimation_parameters import empirical_cohort_age_groups, initial_age
 
 # Find pathname to this file:
 my_file_path = os.path.dirname(os.path.abspath(__file__))
 
 # Pathnames to the other files:
 # Relative directory for primitive parameter files
-calibration_dir = os.path.join(my_file_path, "../Calibration/")
+calibration_dir = os.path.join(my_file_path, "../calibration/")
 # Relative directory for primitive parameter files
-tables_dir = os.path.join(my_file_path, "../Tables/")
+tables_dir = os.path.join(my_file_path, "../tables/")
 # Relative directory for primitive parameter files
-figures_dir = os.path.join(my_file_path, "../Figures/")
+figures_dir = os.path.join(my_file_path, "../figures/")
 # Relative directory for primitive parameter files
-code_dir = os.path.join(my_file_path, "../Code/")
+code_dir = os.path.join(my_file_path, "../code/")
 
 # Need to rely on the manual insertion of pathnames to all files in do_all.py
 # NOTE sys.path.insert(0, os.path.abspath(tables_dir)), etc. may need to be
@@ -35,7 +35,7 @@ code_dir = os.path.join(my_file_path, "../Code/")
 # os.path.abspath('./')   #'./'
 scf_data_path = data_location = os.path.dirname(os.path.abspath(__file__))
 
-data = pd.read_csv(scf_data_path + "/SCFdata.csv")
+data = pd.read_csv(scf_data_path + "/data/SCFdata.csv")
 
 # Keep only observations with normal incomes > 0,
 # otherwise wealth/income is not well defined
@@ -69,7 +69,7 @@ for ages in empirical_cohort_age_groups:
     simulation_map_cohorts_to_age_indices.append(np.array(ages) - initial_age)
 
 if __name__ == "__main__":
-    print("Sorry, SetupSCFdata doesn't actually do anything on its own.")
+    print("Sorry, setup_scf_data doesn't actually do anything on its own.")
     print("This module is imported by StructEstimation, providing data for")
     print("the example estimation.  Please see that module if you want more")
     print("interesting output.")
