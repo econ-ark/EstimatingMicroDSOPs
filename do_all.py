@@ -12,7 +12,7 @@ replication you would like to have.
 More Details
 ------------
 
-This example script allows the user to create all of the Figures and Tables
+This example script allows the user to create all of the figures and tables
 modules for SolvingMicroDSOPs.StructuralEstimation.
 
 This is example is kept as simple and minimal as possible to illustrate the
@@ -21,10 +21,10 @@ format of a "replication archive."
 The file structure is as follows:
 
 ./SolvingMicroDSOPs/
-    Calibration/        # Directory that contain the necessary code and data to parameterize the model
-    Code/               # The main estimation code, in this case StructuralEstimation.py
-    Figures/            # Any Figures created by the main code
-    Tables/             # Any tables created by the main code
+    calibration/        # Directory that contain the necessary code and data to parameterize the model
+    code/               # The main estimation code, in this case StructuralEstimation.py
+    figures/            # Any figures created by the main code
+    tables/             # Any tables created by the main code
 
 Because computational modeling can be very memory- and time-intensive, this file
 also allows the user to choose whether to run files based on there resouce
@@ -49,26 +49,26 @@ still run.
 import os
 import sys
 
-from Calibration.Options import (
+from calibration.Options import (
     low_resource,
     medium_resource,
     high_resource,
     all_replications,
 )
-from Code.StructEstimation import estimate
+from code.StructEstimation import estimate
 
 # Find pathname to this file:
 my_file_path = os.path.dirname(os.path.abspath(__file__))
 
 # Pathnames to the other files:
 # Relative directory for primitive parameter files
-calibration_dir = os.path.join(my_file_path, "Calibration")
+calibration_dir = os.path.join(my_file_path, "calibration")
 # Relative directory for primitive parameter files
-tables_dir = os.path.join(my_file_path, "Tables")
+tables_dir = os.path.join(my_file_path, "tables")
 # Relative directory for primitive parameter files
-figures_dir = os.path.join(my_file_path, "Figures")
+figures_dir = os.path.join(my_file_path, "figures")
 # Relative directory for primitive parameter files
-code_dir = os.path.join(my_file_path, "Code")
+code_dir = os.path.join(my_file_path, "code")
 
 # manually add the pathnames to the various files directly to the beginning
 # of the Python path. This will be needed for all files that will run in
@@ -103,11 +103,11 @@ def run_replication():
     which_replication = input(
         """Which replication would you like to run? (See documentation in do_all.py for details.) Please enter the option number to run that option; default is in brackets:
 
-        [1] low-resource:    ~90 sec; output ./Tables/estimate_results.csv
+        [1] low-resource:    ~90 sec; output ./tables/estimate_results.csv
 
-         2  medium-resource: ~7 min;  output ./Figures/SMMcontour.pdf
-                                             ./Figures/SMMcontour.png
-         3  high-resource:   ~30 min; output ./Tables/bootstrap_results.csv
+         2  medium-resource: ~7 min;  output ./figures/SMMcontour.pdf
+                                             ./figures/SMMcontour.png
+         3  high-resource:   ~30 min; output ./tables/bootstrap_results.csv
 
          4  all:             ~40 min; output: all above.
 

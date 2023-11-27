@@ -1,5 +1,5 @@
-from Calibration.Options import low_resource, medium_resource
-from Code.StructEstimation import estimate
+from calibration.options import low_resource, medium_resource
+from code.estimation import estimate
 
 
 def test_low_resource():
