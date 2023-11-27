@@ -35,22 +35,22 @@ from HARK.estimation import bootstrap_sample_from_data, minimize_nelder_mead
 from scipy.optimize import approx_fprime
 
 # Parameters for the consumer type and the estimation
-import Calibration.EstimationParameters as parameters
-import Calibration.SetupSCFdata as data  # SCF 2004 data on household wealth
-from Code.ConsWealthPortfolioModel import WealthPortfolioConsumerType
+import calibration.estimation_parameters as parameters
+import calibration.setup_scf_data as data  # SCF 2004 data on household wealth
+from code.ConsWealthPortfolioModel import WealthPortfolioConsumerType
 
 # Find pathname to this file:
 my_file_path = os.path.dirname(os.path.abspath(__file__))
 
 # Pathnames to the other files:
 # Relative directory for primitive parameter files
-calibration_dir = os.path.join(my_file_path, "../Calibration/")
+calibration_dir = os.path.join(my_file_path, "../calibration/")
 # Relative directory for primitive parameter files
-tables_dir = os.path.join(my_file_path, "../Tables/")
+tables_dir = os.path.join(my_file_path, "../tables/")
 # Relative directory for primitive parameter files
-figures_dir = os.path.join(my_file_path, "../Figures/")
+figures_dir = os.path.join(my_file_path, "../figures/")
 # Relative directory for primitive parameter files
-code_dir = os.path.join(my_file_path, "../Code/")
+code_dir = os.path.join(my_file_path, "../code/")
 
 # Add the calibration folder to the path
 sys.path.insert(0, os.path.abspath(calibration_dir))
