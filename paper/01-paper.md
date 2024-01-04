@@ -6,7 +6,7 @@ short_title: Structural Estimation
 authors:
   - name: Alan Lujan
     affiliations:
-      - Ohio State University
+      - Johns Hopkins University
       - Econ-ARK
     email: alanlujan91@gmail.com
 license: CC-BY-4.0

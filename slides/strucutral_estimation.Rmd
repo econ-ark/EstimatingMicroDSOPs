@@ -2,7 +2,7 @@
 title: "Structural Estimation of Life Cycle Models "
 subtitle: "with Welth in the Utility Function"
 author: "Alan E. Lujan Solis"
-institute: "Ohio State University <br> Econ-ARK"
+institute: "Johns Hopkins University <br> Econ-ARK"
 date: "July 7, 2023"
 output:
   xaringan::moon_reader:

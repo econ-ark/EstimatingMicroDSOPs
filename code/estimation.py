@@ -26,6 +26,7 @@ from HARK.ConsumptionSaving.ConsBequestModel import (
 # The consumption-saving micro model
 from HARK.ConsumptionSaving.ConsIndShockModel import IndShockConsumerType
 from HARK.ConsumptionSaving.ConsPortfolioModel import PortfolioConsumerType
+from HARK.ConsumptionSaving.ConsWealthPortfolioModel import WealthPortfolioConsumerType
 
 # Method for sampling from a discrete distribution
 from HARK.distribution import DiscreteDistribution
@@ -37,7 +38,6 @@ from scipy.optimize import approx_fprime
 # Parameters for the consumer type and the estimation
 import calibration.estimation_parameters as parameters
 import calibration.setup_scf_data as data  # SCF 2004 data on household wealth
-from code.ConsWealthPortfolioModel import WealthPortfolioConsumerType
 
 # Find pathname to this file:
 my_file_path = os.path.dirname(os.path.abspath(__file__))
@@ -851,7 +851,7 @@ def estimate_all():
         contour = subfigs_contour[idx].contourf(
             CRRA_mesh, DiscFacAdj_mesh, smm_obj_levels, level_count
         )
-        cbar = fig_sensitivity.colorbar(contour)
+        fig_sensitivity.colorbar(contour)
 
         # Plot the model estimate
         subfigs_contour[idx].plot(model_estimate[1], model_estimate[0], "*r", ms=15)
