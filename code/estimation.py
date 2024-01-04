@@ -9,9 +9,10 @@ consumption-saving model with idiosyncratic shocks to permanent and transitory
 income as defined in ConsIndShockModel.
 """
 
+# Parameters for the consumer type and the estimation
+import code.calibration.estimation_parameters as parameters
+import code.calibration.setup_scf_data as data  # SCF 2004 data on household wealth
 import csv
-import os
-import sys
 from time import time  # Timing utility
 
 import matplotlib.pyplot as plt
@@ -35,29 +36,16 @@ from HARK.distribution import DiscreteDistribution
 from HARK.estimation import bootstrap_sample_from_data, minimize_nelder_mead
 from scipy.optimize import approx_fprime
 
-# Parameters for the consumer type and the estimation
-import calibration.estimation_parameters as parameters
-import calibration.setup_scf_data as data  # SCF 2004 data on household wealth
-
-# Find pathname to this file:
-my_file_path = os.path.dirname(os.path.abspath(__file__))
 
 # Pathnames to the other files:
 # Relative directory for primitive parameter files
-calibration_dir = os.path.join(my_file_path, "../calibration/")
+calibration_dir = "code/calibration/"
 # Relative directory for primitive parameter files
-tables_dir = os.path.join(my_file_path, "../tables/")
+tables_dir = "content/tables/"
 # Relative directory for primitive parameter files
-figures_dir = os.path.join(my_file_path, "../figures/")
+figures_dir = "content/figures/"
 # Relative directory for primitive parameter files
-code_dir = os.path.join(my_file_path, "../code/")
-
-# Add the calibration folder to the path
-sys.path.insert(0, os.path.abspath(calibration_dir))
-
-# Need to rely on the manual insertion of pathnames to all files in do_all.py
-# NOTE sys.path.insert(0, os.path.abspath(tables_dir)), etc. may need to be
-# copied from do_all.py to here
+code_dir = "code/"
 
 
 # Set booleans to determine which tasks should be done
@@ -513,9 +501,10 @@ def estimate(
         )
 
         # Create the simple estimate table
-        estimate_results_file = os.path.join(
-            tables_dir, estimation_agent + "_estimate_results.csv"
+        estimate_results_file = (
+            tables_dir + "/" + estimation_agent + "_estimate_results.csv"
         )
+
         with open(estimate_results_file, "wt") as f:
             writer = csv.writer(f)
             writer.writerow(["DiscFacAdj", "CRRA"])
@@ -559,9 +548,10 @@ def estimate(
         )
 
         # Create the simple bootstrap table
-        bootstrap_results_file = os.path.join(
-            tables_dir, estimation_agent + "_bootstrap_results.csv"
+        bootstrap_results_file = (
+            tables_dir + "/" + estimation_agent + "_bootstrap_results.csv"
         )
+
         with open(bootstrap_results_file, "wt") as f:
             writer = csv.writer(f)
             writer.writerow(
@@ -630,9 +620,9 @@ def estimate(
         axs[1].set_ylabel("Sensitivity")
         axs[1].set_xlabel("Median W/Y Ratio")
 
-        plt.savefig(os.path.join(figures_dir, estimation_agent + "Sensitivity.pdf"))
-        plt.savefig(os.path.join(figures_dir, estimation_agent + "Sensitivity.png"))
-        plt.savefig(os.path.join(figures_dir, estimation_agent + "Sensitivity.svg"))
+        plt.savefig(figures_dir + "/" + estimation_agent + "Sensitivity.pdf")
+        plt.savefig(figures_dir + "/" + estimation_agent + "Sensitivity.png")
+        plt.savefig(figures_dir + "/" + estimation_agent + "Sensitivity.svg")
 
         plt.show()
 
@@ -675,9 +665,9 @@ def estimate(
         pylab.plot(model_estimate[1], model_estimate[0], "*r", ms=15)
         pylab.xlabel(r"coefficient of relative risk aversion $\rho$", fontsize=14)
         pylab.ylabel(r"discount factor adjustment $\beth$", fontsize=14)
-        pylab.savefig(os.path.join(figures_dir, estimation_agent + "SMMcontour.pdf"))
-        pylab.savefig(os.path.join(figures_dir, estimation_agent + "SMMcontour.png"))
-        pylab.savefig(os.path.join(figures_dir, estimation_agent + "SMMcontour.svg"))
+        pylab.savefig(figures_dir + "/" + estimation_agent + "SMMcontour.pdf")
+        pylab.savefig(figures_dir + "/" + estimation_agent + "SMMcontour.png")
+        pylab.savefig(figures_dir + "/" + estimation_agent + "SMMcontour.svg")
         pylab.show()
 
 
@@ -871,14 +861,14 @@ def estimate_all():
             f"Time to execute all: {time_to_contour / 60:.2f} min, {time_to_contour:.2f} sec"
         )
 
-    fig_sensitivity.savefig(os.path.join(figures_dir, "AllSensitivity.pdf"))
-    fig_sensitivity.savefig(os.path.join(figures_dir, "AllSensitivity.png"))
-    fig_sensitivity.savefig(os.path.join(figures_dir, "AllSensitivity.svg"))
+    fig_sensitivity.savefig(figures_dir + "/AllSensitivity.pdf")
+    fig_sensitivity.savefig(figures_dir + "/AllSensitivity.png")
+    fig_sensitivity.savefig(figures_dir + "/AllSensitivity.svg")
 
     # Save and show the plot
-    fig_contour.savefig(os.path.join(figures_dir, "AllSMMcontour.pdf"))
-    fig_contour.savefig(os.path.join(figures_dir, "AllSMMcontour.png"))
-    fig_contour.savefig(os.path.join(figures_dir, "AllSMMcontour.svg"))
+    fig_contour.savefig(figures_dir + "/AllSMMcontour.pdf")
+    fig_contour.savefig(figures_dir + "/AllSMMcontour.png")
+    fig_contour.savefig(figures_dir + "/AllSMMcontour.svg")
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-from calibration.options import low_resource, medium_resource
+from code.calibration.options import low_resource, medium_resource
 from code.estimation import estimate
 
 

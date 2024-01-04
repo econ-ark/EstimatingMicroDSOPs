@@ -74,73 +74,7 @@ inc_calib = parse_income_spec(
 )
 
 # Age-varying discount factors over the lifecycle, lifted from Cagetti (2003)
-DiscFac_timevary = [
-    1.064914,
-    1.057997,
-    1.051422,
-    1.045179,
-    1.039259,
-    1.033653,
-    1.028352,
-    1.023348,
-    1.018632,
-    1.014198,
-    1.010037,
-    1.006143,
-    1.002509,
-    0.9991282,
-    0.9959943,
-    0.9931012,
-    0.9904431,
-    0.9880143,
-    0.9858095,
-    0.9838233,
-    0.9820506,
-    0.9804866,
-    0.9791264,
-    0.9779656,
-    0.9769995,
-    0.9762239,
-    0.9756346,
-    0.9752274,
-    0.9749984,
-    0.9749437,
-    0.9750595,
-    0.9753422,
-    0.9757881,
-    0.9763936,
-    0.9771553,
-    0.9780698,
-    0.9791338,
-    0.9803439,
-    0.981697,
-    0.8287214,
-    0.9902111,
-    0.9902111,
-    0.9902111,
-    0.9902111,
-    0.9902111,
-    0.9902111,
-    0.9902111,
-    0.9902111,
-    0.9902111,
-    0.9902111,
-    0.9902111,
-    0.9902111,
-    0.9902111,
-    0.9902111,
-    0.9902111,
-    0.9902111,
-    0.9902111,
-    0.9902111,
-    0.9902111,
-    0.9902111,
-    0.9902111,
-    0.9902111,
-    0.9902111,
-    0.9902111,
-    0.9902111,
-]
+DiscFac_timevary = np.genfromtxt("code/data/Cagetti2003.csv")
 
 # Survival probabilities over the lifecycle
 liv_prb = parse_ssa_life_table(
@@ -150,14 +84,9 @@ liv_prb = parse_ssa_life_table(
 # Age groups for the estimation: calculate average wealth-to-permanent income ratio
 # for consumers within each of these age groups, compare actual to simulated data
 empirical_cohort_age_groups = [
-    [26, 27, 28, 29, 30],
-    [31, 32, 33, 34, 35],
-    [36, 37, 38, 39, 40],
-    [41, 42, 43, 44, 45],
-    [46, 47, 48, 49, 50],
-    [51, 52, 53, 54, 55],
-    [56, 57, 58, 59, 60],
+    [age for age in range(start, start + 5)] for start in range(26, 61, 5)
 ]
+
 
 # Three point discrete distribution of initial w
 initial_wealth_income_ratio_vals = np.array([0.17, 0.5, 0.83])
