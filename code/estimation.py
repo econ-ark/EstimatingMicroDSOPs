@@ -13,20 +13,17 @@ income as defined in ConsIndShockModel.
 import code.calibration.estimation_parameters as parameters
 import code.calibration.setup_scf_data as data  # SCF 2004 data on household wealth
 import csv
+from code.agents import (
+    BequestWarmGlowLifeCycleConsumerType,
+    BequestWarmGlowLifeCyclePortfolioType,
+    IndShkLifeCycleConsumerType,
+    PortfolioLifeCycleConsumerType,
+    WealthPortfolioLifeCycleConsumerType,
+)
 from time import time  # Timing utility
 
 import matplotlib.pyplot as plt
 import numpy as np  # Numeric Python
-from HARK.ConsumptionSaving.ConsBequestModel import (
-    BequestWarmGlowConsumerType,
-    BequestWarmGlowPortfolioType,
-)
-
-# Import modules from core HARK libraries:
-# The consumption-saving micro model
-from HARK.ConsumptionSaving.ConsIndShockModel import IndShockConsumerType
-from HARK.ConsumptionSaving.ConsPortfolioModel import PortfolioConsumerType
-from HARK.ConsumptionSaving.ConsWealthPortfolioModel import WealthPortfolioConsumerType
 
 # Method for sampling from a discrete distribution
 from HARK.distribution import DiscreteDistribution
@@ -34,6 +31,9 @@ from HARK.distribution import DiscreteDistribution
 # Estimation methods
 from HARK.estimation import bootstrap_sample_from_data, minimize_nelder_mead
 from scipy.optimize import approx_fprime
+
+# Import modules from core HARK libraries:
+# The consumption-saving micro model
 
 
 # Pathnames to the other files:
@@ -64,122 +64,17 @@ local_make_contour_plot = True
 # =====================================================
 
 
-class TempConsumerType:
-    def __init__(self, cycles=1, time_flow=True, **kwds):
-        """
-        Make a new consumer type.
-
-        Parameters
-        ----------
-        cycles : int
-            Number of times the sequence of periods should be solved.
-        time_flow : boolean
-            Whether time is currently "flowing" forward for this instance.
-
-        Returns
-        -------
-        None
-        """
-        # Initialize a basic AgentType
-        super().__init__(cycles=cycles, time_flow=time_flow, **kwds)
-        # This estimation uses age-varying discount factors as
-        # estimated by Cagetti (2003), so switch from time_inv to time_vary
-        self.add_to_time_vary("DiscFac")
-        self.del_from_time_inv("DiscFac")
-
-    def check_restrictions(self):
-        return None
-
-    def simBirth(self, which_agents):
-        """
-        Alternate method for simulating initial states for simulated agents, drawing from a finite
-        distribution.  Used to overwrite IndShockConsumerType.simBirth, which uses lognormal distributions.
-
-        Parameters
-        ----------
-        which_agents : np.array(Bool)
-            Boolean array of size self.AgentCount indicating which agents should be "born".
-
-        Returns
-        -------
-        None
-        """
-        # Get and store states for newly born agents
-        # Take directly from pre-specified distribution
-        self.state_now["aNrm"][which_agents] = self.aNrmInit[which_agents]
-        # No variation in permanent income needed
-        self.state_now["pLvl"][which_agents] = 1.0
-        # How many periods since each agent was born
-        self.t_age[which_agents] = 0
-        # Which period of the cycle each agents is currently in
-        self.t_cycle[which_agents] = 0
-        return None
-
-
-class IndShkLifeCycleConsumerType(TempConsumerType, IndShockConsumerType):
-    """
-    A very lightly edited version of IndShockConsumerType.  Uses an alternate method of making new
-    consumers and specifies DiscFac as being age-dependent.  Called "temp" because only used here.
-    """
-
-
-class PortfolioLifeCycleConsumerType(TempConsumerType, PortfolioConsumerType):
-    """
-    A very lightly edited version of PortfolioConsumerType.  Uses an alternate method of making new
-    consumers and specifies DiscFac as being age-dependent.  Called "temp" because only used here.
-    """
-
-    def post_solve(self):
-        for solution in self.solution:
-            solution.cFunc = solution.cFuncAdj
-            share = solution.ShareFuncAdj
-            solution.ShareFuncAdj = lambda m: np.clip(share(m), 0.0, 1.0)
-
-
-class BequestWarmGlowLifeCycleConsumerType(
-    TempConsumerType, BequestWarmGlowConsumerType
-):
-    """
-    A very lightly edited version of BequestWarmGlowConsumerType.  Uses an alternate method of making new
-    consumers and specifies DiscFac as being age-dependent.  Called "temp" because only used here.
-    """
-
-
-class BequestWarmGlowLifeCyclePortfolioType(
-    TempConsumerType, BequestWarmGlowPortfolioType
-):
-    """
-    A very lightly edited version of BequestWarmGlowPortfolioType.  Uses an alternate method of making new
-    consumers and specifies DiscFac as being age-dependent.  Called "temp" because only used here.
-    """
-
-    def post_solve(self):
-        for solution in self.solution:
-            solution.cFunc = solution.cFuncAdj
-            share = solution.ShareFuncAdj
-            solution.ShareFuncAdj = lambda m: np.clip(share(m), 0.0, 1.0)
-
-
-class WealthPortfolioLifeCycleConsumerType(
-    TempConsumerType, WealthPortfolioConsumerType
-):
-    """
-    A very lightly edited version of WealthPortfolioConsumerType.  Uses an alternate method of making new
-    consumers and specifies DiscFac as being age-dependent.  Called "temp" because only used here.
-    """
-
-
 def weighted_median(values, weights):
-    inds = np.argsort(values)
-    values = values[inds]
-    weights = weights[inds]
+    sorted_indices = np.argsort(values)
+    sorted_values = values[sorted_indices]
+    sorted_weights = weights[sorted_indices]
 
-    wsum = np.cumsum(inds)
-    ind = np.where(wsum > wsum[-1] / 2)[0][0]
+    cumulative_weights = np.cumsum(sorted_weights)
+    median_index = np.searchsorted(
+        cumulative_weights, cumulative_weights[-1] / 2, side="right"
+    )
 
-    median = values[ind]
-
-    return median
+    return sorted_values[median_index]
 
 
 def get_targeted_moments(
@@ -440,7 +335,7 @@ def estimate_model_nelder_mead(
 
     # Calculate minutes and remaining seconds
     minutes, seconds = divmod(time_to_estimate, 60)
-    print(f"Time to estimate: {minutes:.2f} min, {seconds:.2f} sec.")
+    print(f"Time to estimate: {int(minutes)} min, {int(seconds)} sec.")
 
     print(f"Estimated values: DiscFacAdj={model_estimate[0]}, CRRA={model_estimate[1]}")
 
@@ -469,7 +364,7 @@ def compute_standard_errors_bootstrap(
 
     t_bootstrap_guess = time_to_estimate * parameters.bootstrap_size
     minutes, seconds = divmod(t_bootstrap_guess, 60)
-    print(f"This will take approximately {minutes:.2f} min, {seconds:.2f} sec.")
+    print(f"This will take approximately {int(minutes)} min, {int(seconds)} sec.")
 
     t_start_bootstrap = time()
     std_errors = calculateStandardErrorsByBootstrap(
@@ -484,7 +379,7 @@ def compute_standard_errors_bootstrap(
 
     # Calculate minutes and remaining seconds
     minutes, seconds = divmod(time_to_bootstrap, 60)
-    print(f"Time to bootstrap: {minutes:.2f} min, {seconds:.2f} sec.")
+    print(f"Time to bootstrap: {int(minutes)} min, {int(seconds)} sec.")
 
     print(f"Standard errors: DiscFacAdj--> {std_errors[0]}, CRRA--> {std_errors[1]}")
 
@@ -602,7 +497,7 @@ def make_contour_plot_obj_func(
 
     # Calculate minutes and remaining seconds
     minutes, seconds = divmod(time_to_contour, 60)
-    print(f"Time to contour: {minutes:.2f} min, {seconds:.2f} sec.")
+    print(f"Time to contour: {int(minutes)} min, {int(seconds)} sec.")
 
     plt.colorbar(smm_contour)
     plt.plot(model_estimate[1], model_estimate[0], "*r", ms=15)
@@ -773,7 +668,7 @@ def estimate_all():
 
         # Calculate minutes and remaining seconds
         minutes, seconds = divmod(time_to_estimate, 60)
-        print(f"Time to estimate: {minutes:.2f} min, {seconds:.2f} sec.")
+        print(f"Time to estimate: {int(minutes)} min, {int(seconds)} sec.")
 
         print(
             f"Estimated values: DiscFacAdj={model_estimate[0]}, CRRA={model_estimate[1]}"
@@ -887,7 +782,7 @@ def estimate_all():
 
         # Calculate minutes and remaining seconds
         minutes, seconds = divmod(time_to_contour, 60)
-        print(f"Time to contour: {minutes:.2f} min, {seconds:.2f} sec.")
+        print(f"Time to contour: {int(minutes)} min, {int(seconds)} sec.")
 
     fig_sensitivity.savefig(figures_dir + "/AllSensitivity.pdf")
     fig_sensitivity.savefig(figures_dir + "/AllSensitivity.png")
