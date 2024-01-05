@@ -20,4 +20,4 @@ root: README
 chapters:
   - title: Paper
     sections:
-      - file: paper\01-paper
+      - file: content/paper/01-paper

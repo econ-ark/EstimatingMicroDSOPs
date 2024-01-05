@@ -1,8 +1,10 @@
-# requirements setup and mamba for faster install for env
-source /opt/conda/etc/profile.d/conda.sh
-mamba env create -qq -f environment.yml
+# Check if the environment exists before creating it
+if ! conda env list | grep -q 'solvingmicrodsops'; then
+    mamba env create -qq -f environment.yml
+fi
+
+# Activate the environment
 conda activate solvingmicrodsops
 
-# execute script to reproduce figures
-cd Code/
-python StructEstimation.py
+# Execute script to reproduce figures
+python code/do_all.py

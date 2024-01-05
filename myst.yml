@@ -17,11 +17,11 @@ project:
   authors:
     - name: Alan Lujan
       affiliations:
-        - Ohio State University
+        - Johns Hopkins University
         - Econ-ARK
       email: alanlujan91@gmail.com
   github: https://github.com/econ-ark/SolvingMicroDSOPs-LifeCycle
-  bibliography: paper/main.bib
+  bibliography: content/paper/main.bib
   math:
     '\CARA': '\alpha'
     '\CRRA': '\rho'

@@ -9,23 +9,21 @@ consumption-saving model with idiosyncratic shocks to permanent and transitory
 income as defined in ConsIndShockModel.
 """
 
+# Parameters for the consumer type and the estimation
+import code.calibration.estimation_parameters as parameters
+import code.calibration.setup_scf_data as scf_data  # SCF 2004 data on household wealth
 import csv
-import os
-import sys
+from code.agents import (
+    BequestWarmGlowLifeCycleConsumerType,
+    BequestWarmGlowLifeCyclePortfolioType,
+    IndShkLifeCycleConsumerType,
+    PortfolioLifeCycleConsumerType,
+    WealthPortfolioLifeCycleConsumerType,
+)
 from time import time  # Timing utility
 
 import matplotlib.pyplot as plt
 import numpy as np  # Numeric Python
-import pylab  # Python reproductions of some Matlab functions
-from HARK.ConsumptionSaving.ConsBequestModel import (
-    BequestWarmGlowConsumerType,
-    BequestWarmGlowPortfolioType,
-)
-
-# Import modules from core HARK libraries:
-# The consumption-saving micro model
-from HARK.ConsumptionSaving.ConsIndShockModel import IndShockConsumerType
-from HARK.ConsumptionSaving.ConsPortfolioModel import PortfolioConsumerType
 
 # Method for sampling from a discrete distribution
 from HARK.distribution import DiscreteDistribution
@@ -34,30 +32,19 @@ from HARK.distribution import DiscreteDistribution
 from HARK.estimation import bootstrap_sample_from_data, minimize_nelder_mead
 from scipy.optimize import approx_fprime
 
-# Parameters for the consumer type and the estimation
-import calibration.estimation_parameters as parameters
-import calibration.setup_scf_data as data  # SCF 2004 data on household wealth
-from code.ConsWealthPortfolioModel import WealthPortfolioConsumerType
+# Import modules from core HARK libraries:
+# The consumption-saving micro model
 
-# Find pathname to this file:
-my_file_path = os.path.dirname(os.path.abspath(__file__))
 
 # Pathnames to the other files:
 # Relative directory for primitive parameter files
-calibration_dir = os.path.join(my_file_path, "../calibration/")
+calibration_dir = "code/calibration/"
 # Relative directory for primitive parameter files
-tables_dir = os.path.join(my_file_path, "../tables/")
+tables_dir = "content/tables/"
 # Relative directory for primitive parameter files
-figures_dir = os.path.join(my_file_path, "../figures/")
+figures_dir = "content/figures/"
 # Relative directory for primitive parameter files
-code_dir = os.path.join(my_file_path, "../code/")
-
-# Add the calibration folder to the path
-sys.path.insert(0, os.path.abspath(calibration_dir))
-
-# Need to rely on the manual insertion of pathnames to all files in do_all.py
-# NOTE sys.path.insert(0, os.path.abspath(tables_dir)), etc. may need to be
-# copied from do_all.py to here
+code_dir = "code/"
 
 
 # Set booleans to determine which tasks should be done
@@ -77,111 +64,6 @@ local_make_contour_plot = True
 # =====================================================
 
 
-class TempConsumerType:
-    def __init__(self, cycles=1, time_flow=True, **kwds):
-        """
-        Make a new consumer type.
-
-        Parameters
-        ----------
-        cycles : int
-            Number of times the sequence of periods should be solved.
-        time_flow : boolean
-            Whether time is currently "flowing" forward for this instance.
-
-        Returns
-        -------
-        None
-        """
-        # Initialize a basic AgentType
-        super().__init__(cycles=cycles, time_flow=time_flow, **kwds)
-        # This estimation uses age-varying discount factors as
-        # estimated by Cagetti (2003), so switch from time_inv to time_vary
-        self.add_to_time_vary("DiscFac")
-        self.del_from_time_inv("DiscFac")
-
-    def check_restrictions(self):
-        return None
-
-    def simBirth(self, which_agents):
-        """
-        Alternate method for simulating initial states for simulated agents, drawing from a finite
-        distribution.  Used to overwrite IndShockConsumerType.simBirth, which uses lognormal distributions.
-
-        Parameters
-        ----------
-        which_agents : np.array(Bool)
-            Boolean array of size self.AgentCount indicating which agents should be "born".
-
-        Returns
-        -------
-        None
-        """
-        # Get and store states for newly born agents
-        # Take directly from pre-specified distribution
-        self.state_now["aNrm"][which_agents] = self.aNrmInit[which_agents]
-        # No variation in permanent income needed
-        self.state_now["pLvl"][which_agents] = 1.0
-        # How many periods since each agent was born
-        self.t_age[which_agents] = 0
-        # Which period of the cycle each agents is currently in
-        self.t_cycle[which_agents] = 0
-        return None
-
-
-class IndShkLifeCycleConsumerType(TempConsumerType, IndShockConsumerType):
-    """
-    A very lightly edited version of IndShockConsumerType.  Uses an alternate method of making new
-    consumers and specifies DiscFac as being age-dependent.  Called "temp" because only used here.
-    """
-
-
-class PortfolioLifeCycleConsumerType(TempConsumerType, PortfolioConsumerType):
-    """
-    A very lightly edited version of PortfolioConsumerType.  Uses an alternate method of making new
-    consumers and specifies DiscFac as being age-dependent.  Called "temp" because only used here.
-    """
-
-    def post_solve(self):
-        for solution in self.solution:
-            solution.cFunc = solution.cFuncAdj
-            share = solution.ShareFuncAdj
-            solution.ShareFuncAdj = lambda m: np.clip(share(m), 0.0, 1.0)
-
-
-class BequestWarmGlowLifeCycleConsumerType(
-    TempConsumerType, BequestWarmGlowConsumerType
-):
-    """
-    A very lightly edited version of BequestWarmGlowConsumerType.  Uses an alternate method of making new
-    consumers and specifies DiscFac as being age-dependent.  Called "temp" because only used here.
-    """
-
-
-class BequestWarmGlowLifeCyclePortfolioType(
-    TempConsumerType, BequestWarmGlowPortfolioType
-):
-    """
-    A very lightly edited version of BequestWarmGlowPortfolioType.  Uses an alternate method of making new
-    consumers and specifies DiscFac as being age-dependent.  Called "temp" because only used here.
-    """
-
-    def post_solve(self):
-        for solution in self.solution:
-            solution.cFunc = solution.cFuncAdj
-            share = solution.ShareFuncAdj
-            solution.ShareFuncAdj = lambda m: np.clip(share(m), 0.0, 1.0)
-
-
-class WealthPortfolioLifeCycleConsumerType(
-    TempConsumerType, WealthPortfolioConsumerType
-):
-    """
-    A very lightly edited version of WealthPortfolioConsumerType.  Uses an alternate method of making new
-    consumers and specifies DiscFac as being age-dependent.  Called "temp" because only used here.
-    """
-
-
 def weighted_median(values, weights):
     inds = np.argsort(values)
     values = values[inds]
@@ -196,10 +78,10 @@ def weighted_median(values, weights):
 
 
 def get_targeted_moments(
-    empirical_data=data.w_to_y_data,
-    empirical_weights=data.empirical_weights,
-    empirical_groups=data.empirical_groups,
-    map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
+    empirical_data=scf_data.w_to_y_data,
+    empirical_weights=scf_data.empirical_weights,
+    empirical_groups=scf_data.empirical_groups,
+    map_simulated_to_empirical_cohorts=scf_data.simulation_map_cohorts_to_age_indices,
 ):
     # Initialize
     group_count = len(map_simulated_to_empirical_cohorts)
@@ -221,7 +103,7 @@ def simulate_moments(
     agent,
     DiscFacAdj_bound=parameters.DiscFacAdj_bound,
     CRRA_bound=parameters.CRRA_bound,
-    map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
+    map_simulated_to_empirical_cohorts=scf_data.simulation_map_cohorts_to_age_indices,
 ):
     """
     A quick check to make sure that the parameter values are within bounds.
@@ -271,7 +153,7 @@ def smmObjectiveFxn(
     tgt_moments,
     DiscFacAdj_bound=parameters.DiscFacAdj_bound,
     CRRA_bound=parameters.CRRA_bound,
-    map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
+    map_simulated_to_empirical_cohorts=scf_data.simulation_map_cohorts_to_age_indices,
 ):
     """
     The objective function for the SMM estimation.  Given values of discount factor
@@ -372,7 +254,7 @@ def calculateStandardErrorsByBootstrap(
 
         # Bootstrap a new dataset by resampling from the original data
         bootstrap_data = (
-            bootstrap_sample_from_data(data.scf_data_array, seed=seed_list[n])
+            bootstrap_sample_from_data(scf_data.scf_data_array, seed=seed_list[n])
         ).T
         w_to_y_data_bootstrap = bootstrap_data[0,]
         empirical_groups_bootstrap = bootstrap_data[1,]
@@ -383,7 +265,7 @@ def calculateStandardErrorsByBootstrap(
             empirical_data=w_to_y_data_bootstrap,
             empirical_weights=empirical_weights_bootstrap,
             empirical_groups=empirical_groups_bootstrap,
-            map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
+            map_simulated_to_empirical_cohorts=scf_data.simulation_map_cohorts_to_age_indices,
         )
 
         # Make a temporary function for use in this estimation run
@@ -393,7 +275,7 @@ def calculateStandardErrorsByBootstrap(
                 CRRA=parameters_to_estimate[1],
                 agent=agent,
                 tgt_moments=bstrap_tgt_moments,
-                map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
+                map_simulated_to_empirical_cohorts=scf_data.simulation_map_cohorts_to_age_indices,
             )
 
         # Estimate the model with the bootstrap data and add to list of estimates
@@ -418,6 +300,213 @@ def calculateStandardErrorsByBootstrap(
 # =================================================================
 # Done defining objects and functions.  Now run them (if desired).
 # =================================================================
+
+
+def estimate_model_nelder_mead(
+    estimation_agent, EstimationAgent, targeted_moments, initial_guess
+):
+    print("----------------------------------------------------------------------")
+    print(
+        f"Now estimating the model using Nelder-Mead from an initial guess of {initial_guess}..."
+    )
+    print("----------------------------------------------------------------------")
+
+    # Make a single-input lambda function for use in the optimizer
+    def smmObjectiveFxnReduced(parameters_to_estimate):
+        """
+        A "reduced form" of the SMM objective function, compatible with the optimizer.
+        Identical to smmObjectiveFunction, but takes only a single input as a length-2
+        list representing [DiscFacAdj,CRRA].
+        """
+        return smmObjectiveFxn(
+            DiscFacAdj=parameters_to_estimate[0],
+            CRRA=parameters_to_estimate[1],
+            agent=EstimationAgent,
+            tgt_moments=targeted_moments,
+        )
+
+    t_start_estimate = time()
+    model_estimate = minimize_nelder_mead(
+        smmObjectiveFxnReduced, initial_guess, verbose=True
+    )
+    t_end_estimate = time()
+
+    time_to_estimate = t_end_estimate - t_start_estimate
+
+    # Calculate minutes and remaining seconds
+    minutes, seconds = divmod(time_to_estimate, 60)
+    print(f"Time to estimate: {int(minutes)} min, {int(seconds)} sec.")
+
+    print(f"Estimated values: DiscFacAdj={model_estimate[0]}, CRRA={model_estimate[1]}")
+
+    # Create the simple estimate table
+    estimate_results_file = (
+        tables_dir + "/" + estimation_agent + "_estimate_results.csv"
+    )
+
+    with open(estimate_results_file, "wt") as f:
+        writer = csv.writer(f)
+        writer.writerow(["DiscFacAdj", "CRRA"])
+        writer.writerow([model_estimate[0], model_estimate[1]])
+
+    return model_estimate, time_to_estimate
+
+
+def compute_standard_errors_bootstrap(
+    estimation_agent, EstimationAgent, model_estimate, time_to_estimate
+):
+    # Estimate the model:
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    print(
+        f"Computing standard errors using {parameters.bootstrap_size} bootstrap replications."
+    )
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+
+    t_bootstrap_guess = time_to_estimate * parameters.bootstrap_size
+    minutes, seconds = divmod(t_bootstrap_guess, 60)
+    print(f"This will take approximately {int(minutes)} min, {int(seconds)} sec.")
+
+    t_start_bootstrap = time()
+    std_errors = calculateStandardErrorsByBootstrap(
+        model_estimate,
+        N=parameters.bootstrap_size,
+        agent=EstimationAgent,
+        seed=parameters.seed,
+        verbose=True,
+    )
+    t_end_bootstrap = time()
+    time_to_bootstrap = t_end_bootstrap - t_start_bootstrap
+
+    # Calculate minutes and remaining seconds
+    minutes, seconds = divmod(time_to_bootstrap, 60)
+    print(f"Time to bootstrap: {int(minutes)} min, {int(seconds)} sec.")
+
+    print(f"Standard errors: DiscFacAdj--> {std_errors[0]}, CRRA--> {std_errors[1]}")
+
+    # Create the simple bootstrap table
+    bootstrap_results_file = (
+        tables_dir + "/" + estimation_agent + "_bootstrap_results.csv"
+    )
+
+    with open(bootstrap_results_file, "wt") as f:
+        writer = csv.writer(f)
+        writer.writerow(
+            [
+                "DiscFacAdj",
+                "DiscFacAdj_standard_error",
+                "CRRA",
+                "CRRA_standard_error",
+            ]
+        )
+        writer.writerow(
+            [model_estimate[0], std_errors[0], model_estimate[1], std_errors[1]]
+        )
+
+
+def compute_sensitivity_measure(
+    estimation_agent, EstimationAgent, model_estimate, initial_guess
+):
+    print("``````````````````````````````````````````````````````````````````````")
+    print("Computing sensitivity measure.")
+    print("``````````````````````````````````````````````````````````````````````")
+
+    # Find the Jacobian of the function that simulates moments
+    def simulate_moments_reduced(x):
+        moments = simulate_moments(
+            x[0],
+            x[1],
+            agent=EstimationAgent,
+            DiscFacAdj_bound=parameters.DiscFacAdj_bound,
+            CRRA_bound=parameters.CRRA_bound,
+            map_simulated_to_empirical_cohorts=scf_data.simulation_map_cohorts_to_age_indices,
+        )
+
+        return moments
+
+    n_moments = len(scf_data.simulation_map_cohorts_to_age_indices)
+    jac = np.array(
+        [
+            approx_fprime(
+                model_estimate,
+                lambda x: simulate_moments_reduced(x)[j],
+                epsilon=0.01,
+            )
+            for j in range(n_moments)
+        ]
+    )
+
+    # Compute sensitivity measure. (all moments weighted equally)
+    sensitivity = np.dot(np.linalg.inv(np.dot(jac.T, jac)), jac.T)
+
+    # Create lables for moments in the plots
+    moment_labels = [
+        "[" + str(min(x)) + "," + str(max(x)) + "]"
+        for x in scf_data.empirical_cohort_age_groups
+    ]
+
+    # Plot
+    fig, axs = plt.subplots(len(initial_guess))
+    fig.set_tight_layout(True)
+
+    axs[0].bar(range(n_moments), sensitivity[0, :], tick_label=moment_labels)
+    axs[0].set_title("DiscFacAdj")
+    axs[0].set_ylabel("Sensitivity")
+    axs[0].set_xlabel("Median W/Y Ratio")
+
+    axs[1].bar(range(n_moments), sensitivity[1, :], tick_label=moment_labels)
+    axs[1].set_title("CRRA")
+    axs[1].set_ylabel("Sensitivity")
+    axs[1].set_xlabel("Median W/Y Ratio")
+
+    plt.savefig(figures_dir + "/" + estimation_agent + "Sensitivity.pdf")
+    plt.savefig(figures_dir + "/" + estimation_agent + "Sensitivity.png")
+    plt.savefig(figures_dir + "/" + estimation_agent + "Sensitivity.svg")
+
+    plt.show()
+
+
+def make_contour_plot_obj_func(
+    estimation_agent, EstimationAgent, model_estimate, targeted_moments
+):
+    print("``````````````````````````````````````````````````````````````````````")
+    print("Creating the contour plot.")
+    print("``````````````````````````````````````````````````````````````````````")
+    t_start_contour = time()
+    DiscFac_star, CRRA_star = model_estimate
+    grid_density = 20  # Number of parameter values in each dimension
+    level_count = 100  # Number of contour levels to plot
+    DiscFacAdj_list = np.linspace(
+        max(DiscFac_star - 0.25, 0.5), min(DiscFac_star + 0.25, 1.05), grid_density
+    )
+    CRRA_list = np.linspace(max(CRRA_star - 5, 2), min(CRRA_star + 5, 8), grid_density)
+    CRRA_mesh, DiscFacAdj_mesh = np.meshgrid(CRRA_list, DiscFacAdj_list)
+    smm_obj_levels = np.empty([grid_density, grid_density])
+    for j in range(grid_density):
+        DiscFacAdj = DiscFacAdj_list[j]
+        for k in range(grid_density):
+            CRRA = CRRA_list[k]
+            smm_obj_levels[j, k] = smmObjectiveFxn(
+                DiscFacAdj,
+                CRRA,
+                agent=EstimationAgent,
+                tgt_moments=targeted_moments,
+            )
+    smm_contour = plt.contourf(CRRA_mesh, DiscFacAdj_mesh, smm_obj_levels, level_count)
+    t_end_contour = time()
+    time_to_contour = t_end_contour - t_start_contour
+
+    # Calculate minutes and remaining seconds
+    minutes, seconds = divmod(time_to_contour, 60)
+    print(f"Time to contour: {int(minutes)} min, {int(seconds)} sec.")
+
+    plt.colorbar(smm_contour)
+    plt.plot(model_estimate[1], model_estimate[0], "*r", ms=15)
+    plt.xlabel(r"coefficient of relative risk aversion $\rho$", fontsize=14)
+    plt.ylabel(r"discount factor adjustment $\beth$", fontsize=14)
+    plt.savefig(figures_dir + "/" + estimation_agent + "SMMcontour.pdf")
+    plt.savefig(figures_dir + "/" + estimation_agent + "SMMcontour.png")
+    plt.savefig(figures_dir + "/" + estimation_agent + "SMMcontour.svg")
+    plt.show()
 
 
 def estimate(
@@ -475,210 +564,31 @@ def estimate(
 
     targeted_moments = get_targeted_moments()
 
+    initial_guess = [parameters.DiscFacAdj_start, parameters.CRRA_start]
+
     # Estimate the model using Nelder-Mead
     if estimate_model:
-        initial_guess = [parameters.DiscFacAdj_start, parameters.CRRA_start]
-        print("----------------------------------------------------------------------")
-        print(
-            f"Now estimating the model using Nelder-Mead from an initial guess of {initial_guess}..."
+        model_estimate, time_to_estimate = estimate_model_nelder_mead(
+            estimation_agent, EstimationAgent, targeted_moments, initial_guess
         )
-        print("----------------------------------------------------------------------")
 
-        # Make a single-input lambda function for use in the optimizer
-        def smmObjectiveFxnReduced(parameters_to_estimate):
-            """
-            A "reduced form" of the SMM objective function, compatible with the optimizer.
-            Identical to smmObjectiveFunction, but takes only a single input as a length-2
-            list representing [DiscFacAdj,CRRA].
-            """
-            return smmObjectiveFxn(
-                DiscFacAdj=parameters_to_estimate[0],
-                CRRA=parameters_to_estimate[1],
-                agent=EstimationAgent,
-                tgt_moments=targeted_moments,
+        # Compute standard errors by bootstrap
+        if compute_standard_errors:
+            compute_standard_errors_bootstrap(
+                estimation_agent, EstimationAgent, model_estimate, time_to_estimate
             )
 
-        t_start_estimate = time()
-        model_estimate = minimize_nelder_mead(
-            smmObjectiveFxnReduced, initial_guess, verbose=True
-        )
-        t_end_estimate = time()
-
-        time_to_estimate = t_end_estimate - t_start_estimate
-        print(
-            f"Time to execute all: {round(time_to_estimate / 60.0, 2)} min, {time_to_estimate} sec"
-        )
-        print(
-            f"Estimated values: DiscFacAdj={model_estimate[0]}, CRRA={model_estimate[1]}"
-        )
-
-        # Create the simple estimate table
-        estimate_results_file = os.path.join(
-            tables_dir, estimation_agent + "_estimate_results.csv"
-        )
-        with open(estimate_results_file, "wt") as f:
-            writer = csv.writer(f)
-            writer.writerow(["DiscFacAdj", "CRRA"])
-            writer.writerow([model_estimate[0], model_estimate[1]])
-
-    if compute_standard_errors and not estimate_model:
-        print(
-            "To run the bootstrap you must first estimate the model by setting estimate_model = True."
-        )
-
-    # Compute standard errors by bootstrap
-    if compute_standard_errors and estimate_model:
-        # Estimate the model:
-        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-        print(
-            f"Computing standard errors using {parameters.bootstrap_size} bootstrap replications."
-        )
-        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-        try:
-            t_bootstrap_guess = time_to_estimate * parameters.bootstrap_size
-            minutes, seconds = divmod(t_bootstrap_guess, 60)
-            print(f"This will take approximately {minutes:.2f} min, {seconds:.2f} sec")
-
-        except:
-            pass
-        t_start_bootstrap = time()
-        std_errors = calculateStandardErrorsByBootstrap(
-            model_estimate,
-            N=parameters.bootstrap_size,
-            agent=EstimationAgent,
-            seed=parameters.seed,
-            verbose=True,
-        )
-        t_end_bootstrap = time()
-        time_to_bootstrap = t_end_bootstrap - t_start_bootstrap
-        print(
-            f"Time to execute all: {time_to_bootstrap / 60:.2f} min, {time_to_bootstrap:.2f} sec"
-        )
-        print(
-            f"Standard errors: DiscFacAdj--> {std_errors[0]}, CRRA--> {std_errors[1]}"
-        )
-
-        # Create the simple bootstrap table
-        bootstrap_results_file = os.path.join(
-            tables_dir, estimation_agent + "_bootstrap_results.csv"
-        )
-        with open(bootstrap_results_file, "wt") as f:
-            writer = csv.writer(f)
-            writer.writerow(
-                [
-                    "DiscFacAdj",
-                    "DiscFacAdj_standard_error",
-                    "CRRA",
-                    "CRRA_standard_error",
-                ]
-            )
-            writer.writerow(
-                [model_estimate[0], std_errors[0], model_estimate[1], std_errors[1]]
+        # Compute sensitivity measure
+        if compute_sensitivity:
+            compute_sensitivity_measure(
+                estimation_agent, EstimationAgent, model_estimate, initial_guess
             )
 
-    # Compute sensitivity measure
-    if compute_sensitivity and estimate_model:
-        print("``````````````````````````````````````````````````````````````````````")
-        print("Computing sensitivity measure.")
-        print("``````````````````````````````````````````````````````````````````````")
-
-        # Find the Jacobian of the function that simulates moments
-        def simulate_moments_reduced(x):
-            moments = simulate_moments(
-                x[0],
-                x[1],
-                agent=EstimationAgent,
-                DiscFacAdj_bound=parameters.DiscFacAdj_bound,
-                CRRA_bound=parameters.CRRA_bound,
-                map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
+        # Make a contour plot of the objective function
+        if make_contour_plot:
+            make_contour_plot_obj_func(
+                estimation_agent, EstimationAgent, model_estimate, targeted_moments
             )
-
-            return moments
-
-        n_moments = len(data.simulation_map_cohorts_to_age_indices)
-        jac = np.array(
-            [
-                approx_fprime(
-                    model_estimate,
-                    lambda x: simulate_moments_reduced(x)[j],
-                    epsilon=0.01,
-                )
-                for j in range(n_moments)
-            ]
-        )
-
-        # Compute sensitivity measure. (all moments weighted equally)
-        sensitivity = np.dot(np.linalg.inv(np.dot(jac.T, jac)), jac.T)
-
-        # Create lables for moments in the plots
-        moment_labels = [
-            "[" + str(min(x)) + "," + str(max(x)) + "]"
-            for x in data.empirical_cohort_age_groups
-        ]
-
-        # Plot
-        fig, axs = plt.subplots(len(initial_guess))
-        fig.set_tight_layout(True)
-
-        axs[0].bar(range(n_moments), sensitivity[0, :], tick_label=moment_labels)
-        axs[0].set_title("DiscFacAdj")
-        axs[0].set_ylabel("Sensitivity")
-        axs[0].set_xlabel("Median W/Y Ratio")
-
-        axs[1].bar(range(n_moments), sensitivity[1, :], tick_label=moment_labels)
-        axs[1].set_title("CRRA")
-        axs[1].set_ylabel("Sensitivity")
-        axs[1].set_xlabel("Median W/Y Ratio")
-
-        plt.savefig(os.path.join(figures_dir, estimation_agent + "Sensitivity.pdf"))
-        plt.savefig(os.path.join(figures_dir, estimation_agent + "Sensitivity.png"))
-        plt.savefig(os.path.join(figures_dir, estimation_agent + "Sensitivity.svg"))
-
-        plt.show()
-
-    # Make a contour plot of the objective function
-    if make_contour_plot:
-        print("``````````````````````````````````````````````````````````````````````")
-        print("Creating the contour plot.")
-        print("``````````````````````````````````````````````````````````````````````")
-        t_start_contour = time()
-        DiscFac_star, CRRA_star = model_estimate
-        grid_density = 20  # Number of parameter values in each dimension
-        level_count = 100  # Number of contour levels to plot
-        DiscFacAdj_list = np.linspace(
-            max(DiscFac_star - 0.25, 0.5), min(DiscFac_star + 0.25, 1.05), grid_density
-        )
-        CRRA_list = np.linspace(
-            max(CRRA_star - 5, 2), min(CRRA_star + 5, 8), grid_density
-        )
-        CRRA_mesh, DiscFacAdj_mesh = pylab.meshgrid(CRRA_list, DiscFacAdj_list)
-        smm_obj_levels = np.empty([grid_density, grid_density])
-        for j in range(grid_density):
-            DiscFacAdj = DiscFacAdj_list[j]
-            for k in range(grid_density):
-                CRRA = CRRA_list[k]
-                smm_obj_levels[j, k] = smmObjectiveFxn(
-                    DiscFacAdj,
-                    CRRA,
-                    agent=EstimationAgent,
-                    tgt_moments=targeted_moments,
-                )
-        smm_contour = pylab.contourf(
-            CRRA_mesh, DiscFacAdj_mesh, smm_obj_levels, level_count
-        )
-        t_end_contour = time()
-        time_to_contour = t_end_contour - t_start_contour
-        print(
-            f"Time to execute all: {time_to_contour / 60:.2f} min, {time_to_contour:.2f} sec"
-        )
-        pylab.colorbar(smm_contour)
-        pylab.plot(model_estimate[1], model_estimate[0], "*r", ms=15)
-        pylab.xlabel(r"coefficient of relative risk aversion $\rho$", fontsize=14)
-        pylab.ylabel(r"discount factor adjustment $\beth$", fontsize=14)
-        pylab.savefig(os.path.join(figures_dir, estimation_agent + "SMMcontour.pdf"))
-        pylab.savefig(os.path.join(figures_dir, estimation_agent + "SMMcontour.png"))
-        pylab.savefig(os.path.join(figures_dir, estimation_agent + "SMMcontour.svg"))
-        pylab.show()
 
 
 def estimate_all():
@@ -755,9 +665,11 @@ def estimate_all():
         t_end_estimate = time()
 
         time_to_estimate = t_end_estimate - t_start_estimate
-        print(
-            f"Time to execute all: {round(time_to_estimate / 60.0, 2)} min, {time_to_estimate} sec"
-        )
+
+        # Calculate minutes and remaining seconds
+        minutes, seconds = divmod(time_to_estimate, 60)
+        print(f"Time to estimate: {int(minutes)} min, {int(seconds)} sec.")
+
         print(
             f"Estimated values: DiscFacAdj={model_estimate[0]}, CRRA={model_estimate[1]}"
         )
@@ -774,12 +686,12 @@ def estimate_all():
                 agent=EstimationAgent,
                 DiscFacAdj_bound=parameters.DiscFacAdj_bound,
                 CRRA_bound=parameters.CRRA_bound,
-                map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
+                map_simulated_to_empirical_cohorts=scf_data.simulation_map_cohorts_to_age_indices,
             )
 
             return moments
 
-        n_moments = len(data.simulation_map_cohorts_to_age_indices)
+        n_moments = len(scf_data.simulation_map_cohorts_to_age_indices)
         jac = np.array(
             [
                 approx_fprime(
@@ -797,7 +709,7 @@ def estimate_all():
         # Create lables for moments in the plots
         moment_labels = [
             "[" + str(min(x)) + "," + str(max(x)) + "]"
-            for x in data.empirical_cohort_age_groups
+            for x in scf_data.empirical_cohort_age_groups
         ]
 
         # Plot
@@ -831,7 +743,7 @@ def estimate_all():
         CRRA_list = np.linspace(
             max(CRRA_star - 5, 2), min(CRRA_star + 5, 8), grid_density
         )
-        CRRA_mesh, DiscFacAdj_mesh = pylab.meshgrid(CRRA_list, DiscFacAdj_list)
+        CRRA_mesh, DiscFacAdj_mesh = np.meshgrid(CRRA_list, DiscFacAdj_list)
         smm_obj_levels = np.empty([grid_density, grid_density])
         for j in range(grid_density):
             DiscFacAdj = DiscFacAdj_list[j]
@@ -851,7 +763,7 @@ def estimate_all():
         contour = subfigs_contour[idx].contourf(
             CRRA_mesh, DiscFacAdj_mesh, smm_obj_levels, level_count
         )
-        cbar = fig_sensitivity.colorbar(contour)
+        fig_sensitivity.colorbar(contour)
 
         # Plot the model estimate
         subfigs_contour[idx].plot(model_estimate[1], model_estimate[0], "*r", ms=15)
@@ -867,18 +779,19 @@ def estimate_all():
         # Print time to execute
         t_end_contour = time()
         time_to_contour = t_end_contour - t_start_contour
-        print(
-            f"Time to execute all: {time_to_contour / 60:.2f} min, {time_to_contour:.2f} sec"
-        )
 
-    fig_sensitivity.savefig(os.path.join(figures_dir, "AllSensitivity.pdf"))
-    fig_sensitivity.savefig(os.path.join(figures_dir, "AllSensitivity.png"))
-    fig_sensitivity.savefig(os.path.join(figures_dir, "AllSensitivity.svg"))
+        # Calculate minutes and remaining seconds
+        minutes, seconds = divmod(time_to_contour, 60)
+        print(f"Time to contour: {int(minutes)} min, {int(seconds)} sec.")
+
+    fig_sensitivity.savefig(figures_dir + "/AllSensitivity.pdf")
+    fig_sensitivity.savefig(figures_dir + "/AllSensitivity.png")
+    fig_sensitivity.savefig(figures_dir + "/AllSensitivity.svg")
 
     # Save and show the plot
-    fig_contour.savefig(os.path.join(figures_dir, "AllSMMcontour.pdf"))
-    fig_contour.savefig(os.path.join(figures_dir, "AllSMMcontour.png"))
-    fig_contour.savefig(os.path.join(figures_dir, "AllSMMcontour.svg"))
+    fig_contour.savefig(figures_dir + "/AllSMMcontour.pdf")
+    fig_contour.savefig(figures_dir + "/AllSMMcontour.png")
+    fig_contour.savefig(figures_dir + "/AllSMMcontour.svg")
 
 
 if __name__ == "__main__":
