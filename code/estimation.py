@@ -11,7 +11,7 @@ income as defined in ConsIndShockModel.
 
 # Parameters for the consumer type and the estimation
 import code.calibration.estimation_parameters as parameters
-import code.calibration.setup_scf_data as data  # SCF 2004 data on household wealth
+import code.calibration.setup_scf_data as scf_data  # SCF 2004 data on household wealth
 import csv
 from code.agents import (
     BequestWarmGlowLifeCycleConsumerType,
@@ -65,23 +65,23 @@ local_make_contour_plot = True
 
 
 def weighted_median(values, weights):
-    sorted_indices = np.argsort(values)
-    sorted_values = values[sorted_indices]
-    sorted_weights = weights[sorted_indices]
+    inds = np.argsort(values)
+    values = values[inds]
+    weights = weights[inds]
 
-    cumulative_weights = np.cumsum(sorted_weights)
-    median_index = np.searchsorted(
-        cumulative_weights, cumulative_weights[-1] / 2, side="right"
-    )
+    wsum = np.cumsum(inds)
+    ind = np.where(wsum > wsum[-1] / 2)[0][0]
 
-    return sorted_values[median_index]
+    median = values[ind]
+
+    return median
 
 
 def get_targeted_moments(
-    empirical_data=data.w_to_y_data,
-    empirical_weights=data.empirical_weights,
-    empirical_groups=data.empirical_groups,
-    map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
+    empirical_data=scf_data.w_to_y_data,
+    empirical_weights=scf_data.empirical_weights,
+    empirical_groups=scf_data.empirical_groups,
+    map_simulated_to_empirical_cohorts=scf_data.simulation_map_cohorts_to_age_indices,
 ):
     # Initialize
     group_count = len(map_simulated_to_empirical_cohorts)
@@ -103,7 +103,7 @@ def simulate_moments(
     agent,
     DiscFacAdj_bound=parameters.DiscFacAdj_bound,
     CRRA_bound=parameters.CRRA_bound,
-    map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
+    map_simulated_to_empirical_cohorts=scf_data.simulation_map_cohorts_to_age_indices,
 ):
     """
     A quick check to make sure that the parameter values are within bounds.
@@ -153,7 +153,7 @@ def smmObjectiveFxn(
     tgt_moments,
     DiscFacAdj_bound=parameters.DiscFacAdj_bound,
     CRRA_bound=parameters.CRRA_bound,
-    map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
+    map_simulated_to_empirical_cohorts=scf_data.simulation_map_cohorts_to_age_indices,
 ):
     """
     The objective function for the SMM estimation.  Given values of discount factor
@@ -254,7 +254,7 @@ def calculateStandardErrorsByBootstrap(
 
         # Bootstrap a new dataset by resampling from the original data
         bootstrap_data = (
-            bootstrap_sample_from_data(data.scf_data_array, seed=seed_list[n])
+            bootstrap_sample_from_data(scf_data.scf_data_array, seed=seed_list[n])
         ).T
         w_to_y_data_bootstrap = bootstrap_data[0,]
         empirical_groups_bootstrap = bootstrap_data[1,]
@@ -265,7 +265,7 @@ def calculateStandardErrorsByBootstrap(
             empirical_data=w_to_y_data_bootstrap,
             empirical_weights=empirical_weights_bootstrap,
             empirical_groups=empirical_groups_bootstrap,
-            map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
+            map_simulated_to_empirical_cohorts=scf_data.simulation_map_cohorts_to_age_indices,
         )
 
         # Make a temporary function for use in this estimation run
@@ -275,7 +275,7 @@ def calculateStandardErrorsByBootstrap(
                 CRRA=parameters_to_estimate[1],
                 agent=agent,
                 tgt_moments=bstrap_tgt_moments,
-                map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
+                map_simulated_to_empirical_cohorts=scf_data.simulation_map_cohorts_to_age_indices,
             )
 
         # Estimate the model with the bootstrap data and add to list of estimates
@@ -418,12 +418,12 @@ def compute_sensitivity_measure(
             agent=EstimationAgent,
             DiscFacAdj_bound=parameters.DiscFacAdj_bound,
             CRRA_bound=parameters.CRRA_bound,
-            map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
+            map_simulated_to_empirical_cohorts=scf_data.simulation_map_cohorts_to_age_indices,
         )
 
         return moments
 
-    n_moments = len(data.simulation_map_cohorts_to_age_indices)
+    n_moments = len(scf_data.simulation_map_cohorts_to_age_indices)
     jac = np.array(
         [
             approx_fprime(
@@ -441,7 +441,7 @@ def compute_sensitivity_measure(
     # Create lables for moments in the plots
     moment_labels = [
         "[" + str(min(x)) + "," + str(max(x)) + "]"
-        for x in data.empirical_cohort_age_groups
+        for x in scf_data.empirical_cohort_age_groups
     ]
 
     # Plot
@@ -686,12 +686,12 @@ def estimate_all():
                 agent=EstimationAgent,
                 DiscFacAdj_bound=parameters.DiscFacAdj_bound,
                 CRRA_bound=parameters.CRRA_bound,
-                map_simulated_to_empirical_cohorts=data.simulation_map_cohorts_to_age_indices,
+                map_simulated_to_empirical_cohorts=scf_data.simulation_map_cohorts_to_age_indices,
             )
 
             return moments
 
-        n_moments = len(data.simulation_map_cohorts_to_age_indices)
+        n_moments = len(scf_data.simulation_map_cohorts_to_age_indices)
         jac = np.array(
             [
                 approx_fprime(
@@ -709,7 +709,7 @@ def estimate_all():
         # Create lables for moments in the plots
         moment_labels = [
             "[" + str(min(x)) + "," + str(max(x)) + "]"
-            for x in data.empirical_cohort_age_groups
+            for x in scf_data.empirical_cohort_age_groups
         ]
 
         # Plot
