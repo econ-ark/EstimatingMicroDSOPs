@@ -146,7 +146,7 @@ def simulate_moments(
     return sim_moments
 
 
-def smmObjectiveFxn(
+def smm_obj_func(
     DiscFacAdj,
     CRRA,
     agent,
@@ -217,9 +217,7 @@ def smmObjectiveFxn(
 
 
 # Define the bootstrap procedure
-def calculateStandardErrorsByBootstrap(
-    initial_estimate, N, agent, seed=0, verbose=False
-):
+def calculate_std_err_bootstrap(initial_estimate, N, agent, seed=0, verbose=False):
     """
     Calculates standard errors by repeatedly re-estimating the model with datasets
     resampled from the actual data.
@@ -269,8 +267,8 @@ def calculateStandardErrorsByBootstrap(
         )
 
         # Make a temporary function for use in this estimation run
-        def smmObjectiveFxnBootstrap(parameters_to_estimate):
-            return smmObjectiveFxn(
+        def smm_obj_func_bootstrap(parameters_to_estimate):
+            return smm_obj_func(
                 DiscFacAdj=parameters_to_estimate[0],
                 CRRA=parameters_to_estimate[1],
                 agent=agent,
@@ -279,7 +277,7 @@ def calculateStandardErrorsByBootstrap(
             )
 
         # Estimate the model with the bootstrap data and add to list of estimates
-        this_estimate = minimize_nelder_mead(smmObjectiveFxnBootstrap, initial_estimate)
+        this_estimate = minimize_nelder_mead(smm_obj_func_bootstrap, initial_estimate)
         estimate_list.append(this_estimate)
         t_now = time()
 
@@ -312,13 +310,13 @@ def estimate_model_nelder_mead(
     print("----------------------------------------------------------------------")
 
     # Make a single-input lambda function for use in the optimizer
-    def smmObjectiveFxnReduced(parameters_to_estimate):
+    def smm_obj_func_redux(parameters_to_estimate):
         """
         A "reduced form" of the SMM objective function, compatible with the optimizer.
         Identical to smmObjectiveFunction, but takes only a single input as a length-2
         list representing [DiscFacAdj,CRRA].
         """
-        return smmObjectiveFxn(
+        return smm_obj_func(
             DiscFacAdj=parameters_to_estimate[0],
             CRRA=parameters_to_estimate[1],
             agent=EstimationAgent,
@@ -327,7 +325,7 @@ def estimate_model_nelder_mead(
 
     t_start_estimate = time()
     model_estimate = minimize_nelder_mead(
-        smmObjectiveFxnReduced, initial_guess, verbose=True
+        smm_obj_func_redux, initial_guess, verbose=True
     )
     t_end_estimate = time()
 
@@ -352,7 +350,7 @@ def estimate_model_nelder_mead(
     return model_estimate, time_to_estimate
 
 
-def compute_standard_errors_bootstrap(
+def compute_std_err_bootstrap(
     estimation_agent, EstimationAgent, model_estimate, time_to_estimate
 ):
     # Estimate the model:
@@ -367,7 +365,7 @@ def compute_standard_errors_bootstrap(
     print(f"This will take approximately {int(minutes)} min, {int(seconds)} sec.")
 
     t_start_bootstrap = time()
-    std_errors = calculateStandardErrorsByBootstrap(
+    std_errors = calculate_std_err_bootstrap(
         model_estimate,
         N=parameters.bootstrap_size,
         agent=EstimationAgent,
@@ -411,7 +409,7 @@ def compute_sensitivity_measure(
     print("``````````````````````````````````````````````````````````````````````")
 
     # Find the Jacobian of the function that simulates moments
-    def simulate_moments_reduced(x):
+    def simulate_moments_redux(x):
         moments = simulate_moments(
             x[0],
             x[1],
@@ -428,7 +426,7 @@ def compute_sensitivity_measure(
         [
             approx_fprime(
                 model_estimate,
-                lambda x: simulate_moments_reduced(x)[j],
+                lambda x: simulate_moments_redux(x)[j],
                 epsilon=0.01,
             )
             for j in range(n_moments)
@@ -485,7 +483,7 @@ def make_contour_plot_obj_func(
         DiscFacAdj = DiscFacAdj_list[j]
         for k in range(grid_density):
             CRRA = CRRA_list[k]
-            smm_obj_levels[j, k] = smmObjectiveFxn(
+            smm_obj_levels[j, k] = smm_obj_func(
                 DiscFacAdj,
                 CRRA,
                 agent=EstimationAgent,
@@ -574,7 +572,7 @@ def estimate(
 
         # Compute standard errors by bootstrap
         if compute_standard_errors:
-            compute_standard_errors_bootstrap(
+            compute_std_err_bootstrap(
                 estimation_agent, EstimationAgent, model_estimate, time_to_estimate
             )
 
@@ -645,13 +643,13 @@ def estimate_all():
         print("----------------------------------------------------------------------")
 
         # Make a single-input lambda function for use in the optimizer
-        def smmObjectiveFxnReduced(parameters_to_estimate):
+        def smm_obj_func_redux(parameters_to_estimate):
             """
             A "reduced form" of the SMM objective function, compatible with the optimizer.
             Identical to smmObjectiveFunction, but takes only a single input as a length-2
             list representing [DiscFacAdj,CRRA].
             """
-            return smmObjectiveFxn(
+            return smm_obj_func(
                 DiscFacAdj=parameters_to_estimate[0],
                 CRRA=parameters_to_estimate[1],
                 agent=EstimationAgent,
@@ -660,7 +658,7 @@ def estimate_all():
 
         t_start_estimate = time()
         model_estimate = minimize_nelder_mead(
-            smmObjectiveFxnReduced, initial_guess, verbose=True
+            smm_obj_func_redux, initial_guess, verbose=True
         )
         t_end_estimate = time()
 
@@ -679,7 +677,7 @@ def estimate_all():
         print("``````````````````````````````````````````````````````````````````````")
 
         # Find the Jacobian of the function that simulates moments
-        def simulate_moments_reduced(x):
+        def simulate_moments_redux(x):
             moments = simulate_moments(
                 x[0],
                 x[1],
@@ -696,7 +694,7 @@ def estimate_all():
             [
                 approx_fprime(
                     model_estimate,
-                    lambda x: simulate_moments_reduced(x)[j],
+                    lambda x: simulate_moments_redux(x)[j],
                     epsilon=0.01,
                 )
                 for j in range(n_moments)
@@ -749,7 +747,7 @@ def estimate_all():
             DiscFacAdj = DiscFacAdj_list[j]
             for k in range(grid_density):
                 CRRA = CRRA_list[k]
-                smm_obj_levels[j, k] = smmObjectiveFxn(
+                smm_obj_levels[j, k] = smm_obj_func(
                     DiscFacAdj,
                     CRRA,
                     agent=EstimationAgent,
