@@ -40,7 +40,7 @@ from scipy.optimize import approx_fprime
 # Relative directory for primitive parameter files
 calibration_dir = "code/calibration/"
 # Relative directory for primitive parameter files
-tables_dir = "content/tables/"
+tables_dir = "code/tables/"
 # Relative directory for primitive parameter files
 figures_dir = "content/figures/"
 # Relative directory for primitive parameter files
