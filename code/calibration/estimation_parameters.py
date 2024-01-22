@@ -26,12 +26,12 @@ show_PermGroFacAgg_error = False
 # - Define all of the model parameters for SolvingMicroDSOPs and ConsumerExamples -
 # ---------------------------------------------------------------------------------
 
-exp_nest = 3  # Number of times to "exponentially nest" when constructing a_grid
+exp_nest = 1  # Number of times to "exponentially nest" when constructing a_grid
 aXtraMin = 0.001  # Minimum end-of-period "assets above minimum" value
-aXtraMax = 20  # Maximum end-of-period "assets above minimum" value
+aXtraMax = 100  # Maximum end-of-period "assets above minimum" value
 aXtraHuge = None  # A very large value of assets to add to the grid, not used
 aXtraExtra = None  # Some other value of assets to add to the grid, not used
-aXtraCount = 8  # Number of points in the grid of "assets above minimum"
+aXtraCount = 200  # Number of points in the grid of "assets above minimum"
 
 # Artificial borrowing constraint; imposed minimum level of end-of period assets
 BoroCnstArt = 0.0
@@ -44,9 +44,9 @@ Rfree = 1.03  # Interest factor on assets
 PermShkCount = 7
 # Number of points in discrete approximation to transitory income shocks
 TranShkCount = 7
-UnempPrb = 0.005  # Probability of unemployment while working
-UnempPrbRet = 0.000  # Probability of "unemployment" while retired
-IncUnemp = 0.0  # Unemployment benefits replacement rate
+UnempPrb = 0.05  # Probability of unemployment while working
+UnempPrbRet = 0.005  # Probability of "unemployment" while retired
+IncUnemp = 0.3  # Unemployment benefits replacement rate
 IncUnempRet = 0.0  # "Unemployment" benefits when retired
 
 final_age = 90  # Age at which the problem ends (die with certainty)
@@ -74,7 +74,7 @@ inc_calib = parse_income_spec(
 )
 
 # Age-varying discount factors over the lifecycle, lifted from Cagetti (2003)
-DiscFac_timevary = np.genfromtxt("code/data/Cagetti2003.csv")
+DiscFac_timevary = np.genfromtxt("../data/Cagetti2003.csv")
 
 # Survival probabilities over the lifecycle
 liv_prb = parse_ssa_life_table(

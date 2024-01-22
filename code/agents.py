@@ -58,7 +58,7 @@ local_make_contour_plot = True
 
 
 class TempConsumerType(AgentType):
-    def __init__(self, cycles=1, time_flow=True, **kwds):
+    def __init__(self, cycles=1, **kwds):
         """
         Make a new consumer type.
 
@@ -74,7 +74,7 @@ class TempConsumerType(AgentType):
         None
         """
         # Initialize a basic AgentType
-        super().__init__(cycles=cycles, time_flow=time_flow, **kwds)
+        super().__init__(cycles=cycles, **kwds)
         # This estimation uses age-varying discount factors as
         # estimated by Cagetti (2003), so switch from time_inv to time_vary
         self.add_to_time_vary("DiscFac")
@@ -125,8 +125,6 @@ class PortfolioLifeCycleConsumerType(TempConsumerType, PortfolioConsumerType):
     def post_solve(self):
         for solution in self.solution:
             solution.cFunc = solution.cFuncAdj
-            share = solution.ShareFuncAdj
-            solution.ShareFuncAdj = lambda m: np.clip(share(m), 0.0, 1.0)
 
 
 class BequestWarmGlowLifeCycleConsumerType(
