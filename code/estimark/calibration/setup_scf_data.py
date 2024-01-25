@@ -2,7 +2,7 @@
 Sets up the SCF data for use in the SolvingMicroDSOPs estimation.
 """
 
-from code.calibration.estimation_parameters import (
+from estimark.calibration.estimation_parameters import (
     empirical_cohort_age_groups,
     initial_age,
 )
@@ -11,7 +11,7 @@ import numpy as np  # Numerical Python
 import pandas as pd
 
 
-scf_data = pd.read_csv("code/data/SCFdata.csv")
+scf_data = pd.read_csv("code/estimark/data/SCFdata.csv")
 
 # Keep only observations with normal incomes > 0,
 # otherwise wealth/income is not well defined

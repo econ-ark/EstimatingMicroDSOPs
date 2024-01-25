@@ -46,13 +46,13 @@ Python PATH with the locations of the MicroDSOP directory structure so it can
 still run.
 """
 
-from code.calibration.options import (
+from estimark.calibration.options import (
     all_replications,
     high_resource,
     low_resource,
     medium_resource,
 )
-from code.estimation import estimate
+from estimark.estimation import estimate
 
 
 # Ask the user which replication to run, and run it:

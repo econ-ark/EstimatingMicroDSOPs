@@ -1,5 +1,5 @@
-from code.calibration.options import low_resource, medium_resource
-from code.estimation import estimate
+from estimark.calibration.options import low_resource, medium_resource
+from estimark.estimation import estimate
 
 
 def test_low_resource():

@@ -10,10 +10,10 @@ income as defined in ConsIndShockModel.
 """
 
 # Parameters for the consumer type and the estimation
-import code.calibration.estimation_parameters as parameters
-import code.calibration.setup_scf_data as scf_data  # SCF 2004 data on household wealth
+import estimark.calibration.estimation_parameters as parameters
+import estimark.calibration.setup_scf_data as scf_data  # SCF 2004 data on household wealth
 import csv
-from code.agents import (
+from estimark.agents import (
     BequestWarmGlowLifeCycleConsumerType,
     BequestWarmGlowLifeCyclePortfolioType,
     IndShkLifeCycleConsumerType,

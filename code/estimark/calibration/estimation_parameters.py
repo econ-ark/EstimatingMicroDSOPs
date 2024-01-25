@@ -74,7 +74,7 @@ inc_calib = parse_income_spec(
 )
 
 # Age-varying discount factors over the lifecycle, lifted from Cagetti (2003)
-DiscFac_timevary = np.genfromtxt("../data/Cagetti2003.csv")
+DiscFac_timevary = np.genfromtxt("code/estimark/data/Cagetti2003.csv")
 
 # Survival probabilities over the lifecycle
 liv_prb = parse_ssa_life_table(
