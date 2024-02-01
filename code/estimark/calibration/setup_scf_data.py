@@ -11,7 +11,14 @@ import numpy as np  # Numerical Python
 import pandas as pd
 
 
-scf_data = pd.read_csv("code/estimark/data/SCFdata.csv")
+from pathlib import Path
+
+# Get the directory containing the current file and construct the full path to the CSV file
+csv_file_path = Path(__file__).resolve().parent / ".." / "data" / "SCFdata.csv"
+
+# Read the CSV file
+scf_data = pd.read_csv(csv_file_path)
+
 
 # Keep only observations with normal incomes > 0,
 # otherwise wealth/income is not well defined

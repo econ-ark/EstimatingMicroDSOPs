@@ -11,7 +11,6 @@ income as defined in ConsIndShockModel.
 
 # Parameters for the consumer type and the estimation
 
-import numpy as np  # Numeric Python
 from HARK.ConsumptionSaving.ConsBequestModel import (
     BequestWarmGlowConsumerType,
     BequestWarmGlowPortfolioType,
@@ -27,18 +26,6 @@ from HARK.core import AgentType
 # Method for sampling from a discrete distribution
 
 # Estimation methods
-
-
-# Pathnames to the other files:
-# Relative directory for primitive parameter files
-calibration_dir = "code/calibration/"
-# Relative directory for primitive parameter files
-tables_dir = "code/tables/"
-# Relative directory for primitive parameter files
-figures_dir = "content/figures/"
-# Relative directory for primitive parameter files
-code_dir = "code/"
-
 
 # Set booleans to determine which tasks should be done
 # Which agent type to estimate ("IndShock" or "Portfolio")
@@ -147,8 +134,6 @@ class BequestWarmGlowLifeCyclePortfolioType(
     def post_solve(self):
         for solution in self.solution:
             solution.cFunc = solution.cFuncAdj
-            share = solution.ShareFuncAdj
-            solution.ShareFuncAdj = lambda m: np.clip(share(m), 0.0, 1.0)
 
 
 class WealthPortfolioLifeCycleConsumerType(

@@ -2,9 +2,11 @@
 Specifies the full set of calibrated values required to estimate the SolvingMicroDSOPs
 model.  The empirical data is stored in a separate csv file and is loaded in setup_scf_data.
 """
+
 import numpy as np
 from HARK.Calibration.Income.IncomeTools import CGM_income, parse_income_spec
 from HARK.datasets.life_tables.us_ssa.SSATools import parse_ssa_life_table
+from pathlib import Path
 
 # ---------------------------------------------------------------------------------
 # Debugging flags
@@ -74,7 +76,11 @@ inc_calib = parse_income_spec(
 )
 
 # Age-varying discount factors over the lifecycle, lifted from Cagetti (2003)
-DiscFac_timevary = np.genfromtxt("code/estimark/data/Cagetti2003.csv")
+
+
+# Get the directory containing the current file and construct the full path to the CSV file
+csv_file_path = Path(__file__).resolve().parent / ".." / "data" / "Cagetti2003.csv"
+DiscFac_timevary = np.genfromtxt(csv_file_path)
 
 # Survival probabilities over the lifecycle
 liv_prb = parse_ssa_life_table(
