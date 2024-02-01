@@ -22,6 +22,8 @@ from estimark.agents import (
 )
 from time import time  # Timing utility
 
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import numpy as np  # Numeric Python
 
@@ -562,7 +564,18 @@ def estimate(
 
     targeted_moments = get_targeted_moments()
 
-    initial_guess = [parameters.DiscFacAdj_start, parameters.CRRA_start]
+    # start from previous estimation results if available
+    try:
+        csv_file_path = (
+            Path(__file__).resolve().parent
+            / ".."
+            / "tables"
+            / (estimation_agent + "_estimate_results.csv")
+        )
+
+        initial_guess = np.genfromtxt(csv_file_path, skip_header=1, delimiter=",")
+    except:
+        initial_guess = [parameters.DiscFacAdj_start, parameters.CRRA_start]
 
     # Estimate the model using Nelder-Mead
     if estimate_model:
