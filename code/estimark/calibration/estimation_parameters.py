@@ -7,6 +7,7 @@ import numpy as np
 from HARK.Calibration.Income.IncomeTools import CGM_income, parse_income_spec
 from HARK.datasets.life_tables.us_ssa.SSATools import parse_ssa_life_table
 from pathlib import Path
+from HARK.ConsumptionSaving.ConsIndShockModel import init_lifecycle
 
 # ---------------------------------------------------------------------------------
 # Debugging flags
@@ -80,7 +81,7 @@ inc_calib = parse_income_spec(
 
 # Get the directory containing the current file and construct the full path to the CSV file
 csv_file_path = Path(__file__).resolve().parent / ".." / "data" / "Cagetti2003.csv"
-DiscFac_timevary = np.genfromtxt(csv_file_path)
+DiscFac_timevary = np.genfromtxt(csv_file_path) * 0.0 + 1.0
 
 # Survival probabilities over the lifecycle
 liv_prb = parse_ssa_life_table(
@@ -108,33 +109,36 @@ seed = 31382  # Just an integer to seed the estimation
 
 # Dictionary that can be passed to ConsumerType to instantiate
 init_consumer_objects = {
-    "CRRA": CRRA_start,
-    "Rfree": Rfree,
-    "PermGroFac": inc_calib["PermGroFac"],
-    "BoroCnstArt": BoroCnstArt,
-    "PermShkStd": inc_calib["PermShkStd"],
-    "PermShkCount": PermShkCount,
-    "TranShkStd": inc_calib["TranShkStd"],
-    "TranShkCount": TranShkCount,
-    "T_cycle": TT,
-    "UnempPrb": UnempPrb,
-    "UnempPrbRet": UnempPrbRet,
-    "T_retire": retirement_t,
-    "T_age": TT + 1,
-    "IncUnemp": IncUnemp,
-    "IncUnempRet": IncUnempRet,
-    "aXtraMin": aXtraMin,
-    "aXtraMax": aXtraMax,
-    "aXtraCount": aXtraCount,
-    "aXtraExtra": [aXtraExtra, aXtraHuge],
-    "aXtraNestFac": exp_nest,
-    "LivPrb": liv_prb,
-    "DiscFac": DiscFac_timevary,
-    "AgentCount": num_agents,
-    "seed": seed,
-    "tax_rate": 0.0,
-    "vFuncBool": vFuncBool,
-    "CubicBool": CubicBool,
+    **init_lifecycle,
+    **{
+        "CRRA": CRRA_start,
+        "Rfree": Rfree,
+        "PermGroFac": inc_calib["PermGroFac"],
+        "BoroCnstArt": BoroCnstArt,
+        "PermShkStd": inc_calib["PermShkStd"],
+        "PermShkCount": PermShkCount,
+        "TranShkStd": inc_calib["TranShkStd"],
+        "TranShkCount": TranShkCount,
+        "T_cycle": TT,
+        "UnempPrb": UnempPrb,
+        "UnempPrbRet": UnempPrbRet,
+        "T_retire": retirement_t,
+        "T_age": TT,
+        "IncUnemp": IncUnemp,
+        "IncUnempRet": IncUnempRet,
+        "aXtraMin": aXtraMin,
+        "aXtraMax": aXtraMax,
+        "aXtraCount": aXtraCount,
+        "aXtraExtra": [aXtraExtra, aXtraHuge],
+        "aXtraNestFac": exp_nest,
+        "LivPrb": liv_prb,
+        "DiscFac": DiscFac_timevary,
+        "AgentCount": num_agents,
+        "seed": seed,
+        "tax_rate": 0.0,
+        "vFuncBool": vFuncBool,
+        "CubicBool": CubicBool,
+    },
 }
 
 if show_PermGroFacAgg_error:
