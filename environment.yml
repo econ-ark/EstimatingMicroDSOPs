@@ -3,10 +3,6 @@ channels:
   - conda-forge
 dependencies:
   - python=3.10
-  - matplotlib
-  - numpy
-  - scipy
-  - pandas
   - pip
   - pip:
       - git+https://github.com/econ-ark/HARK@master

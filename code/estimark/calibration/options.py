@@ -6,6 +6,8 @@ low_resource = {
     "make_contour_plot": False,
     "compute_standard_errors": False,
     "compute_sensitivity": False,
+    "subjective_stock_market": False,
+    "subjective_labor_market": False,
 }
 # Author note:
 # This takes approximately 90 seconds on a laptop with the following specs:
@@ -16,6 +18,8 @@ medium_resource = {
     "make_contour_plot": True,
     "compute_standard_errors": False,
     "compute_sensitivity": True,
+    "subjective_stock_market": False,
+    "subjective_labor_market": False,
 }
 # Author note:
 # This takes approximately 7 minutes on a laptop with the following specs:
@@ -26,6 +30,8 @@ high_resource = {
     "make_contour_plot": False,
     "compute_standard_errors": True,
     "compute_sensitivity": True,
+    "subjective_stock_market": False,
+    "subjective_labor_market": False,
 }
 # Author note:
 # This takes approximately 30 minutes on a laptop with the following specs:
@@ -36,6 +42,8 @@ all_replications = {
     "make_contour_plot": True,
     "compute_standard_errors": True,
     "compute_sensitivity": True,
+    "subjective_stock_market": False,
+    "subjective_labor_market": False,
 }
 # Author note:
 # This takes approximately 40 minutes on a laptop with the following specs:

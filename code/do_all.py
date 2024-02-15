@@ -85,6 +85,18 @@ def run_replication():
          q  quit: exit without executing.\n\n"""
     )
 
+    subjective_markets = input(
+        """Would you like to add subjective stock or labor market beliefs to the model?:
+        
+        [1] No
+        
+        [2] Subjective Stock Market Beliefs
+        
+        [3] Subjective Labor Market Beliefs
+        
+        [4] Both\n\n"""
+    )
+
     replication_specs = {}
 
     if which_model == "1" or which_model == "":
@@ -123,6 +135,14 @@ def run_replication():
     else:
         print("Invalid replication choice.")
         return
+
+    if subjective_markets == "2" or subjective_markets == "4":
+        replication_specs["subjective_stock_market"] = True
+        print("Adding subjective stock market beliefs...")
+
+    if subjective_markets == "3" or subjective_markets == "4":
+        replication_specs["subjective_labor_market"] = True
+        print("Adding subjective labor market beliefs...")
 
     estimate(**replication_specs)
 

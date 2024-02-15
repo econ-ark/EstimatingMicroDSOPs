@@ -10,7 +10,12 @@ income as defined in ConsIndShockModel.
 """
 
 # Parameters for the consumer type and the estimation
-import estimark.calibration.estimation_parameters as parameters
+from estimark.calibration.estimation_parameters import (
+    init_consumer_objects,
+    init_subjective_labor_market,
+    init_subjective_stock_market,
+    options,
+)
 import estimark.calibration.setup_scf_data as scf_data  # SCF 2004 data on household wealth
 import csv
 from estimark.agents import (
@@ -103,8 +108,8 @@ def simulate_moments(
     DiscFacAdj,
     CRRA,
     agent,
-    DiscFacAdj_bound=parameters.DiscFacAdj_bound,
-    CRRA_bound=parameters.CRRA_bound,
+    DiscFacAdj_bound=options["DiscFacAdj_bound"],
+    CRRA_bound=options["CRRA_bound"],
     map_simulated_to_empirical_cohorts=scf_data.simulation_map_cohorts_to_age_indices,
 ):
     """
@@ -121,7 +126,7 @@ def simulate_moments(
         return 1e30 * np.ones(len(map_simulated_to_empirical_cohorts))
 
     # Update the agent with a new path of DiscFac based on this DiscFacAdj (and a new CRRA)
-    agent.DiscFac = [b * DiscFacAdj for b in parameters.DiscFac_timevary]
+    agent.DiscFac = [b * DiscFacAdj for b in options["DiscFac_timevary"]]
     agent.CRRA = CRRA
     # Solve the model for these parameters, then simulate wealth data
     agent.solve()  # Solve the microeconomic model
@@ -153,8 +158,8 @@ def smm_obj_func(
     CRRA,
     agent,
     tgt_moments,
-    DiscFacAdj_bound=parameters.DiscFacAdj_bound,
-    CRRA_bound=parameters.CRRA_bound,
+    DiscFacAdj_bound=options["DiscFacAdj_bound"],
+    CRRA_bound=options["CRRA_bound"],
     map_simulated_to_empirical_cohorts=scf_data.simulation_map_cohorts_to_age_indices,
 ):
     """
@@ -358,20 +363,20 @@ def compute_std_err_bootstrap(
     # Estimate the model:
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
     print(
-        f"Computing standard errors using {parameters.bootstrap_size} bootstrap replications."
+        f"Computing standard errors using {options['bootstrap_size']} bootstrap replications."
     )
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
-    t_bootstrap_guess = time_to_estimate * parameters.bootstrap_size
+    t_bootstrap_guess = time_to_estimate * options["bootstrap_size"]
     minutes, seconds = divmod(t_bootstrap_guess, 60)
     print(f"This will take approximately {int(minutes)} min, {int(seconds)} sec.")
 
     t_start_bootstrap = time()
     std_errors = calculate_std_err_bootstrap(
         model_estimate,
-        N=parameters.bootstrap_size,
+        N=options["bootstrap_size"],
         agent=EstimationAgent,
-        seed=parameters.seed,
+        seed=options["seed"],
         verbose=True,
     )
     t_end_bootstrap = time()
@@ -416,8 +421,8 @@ def compute_sensitivity_measure(
             x[0],
             x[1],
             agent=EstimationAgent,
-            DiscFacAdj_bound=parameters.DiscFacAdj_bound,
-            CRRA_bound=parameters.CRRA_bound,
+            DiscFacAdj_bound=options["DiscFacAdj_bound"],
+            CRRA_bound=options["CRRA_bound"],
             map_simulated_to_empirical_cohorts=scf_data.simulation_map_cohorts_to_age_indices,
         )
 
@@ -515,6 +520,8 @@ def estimate(
     compute_standard_errors=local_compute_standard_errors,
     compute_sensitivity=local_compute_sensitivity,
     make_contour_plot=local_make_contour_plot,
+    subjective_stock_market=False,
+    subjective_labor_market=False,
 ):
     """
     Run the main estimation procedure for SolvingMicroDSOP.
@@ -546,20 +553,30 @@ def estimate(
     elif estimation_agent == "WealthPortfolio":
         agent_type = WealthPortfolioLifeCycleConsumerType
 
+    if subjective_stock_market or subjective_labor_market:
+        estimation_agent += "Sub"
+        if subjective_stock_market:
+            estimation_agent += "(Stock)"
+            init_consumer_objects.update(init_subjective_stock_market)
+        if subjective_labor_market:
+            estimation_agent += "(Labor)"
+            init_consumer_objects.update(init_subjective_labor_market)
+        estimation_agent += "Market"
+
     # Make a lifecycle consumer to be used for estimation, including simulated
     # shocks (plus an initial distribution of wealth)
     # Make a TempConsumerType for estimation
-    EstimationAgent = agent_type(**parameters.init_consumer_objects)
+    EstimationAgent = agent_type(**init_consumer_objects)
     # Set the number of periods to simulate
     EstimationAgent.T_sim = EstimationAgent.T_cycle + 1
     # Choose to track bank balances as wealth
     EstimationAgent.track_vars = ["bNrm"]
     # Draw initial assets for each consumer
     EstimationAgent.aNrmInit = DiscreteDistribution(
-        parameters.initial_wealth_income_ratio_probs,
-        parameters.initial_wealth_income_ratio_vals,
-        seed=parameters.seed,
-    ).draw(N=parameters.num_agents)
+        options["initial_wealth_income_ratio_probs"],
+        options["initial_wealth_income_ratio_vals"],
+        seed=options["seed"],
+    ).draw(N=options["num_agents"])
     EstimationAgent.make_shock_history()
 
     targeted_moments = get_targeted_moments()
@@ -575,7 +592,7 @@ def estimate(
 
         initial_guess = np.genfromtxt(csv_file_path, skip_header=1, delimiter=",")
     except:
-        initial_guess = [parameters.DiscFacAdj_start, parameters.CRRA_start]
+        initial_guess = [options["DiscFacAdj_start"], options["CRRA_start"]]
 
     # Estimate the model using Nelder-Mead
     if estimate_model:
@@ -631,24 +648,24 @@ def estimate_all():
         # Make a lifecycle consumer to be used for estimation, including simulated
         # shocks (plus an initial distribution of wealth)
         # Make a TempConsumerType for estimation
-        EstimationAgent = agent_type(**parameters.init_consumer_objects)
+        EstimationAgent = agent_type(**init_consumer_objects)
         # Set the number of periods to simulate
         EstimationAgent.T_sim = EstimationAgent.T_cycle + 1
         # Choose to track bank balances as wealth
         EstimationAgent.track_vars = ["bNrm"]
         # Draw initial assets for each consumer
         EstimationAgent.aNrmInit = DiscreteDistribution(
-            parameters.initial_wealth_income_ratio_probs,
-            parameters.initial_wealth_income_ratio_vals,
-            seed=parameters.seed,
-        ).draw(N=parameters.num_agents)
+            options["initial_wealth_income_ratio_probs"],
+            options["initial_wealth_income_ratio_vals"],
+            seed=options["seed"],
+        ).draw(N=options["num_agents"])
         EstimationAgent.make_shock_history()
 
         targeted_moments = get_targeted_moments()
 
         idx = np.unravel_index(count, (2, 2))
 
-        initial_guess = [parameters.DiscFacAdj_start, parameters.CRRA_start]
+        initial_guess = [options["DiscFacAdj_start"], options["CRRA_start"]]
         print("----------------------------------------------------------------------")
         print(
             f"Now estimating the model using Nelder-Mead from an initial guess of {initial_guess}..."
@@ -695,8 +712,8 @@ def estimate_all():
                 x[0],
                 x[1],
                 agent=EstimationAgent,
-                DiscFacAdj_bound=parameters.DiscFacAdj_bound,
-                CRRA_bound=parameters.CRRA_bound,
+                DiscFacAdj_bound=options["DiscFacAdj_bound"],
+                CRRA_bound=options["CRRA_bound"],
                 map_simulated_to_empirical_cohorts=scf_data.simulation_map_cohorts_to_age_indices,
             )
 

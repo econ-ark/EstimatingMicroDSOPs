@@ -103,6 +103,19 @@ num_agents = 10000  # Number of agents to simulate
 bootstrap_size = 50  # Number of re-estimations to do during bootstrap
 seed = 31382  # Just an integer to seed the estimation
 
+options = {
+    "initial_wealth_income_ratio_vals": initial_wealth_income_ratio_vals,
+    "initial_wealth_income_ratio_probs": initial_wealth_income_ratio_probs,
+    "num_agents": num_agents,
+    "bootstrap_size": bootstrap_size,
+    "seed": seed,
+    "DiscFacAdj_start": DiscFacAdj_start,
+    "CRRA_start": CRRA_start,
+    "DiscFacAdj_bound": DiscFacAdj_bound,
+    "CRRA_bound": CRRA_bound,
+    "DiscFac_timevary": DiscFac_timevary,
+}
+
 # -----------------------------------------------------------------------------
 # -- Set up the dictionary "container" for making a basic lifecycle type ------
 # -----------------------------------------------------------------------------
@@ -139,6 +152,21 @@ init_consumer_objects = {
         "vFuncBool": vFuncBool,
         "CubicBool": CubicBool,
     },
+}
+
+# from Mateo's JMP for College Educated
+ElnR = 0.020
+VlnR = 0.424**2
+
+init_subjective_stock_market = {
+    "Rfree": 1.019,  # from Mateo's JMP
+    "RiskyAvg": np.exp(ElnR + 0.5 * VlnR),
+    "RiskyStd": np.sqrt(np.exp(2 * ElnR + VlnR) * (np.exp(VlnR) - 1)),
+}
+
+init_subjective_labor_market = {  # from Tao's JMP
+    "TranShkStd": [0.03] * len(inc_calib["TranShkStd"]),
+    "PermShkStd": [0.03] * len(inc_calib["PermShkStd"]),
 }
 
 if show_PermGroFacAgg_error:
