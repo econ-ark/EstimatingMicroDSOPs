@@ -1,5 +1,5 @@
 """
-Sets up the SCF data for use in the SolvingMicroDSOPs estimation.
+Sets up the SCF data for use in the EstimatingMicroDSOPs estimation.
 """
 
 from estimark.calibration.estimation_parameters import (

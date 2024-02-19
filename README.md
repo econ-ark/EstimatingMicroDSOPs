@@ -1,15 +1,15 @@
-# SolvingMicroDSOPs
+# EstimatingMicroDSOPs
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/econ-ark/SolvingMicroDSOPs/HEAD)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/econ-ark/EstimatingMicroDSOPs/HEAD)
 
 To reproduces all the results in the repository first clone this repository locally:
 
 ```
 # Clone this repository
-$ git clone https://github.com/econ-ark/SolvingMicroDSOPs
+$ git clone https://github.com/econ-ark/EstimatingMicroDSOPs
 
-# Change working directory to SolvingMicroDSOPs
-$ cd SolvingMicroDSOPs
+# Change working directory to EstimatingMicroDSOPs
+$ cd EstimatingMicroDSOPs
 ```
 
 Then you can either use a local virtual env(conda) or [nbreproduce](https://github.com/econ-ark/nbreproduce) to
@@ -19,7 +19,7 @@ reproduce to the results.
 
 ```
 $ conda env create -f environment.yml
-$ conda activate solvingmicrodsops
+$ conda activate estimatingmicrodsops
 # execute the script, select the appropriate option and use it to reproduce the data and figures.
 $ python do_all.py
 ```

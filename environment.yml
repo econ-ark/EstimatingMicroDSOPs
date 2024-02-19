@@ -1,4 +1,4 @@
-name: solvingmicrodsops
+name: estimatingmicrodsops
 channels:
   - conda-forge
 dependencies:

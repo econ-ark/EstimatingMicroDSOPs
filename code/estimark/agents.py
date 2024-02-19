@@ -1,6 +1,6 @@
 """
 Demonstrates an example estimation of microeconomic dynamic stochastic optimization
-problem, as described in Section 9 of Chris Carroll's SolvingMicroDSOPs.pdf notes.
+problem, as described in Section 9 of Chris Carroll's EstimatingMicroDSOPs.pdf notes.
 The estimation attempts to match the age-conditional wealth profile of simulated
 consumers to the median wealth holdings of seven age groups in the 2004 SCF by
 varying only two parameters: the coefficient of relative risk aversion and a scaling

@@ -1,5 +1,5 @@
 """
-Specifies the full set of calibrated values required to estimate the SolvingMicroDSOPs
+Specifies the full set of calibrated values required to estimate the EstimatingMicroDSOPs
 model.  The empirical data is stored in a separate csv file and is loaded in setup_scf_data.
 """
 
@@ -26,7 +26,7 @@ show_PermGroFacAgg_error = False
 # line below fixes it properly ('feature not a bug') and remove all this text.
 
 # ---------------------------------------------------------------------------------
-# - Define all of the model parameters for SolvingMicroDSOPs and ConsumerExamples -
+# - Define all of the model parameters for EstimatingMicroDSOPs and ConsumerExamples -
 # ---------------------------------------------------------------------------------
 
 exp_nest = 1  # Number of times to "exponentially nest" when constructing a_grid
