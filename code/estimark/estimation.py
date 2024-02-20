@@ -56,7 +56,7 @@ code_dir = "code/"
 
 # Set booleans to determine which tasks should be done
 # Which agent type to estimate ("IndShock" or "Portfolio")
-local_estimation_agent = "IndShock"
+local_agent_name = "IndShock"
 local_estimate_model = True  # Whether to estimate the model
 # Whether to get standard errors via bootstrap
 local_compute_standard_errors = False
@@ -64,11 +64,60 @@ local_compute_standard_errors = False
 local_compute_sensitivity = True
 # Whether to make a contour map of the objective function
 local_make_contour_plot = True
+# Whether to use subjective beliefs
+local_subjective_stock_market = False
+local_subjective_labor_market = False
 
 
 # =====================================================
 # Define objects and functions used for the estimation
 # =====================================================
+
+
+def make_estimation_agent(
+    agent_name=local_agent_name,
+    subjective_stock_market=local_subjective_stock_market,
+    subjective_labor_market=local_subjective_labor_market,
+):
+
+    if agent_name == "IndShock":
+        agent_type = IndShkLifeCycleConsumerType
+    elif agent_name == "Portfolio":
+        agent_type = PortfolioLifeCycleConsumerType
+    elif agent_name == "WarmGlow":
+        agent_type = BequestWarmGlowLifeCycleConsumerType
+    elif agent_name == "WarmGlowPortfolio":
+        agent_type = BequestWarmGlowLifeCyclePortfolioType
+    elif agent_name == "WealthPortfolio":
+        agent_type = WealthPortfolioLifeCycleConsumerType
+
+    if subjective_stock_market or subjective_labor_market:
+        agent_name += "Sub"
+        if subjective_stock_market:
+            agent_name += "(Stock)"
+            init_consumer_objects.update(init_subjective_stock_market)
+        if subjective_labor_market:
+            agent_name += "(Labor)"
+            init_consumer_objects.update(init_subjective_labor_market)
+        agent_name += "Market"
+
+    # Make a lifecycle consumer to be used for estimation, including simulated
+    # shocks (plus an initial distribution of wealth)
+    # Make a TempConsumerType for estimation
+    estimation_agent = agent_type(**init_consumer_objects)
+    # Set the number of periods to simulate
+    estimation_agent.T_sim = estimation_agent.T_cycle + 1
+    # Choose to track bank balances as wealth
+    estimation_agent.track_vars = ["bNrm"]
+    # Draw initial assets for each consumer
+    estimation_agent.aNrmInit = DiscreteDistribution(
+        options["initial_wealth_income_ratio_probs"],
+        options["initial_wealth_income_ratio_vals"],
+        seed=options["seed"],
+    ).draw(N=options["num_agents"])
+    estimation_agent.make_shock_history()
+
+    return estimation_agent, agent_name
 
 
 def weighted_median(values, weights):
@@ -101,6 +150,23 @@ def get_targeted_moments(
         )
 
     return tgt_moments
+
+
+def get_initial_guess(agent_name):
+    # start from previous estimation results if available
+    try:
+        csv_file_path = (
+            Path(__file__).resolve().parent
+            / ".."
+            / "tables"
+            / (agent_name + "_estimate_results.csv")
+        )
+
+        initial_guess = np.genfromtxt(csv_file_path, skip_header=1, delimiter=",")
+    except:
+        initial_guess = [options["DiscFacAdj_start"], options["CRRA_start"]]
+
+    return initial_guess
 
 
 # Define the objective function for the simulated method of moments estimation
@@ -308,7 +374,7 @@ def calculate_std_err_bootstrap(initial_estimate, N, agent, seed=0, verbose=Fals
 
 
 def estimate_model_nelder_mead(
-    estimation_agent, EstimationAgent, targeted_moments, initial_guess
+    agent_name, estimation_agent, targeted_moments, initial_guess
 ):
     print("----------------------------------------------------------------------")
     print(
@@ -326,7 +392,7 @@ def estimate_model_nelder_mead(
         return smm_obj_func(
             DiscFacAdj=parameters_to_estimate[0],
             CRRA=parameters_to_estimate[1],
-            agent=EstimationAgent,
+            agent=estimation_agent,
             tgt_moments=targeted_moments,
         )
 
@@ -345,9 +411,7 @@ def estimate_model_nelder_mead(
     print(f"Estimated values: DiscFacAdj={model_estimate[0]}, CRRA={model_estimate[1]}")
 
     # Create the simple estimate table
-    estimate_results_file = (
-        tables_dir + "/" + estimation_agent + "_estimate_results.csv"
-    )
+    estimate_results_file = tables_dir + "/" + agent_name + "_estimate_results.csv"
 
     with open(estimate_results_file, "wt") as f:
         writer = csv.writer(f)
@@ -358,7 +422,7 @@ def estimate_model_nelder_mead(
 
 
 def compute_std_err_bootstrap(
-    estimation_agent, EstimationAgent, model_estimate, time_to_estimate
+    agent_name, estimation_agent, model_estimate, time_to_estimate
 ):
     # Estimate the model:
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
@@ -375,7 +439,7 @@ def compute_std_err_bootstrap(
     std_errors = calculate_std_err_bootstrap(
         model_estimate,
         N=options["bootstrap_size"],
-        agent=EstimationAgent,
+        agent=estimation_agent,
         seed=options["seed"],
         verbose=True,
     )
@@ -389,9 +453,7 @@ def compute_std_err_bootstrap(
     print(f"Standard errors: DiscFacAdj--> {std_errors[0]}, CRRA--> {std_errors[1]}")
 
     # Create the simple bootstrap table
-    bootstrap_results_file = (
-        tables_dir + "/" + estimation_agent + "_bootstrap_results.csv"
-    )
+    bootstrap_results_file = tables_dir + "/" + agent_name + "_bootstrap_results.csv"
 
     with open(bootstrap_results_file, "wt") as f:
         writer = csv.writer(f)
@@ -409,7 +471,7 @@ def compute_std_err_bootstrap(
 
 
 def compute_sensitivity_measure(
-    estimation_agent, EstimationAgent, model_estimate, initial_guess
+    agent_name, estimation_agent, model_estimate, initial_guess
 ):
     print("``````````````````````````````````````````````````````````````````````")
     print("Computing sensitivity measure.")
@@ -420,7 +482,7 @@ def compute_sensitivity_measure(
         moments = simulate_moments(
             x[0],
             x[1],
-            agent=EstimationAgent,
+            agent=estimation_agent,
             DiscFacAdj_bound=options["DiscFacAdj_bound"],
             CRRA_bound=options["CRRA_bound"],
             map_simulated_to_empirical_cohorts=scf_data.simulation_map_cohorts_to_age_indices,
@@ -463,15 +525,15 @@ def compute_sensitivity_measure(
     axs[1].set_ylabel("Sensitivity")
     axs[1].set_xlabel("Median W/Y Ratio")
 
-    plt.savefig(figures_dir + "/" + estimation_agent + "Sensitivity.pdf")
-    plt.savefig(figures_dir + "/" + estimation_agent + "Sensitivity.png")
-    plt.savefig(figures_dir + "/" + estimation_agent + "Sensitivity.svg")
+    plt.savefig(figures_dir + "/" + agent_name + "Sensitivity.pdf")
+    plt.savefig(figures_dir + "/" + agent_name + "Sensitivity.png")
+    plt.savefig(figures_dir + "/" + agent_name + "Sensitivity.svg")
 
     plt.show()
 
 
 def make_contour_plot_obj_func(
-    estimation_agent, EstimationAgent, model_estimate, targeted_moments
+    agent_name, estimation_agent, model_estimate, targeted_moments
 ):
     print("``````````````````````````````````````````````````````````````````````")
     print("Creating the contour plot.")
@@ -493,7 +555,7 @@ def make_contour_plot_obj_func(
             smm_obj_levels[j, k] = smm_obj_func(
                 DiscFacAdj,
                 CRRA,
-                agent=EstimationAgent,
+                agent=estimation_agent,
                 tgt_moments=targeted_moments,
             )
     smm_contour = plt.contourf(CRRA_mesh, DiscFacAdj_mesh, smm_obj_levels, level_count)
@@ -508,20 +570,20 @@ def make_contour_plot_obj_func(
     plt.plot(model_estimate[1], model_estimate[0], "*r", ms=15)
     plt.xlabel(r"coefficient of relative risk aversion $\rho$", fontsize=14)
     plt.ylabel(r"discount factor adjustment $\beth$", fontsize=14)
-    plt.savefig(figures_dir + "/" + estimation_agent + "SMMcontour.pdf")
-    plt.savefig(figures_dir + "/" + estimation_agent + "SMMcontour.png")
-    plt.savefig(figures_dir + "/" + estimation_agent + "SMMcontour.svg")
+    plt.savefig(figures_dir + "/" + agent_name + "SMMcontour.pdf")
+    plt.savefig(figures_dir + "/" + agent_name + "SMMcontour.png")
+    plt.savefig(figures_dir + "/" + agent_name + "SMMcontour.svg")
     plt.show()
 
 
 def estimate(
-    estimation_agent=local_estimation_agent,
+    agent_name=local_agent_name,
     estimate_model=local_estimate_model,
     compute_standard_errors=local_compute_standard_errors,
     compute_sensitivity=local_compute_sensitivity,
     make_contour_plot=local_make_contour_plot,
-    subjective_stock_market=False,
-    subjective_labor_market=False,
+    subjective_stock_market=local_subjective_stock_market,
+    subjective_labor_market=local_subjective_labor_market,
 ):
     """
     Run the main estimation procedure for SolvingMicroDSOP.
@@ -542,80 +604,38 @@ def estimate(
     None
     """
 
-    if estimation_agent == "IndShock":
-        agent_type = IndShkLifeCycleConsumerType
-    elif estimation_agent == "Portfolio":
-        agent_type = PortfolioLifeCycleConsumerType
-    elif estimation_agent == "WarmGlow":
-        agent_type = BequestWarmGlowLifeCycleConsumerType
-    elif estimation_agent == "WarmGlowPortfolio":
-        agent_type = BequestWarmGlowLifeCyclePortfolioType
-    elif estimation_agent == "WealthPortfolio":
-        agent_type = WealthPortfolioLifeCycleConsumerType
-
-    if subjective_stock_market or subjective_labor_market:
-        estimation_agent += "Sub"
-        if subjective_stock_market:
-            estimation_agent += "(Stock)"
-            init_consumer_objects.update(init_subjective_stock_market)
-        if subjective_labor_market:
-            estimation_agent += "(Labor)"
-            init_consumer_objects.update(init_subjective_labor_market)
-        estimation_agent += "Market"
-
-    # Make a lifecycle consumer to be used for estimation, including simulated
-    # shocks (plus an initial distribution of wealth)
-    # Make a TempConsumerType for estimation
-    EstimationAgent = agent_type(**init_consumer_objects)
-    # Set the number of periods to simulate
-    EstimationAgent.T_sim = EstimationAgent.T_cycle + 1
-    # Choose to track bank balances as wealth
-    EstimationAgent.track_vars = ["bNrm"]
-    # Draw initial assets for each consumer
-    EstimationAgent.aNrmInit = DiscreteDistribution(
-        options["initial_wealth_income_ratio_probs"],
-        options["initial_wealth_income_ratio_vals"],
-        seed=options["seed"],
-    ).draw(N=options["num_agents"])
-    EstimationAgent.make_shock_history()
+    estimation_agent, agent_name = make_estimation_agent(
+        agent_name=agent_name,
+        subjective_stock_market=subjective_stock_market,
+        subjective_labor_market=subjective_labor_market,
+    )
 
     targeted_moments = get_targeted_moments()
 
-    # start from previous estimation results if available
-    try:
-        csv_file_path = (
-            Path(__file__).resolve().parent
-            / ".."
-            / "tables"
-            / (estimation_agent + "_estimate_results.csv")
-        )
-
-        initial_guess = np.genfromtxt(csv_file_path, skip_header=1, delimiter=",")
-    except:
-        initial_guess = [options["DiscFacAdj_start"], options["CRRA_start"]]
+    initial_guess = get_initial_guess(agent_name)
 
     # Estimate the model using Nelder-Mead
     if estimate_model:
         model_estimate, time_to_estimate = estimate_model_nelder_mead(
-            estimation_agent, EstimationAgent, targeted_moments, initial_guess
+            agent_name, estimation_agent, targeted_moments, initial_guess
         )
 
         # Compute standard errors by bootstrap
         if compute_standard_errors:
             compute_std_err_bootstrap(
-                estimation_agent, EstimationAgent, model_estimate, time_to_estimate
+                agent_name, estimation_agent, model_estimate, time_to_estimate
             )
 
         # Compute sensitivity measure
         if compute_sensitivity:
             compute_sensitivity_measure(
-                estimation_agent, EstimationAgent, model_estimate, initial_guess
+                agent_name, estimation_agent, model_estimate, initial_guess
             )
 
         # Make a contour plot of the objective function
         if make_contour_plot:
             make_contour_plot_obj_func(
-                estimation_agent, EstimationAgent, model_estimate, targeted_moments
+                agent_name, estimation_agent, model_estimate, targeted_moments
             )
 
 
@@ -648,18 +668,18 @@ def estimate_all():
         # Make a lifecycle consumer to be used for estimation, including simulated
         # shocks (plus an initial distribution of wealth)
         # Make a TempConsumerType for estimation
-        EstimationAgent = agent_type(**init_consumer_objects)
+        estimation_agent = agent_type(**init_consumer_objects)
         # Set the number of periods to simulate
-        EstimationAgent.T_sim = EstimationAgent.T_cycle + 1
+        estimation_agent.T_sim = estimation_agent.T_cycle + 1
         # Choose to track bank balances as wealth
-        EstimationAgent.track_vars = ["bNrm"]
+        estimation_agent.track_vars = ["bNrm"]
         # Draw initial assets for each consumer
-        EstimationAgent.aNrmInit = DiscreteDistribution(
+        estimation_agent.aNrmInit = DiscreteDistribution(
             options["initial_wealth_income_ratio_probs"],
             options["initial_wealth_income_ratio_vals"],
             seed=options["seed"],
         ).draw(N=options["num_agents"])
-        EstimationAgent.make_shock_history()
+        estimation_agent.make_shock_history()
 
         targeted_moments = get_targeted_moments()
 
@@ -682,7 +702,7 @@ def estimate_all():
             return smm_obj_func(
                 DiscFacAdj=parameters_to_estimate[0],
                 CRRA=parameters_to_estimate[1],
-                agent=EstimationAgent,
+                agent=estimation_agent,
                 tgt_moments=targeted_moments,
             )
 
@@ -711,7 +731,7 @@ def estimate_all():
             moments = simulate_moments(
                 x[0],
                 x[1],
-                agent=EstimationAgent,
+                agent=estimation_agent,
                 DiscFacAdj_bound=options["DiscFacAdj_bound"],
                 CRRA_bound=options["CRRA_bound"],
                 map_simulated_to_empirical_cohorts=scf_data.simulation_map_cohorts_to_age_indices,
@@ -780,7 +800,7 @@ def estimate_all():
                 smm_obj_levels[j, k] = smm_obj_func(
                     DiscFacAdj,
                     CRRA,
-                    agent=EstimationAgent,
+                    agent=estimation_agent,
                     tgt_moments=targeted_moments,
                 )
 

@@ -100,15 +100,15 @@ def run_replication():
     replication_specs = {}
 
     if which_model == "1" or which_model == "":
-        replication_specs["estimation_agent"] = "IndShock"
+        replication_specs["agent_name"] = "IndShock"
     elif which_model == "2":
-        replication_specs["estimation_agent"] = "Portfolio"
+        replication_specs["agent_name"] = "Portfolio"
     elif which_model == "3":
-        replication_specs["estimation_agent"] = "WarmGlow"
+        replication_specs["agent_name"] = "WarmGlow"
     elif which_model == "4":
-        replication_specs["estimation_agent"] = "WarmGlowPortfolio"
+        replication_specs["agent_name"] = "WarmGlowPortfolio"
     elif which_model == "5":
-        replication_specs["estimation_agent"] = "WealthPortfolio"
+        replication_specs["agent_name"] = "WealthPortfolio"
     else:
         print("Invalid model choice.")
         return
