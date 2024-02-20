@@ -154,16 +154,18 @@ def get_targeted_moments(
 
 def get_initial_guess(agent_name):
     # start from previous estimation results if available
-    try:
-        csv_file_path = (
-            Path(__file__).resolve().parent
-            / ".."
-            / "tables"
-            / (agent_name + "_estimate_results.csv")
-        )
 
-        initial_guess = np.genfromtxt(csv_file_path, skip_header=1, delimiter=",")
-    except:
+    csv_file_path = (
+        Path(__file__).resolve().parent
+        / ".."
+        / "tables"
+        / (agent_name + "_estimate_results.csv")
+    )
+
+    try:
+        with open(csv_file_path, "r") as file:
+            initial_guess = np.loadtxt(file, skiprows=1, delimiter=",")
+    except FileNotFoundError:
         initial_guess = [options["DiscFacAdj_start"], options["CRRA_start"]]
 
     return initial_guess

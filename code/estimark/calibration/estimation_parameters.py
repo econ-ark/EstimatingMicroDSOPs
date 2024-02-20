@@ -172,9 +172,9 @@ init_subjective_labor_market = {  # from Tao's JMP
 if show_PermGroFacAgg_error:
     pass  # do nothing
 else:
-    print(
-        "***NOTE: using a 'quick fix' for an attribute error. See 'Error Notes' in EstimationParameter.py for further discussion.***"
-    )
+    # print(
+    #     "***NOTE: using a 'quick fix' for an attribute error. See 'Error Notes' in EstimationParameter.py for further discussion.***"
+    # )
     init_consumer_objects["PermGroFacAgg"] = 1.0
 
 if __name__ == "__main__":

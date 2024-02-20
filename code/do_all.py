@@ -62,13 +62,13 @@ def run_replication():
         
         [1] IndShockConsumerType
         
-        2   PortfolioConsumerType 
+         2  PortfolioConsumerType 
         
-        3   BequestWarmGlowConsumerType
+         3  BequestWarmGlowConsumerType
         
-        4   BequestWarmGlowPortfolioType
+         4  BequestWarmGlowPortfolioType
         
-        5   WealthPortfolioConsumerType \n\n"""
+         5  WealthPortfolioConsumerType \n\n"""
     )
 
     which_replication = input(
@@ -90,11 +90,11 @@ def run_replication():
         
         [1] No
         
-        [2] Subjective Stock Market Beliefs
+         2  Subjective Stock Market Beliefs
         
-        [3] Subjective Labor Market Beliefs
+         3  Subjective Labor Market Beliefs
         
-        [4] Both\n\n"""
+         4  Both\n\n"""
     )
 
     replication_specs = {}
