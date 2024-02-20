@@ -79,7 +79,6 @@ def make_estimation_agent(
     subjective_stock_market=local_subjective_stock_market,
     subjective_labor_market=local_subjective_labor_market,
 ):
-
     if agent_name == "IndShock":
         agent_type = IndShkLifeCycleConsumerType
     elif agent_name == "Portfolio":
@@ -214,7 +213,13 @@ def simulate_moments(
         # The simulated time indices corresponding to this age group
         cohort_indices = map_simulated_to_empirical_cohorts[g]
         # The median of simulated wealth-to-income for this age group
-        sim_moments += [np.median(sim_w_history[cohort_indices,])]
+        sim_moments += [
+            np.median(
+                sim_w_history[
+                    cohort_indices,
+                ]
+            )
+        ]
 
     sim_moments = np.array(sim_moments)
 
@@ -329,9 +334,15 @@ def calculate_std_err_bootstrap(initial_estimate, N, agent, seed=0, verbose=Fals
         bootstrap_data = (
             bootstrap_sample_from_data(scf_data.scf_data_array, seed=seed_list[n])
         ).T
-        w_to_y_data_bootstrap = bootstrap_data[0,]
-        empirical_groups_bootstrap = bootstrap_data[1,]
-        empirical_weights_bootstrap = bootstrap_data[2,]
+        w_to_y_data_bootstrap = bootstrap_data[
+            0,
+        ]
+        empirical_groups_bootstrap = bootstrap_data[
+            1,
+        ]
+        empirical_weights_bootstrap = bootstrap_data[
+            2,
+        ]
 
         # Find moments with bootstrapped sample
         bstrap_tgt_moments = get_targeted_moments(

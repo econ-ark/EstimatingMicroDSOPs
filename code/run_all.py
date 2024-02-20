@@ -6,12 +6,11 @@ from estimark.calibration.options import (
 )
 from estimark.estimation import estimate
 import dask
-from dask.distributed import Client, progress
+from dask.distributed import Client
 
 
 # Ask the user which replication to run, and run it:
 def run_replication():
-
     client = Client(threads_per_worker=10, n_workers=20)
 
     lazy_results = []
