@@ -14,19 +14,19 @@ def test_medium_resource():
 
 def test_portfolio_low_resource():
     print("Running medium-resource replication...")
-    estimate(**low_resource, estimation_agent="Portfolio")
+    estimate(**low_resource, agent_name="Portfolio")
 
 
 def test_warmglow_low_resource():
     print("Running medium-resource replication...")
-    estimate(**low_resource, estimation_agent="WarmGlow")
+    estimate(**low_resource, agent_name="WarmGlow")
 
 
 def test_warmglowportfolio_low_resource():
     print("Running medium-resource replication...")
-    estimate(**low_resource, estimation_agent="WarmGlowPortfolio")
+    estimate(**low_resource, agent_name="WarmGlowPortfolio")
 
 
 def test_wealthportfolio_low_resource():
     print("Running medium-resource replication...")
-    estimate(**low_resource, estimation_agent="WealthPortfolio")
+    estimate(**low_resource, agent_name="WealthPortfolio")
