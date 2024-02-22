@@ -1,4 +1,4 @@
-from estimark.calibration.options import low_resource, medium_resource
+from estimark.options import low_resource, medium_resource
 from estimark.estimation import estimate
 
 

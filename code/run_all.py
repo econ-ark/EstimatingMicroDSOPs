@@ -1,4 +1,4 @@
-from estimark.calibration.options import (
+from estimark.options import (
     all_replications,
     high_resource,
     low_resource,
@@ -63,11 +63,11 @@ def run_replication():
                 return
 
             if subjective_markets == "2" or subjective_markets == "4":
-                replication_specs["subjective_stock_market"] = True
+                replication_specs["subjective_stock"] = True
                 print("Adding subjective stock market beliefs...")
 
             if subjective_markets == "3" or subjective_markets == "4":
-                replication_specs["subjective_labor_market"] = True
+                replication_specs["subjective_labor"] = True
                 print("Adding subjective labor market beliefs...")
 
             lazy_result = dask.delayed(estimate)(**replication_specs)
