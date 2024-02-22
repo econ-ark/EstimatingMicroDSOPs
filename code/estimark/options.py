@@ -4,7 +4,7 @@
 low_resource = {
     "estimate_model": True,
     "make_contour_plot": False,
-    "compute_standard_errors": False,
+    "compute_se_bootstrap": False,
     "compute_sensitivity": False,
     "subjective_stock": False,
     "subjective_labor": False,
@@ -16,7 +16,7 @@ low_resource = {
 medium_resource = {
     "estimate_model": True,
     "make_contour_plot": True,
-    "compute_standard_errors": False,
+    "compute_se_bootstrap": False,
     "compute_sensitivity": True,
     "subjective_stock": False,
     "subjective_labor": False,
@@ -28,7 +28,7 @@ medium_resource = {
 high_resource = {
     "estimate_model": True,
     "make_contour_plot": False,
-    "compute_standard_errors": True,
+    "compute_se_bootstrap": True,
     "compute_sensitivity": True,
     "subjective_stock": False,
     "subjective_labor": False,
@@ -40,7 +40,7 @@ high_resource = {
 all_replications = {
     "estimate_model": True,
     "make_contour_plot": True,
-    "compute_standard_errors": True,
+    "compute_se_bootstrap": True,
     "compute_sensitivity": True,
     "subjective_stock": False,
     "subjective_labor": False,

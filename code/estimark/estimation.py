@@ -20,6 +20,7 @@ import numpy as np  # Numeric Python
 from HARK.distribution import DiscreteDistribution
 
 # Estimation methods
+# todo: use estimagic
 from HARK.estimation import bootstrap_sample_from_data, minimize_nelder_mead
 from scipy.optimize import approx_fprime
 
@@ -63,7 +64,7 @@ figures_dir = "content/figures/"
 local_agent_name = "IndShock"
 local_estimate_model = True  # Whether to estimate the model
 # Whether to get standard errors via bootstrap
-local_compute_standard_errors = False
+local_compute_se_bootstrap = False
 # Whether to compute a measure of estimates' sensitivity to moments
 local_compute_sensitivity = True
 # Whether to make a contour map of the objective function
@@ -136,11 +137,9 @@ def weighted_median(values, weights):
     return median
 
 
-def get_target_moments(
-    data=scf_data, weights=scf_weights, groups=scf_groups, mapping=scf_mapping
-):
+def get_targeted_moments(data=scf_data, weights=scf_weights, groups=scf_groups):
     # Initialize
-    group_count = len(mapping)
+    group_count = len(scf_mapping)
     target_moments = np.zeros(group_count)
 
     for g in range(group_count):
@@ -170,26 +169,24 @@ def get_initial_guess(agent_name):
 
 
 # Define the objective function for the simulated method of moments estimation
-def simulate_moments(
-    DiscFacAdj,
-    CRRA,
-    agent,
-    bounds_DiscFacAdj=options["bounds_DiscFacAdj"],
-    bounds_CRRA=options["bounds_CRRA"],
-    mapping=scf_mapping,
-):
+# todo: params, bounds, agent
+def simulate_moments(DiscFacAdj, CRRA, agent):
     """
     A quick check to make sure that the parameter values are within bounds.
     Far flung falues of DiscFacAdj or CRRA might cause an error during solution or
     simulation, so the objective function doesn't even bother with them.
     """
+
+    bounds_DiscFacAdj = options["bounds_DiscFacAdj"]
+    bounds_CRRA = options["bounds_CRRA"]
+
     if (
         DiscFacAdj < bounds_DiscFacAdj[0]
         or DiscFacAdj > bounds_DiscFacAdj[1]
         or CRRA < bounds_CRRA[0]
         or CRRA > bounds_CRRA[1]
     ):
-        return 1e30 * np.ones(len(mapping))
+        return 1e30 * np.ones(len(scf_mapping))
 
     # Update the agent with a new path of DiscFac based on this DiscFacAdj (and a new CRRA)
     agent.DiscFac = [b * DiscFacAdj for b in options["timevary_DiscFac"]]
@@ -198,7 +195,7 @@ def simulate_moments(
     agent.solve()  # Solve the microeconomic model
     # "Unpack" the consumption function for convenient access
     # agent.unpack("cFunc")
-    max_sim_age = max([max(ages) for ages in mapping]) + 1
+    max_sim_age = max([max(ages) for ages in scf_mapping]) + 1
     # Initialize the simulation by clearing histories, resetting initial values
     agent.initialize_sim()
     agent.simulate(max_sim_age)  # Simulate histories of consumption and wealth
@@ -206,11 +203,11 @@ def simulate_moments(
     sim_w_history = agent.history["bNrm"]
 
     # Find the distance between empirical data and simulated medians for each age group
-    group_count = len(mapping)
+    group_count = len(scf_mapping)
     sim_moments = []
     for g in range(group_count):
         # The simulated time indices corresponding to this age group
-        cohort_indices = mapping[g]
+        cohort_indices = scf_mapping[g]
         # The median of simulated wealth-to-income for this age group
         sim_moments += [np.median(sim_w_history[cohort_indices])]
 
@@ -219,15 +216,7 @@ def simulate_moments(
     return sim_moments
 
 
-def smm_obj_func(
-    DiscFacAdj,
-    CRRA,
-    agent,
-    target_moments,
-    bounds_DiscFacAdj=options["bounds_DiscFacAdj"],
-    bounds_CRRA=options["bounds_CRRA"],
-    mapping=scf_mapping,
-):
+def smm_obj_func(DiscFacAdj, CRRA, agent, moments):
     """
     The objective function for the SMM estimation.  Given values of discount factor
     adjuster DiscFacAdj, coeffecient of relative risk aversion CRRA, a base consumer
@@ -275,22 +264,15 @@ def smm_obj_func(
         median wealth-to-permanent-income ratio in the simulation.
     """
 
-    sim_moments = simulate_moments(
-        DiscFacAdj,
-        CRRA,
-        agent,
-        bounds_DiscFacAdj,
-        bounds_CRRA,
-        mapping,
-    )
-    errors = target_moments - sim_moments
+    sim_moments = simulate_moments(DiscFacAdj, CRRA, agent)
+    errors = moments - sim_moments
     loss = np.dot(errors, errors)
 
     return loss
 
 
 # Define the bootstrap procedure
-def calculate_std_err_bootstrap(initial_estimate, N, agent, seed=0, verbose=False):
+def calculate_se_bootstrap(initial_estimate, N, agent, seed=0, verbose=False):
     """
     Calculates standard errors by repeatedly re-estimating the model with datasets
     resampled from the actual data.
@@ -325,26 +307,22 @@ def calculate_std_err_bootstrap(initial_estimate, N, agent, seed=0, verbose=Fals
 
         # Bootstrap a new dataset by resampling from the original data
         bootstrap_data = (bootstrap_sample_from_data(scf_array, seed=seed_list[n])).T
-        w_to_y_data_bootstrap = bootstrap_data[0]
-        empirical_groups_bootstrap = bootstrap_data[1]
-        empirical_weights_bootstrap = bootstrap_data[2]
+        data_bootstrap = bootstrap_data[0]
+        groups_bootstrap = bootstrap_data[1]
+        weights_bootstrap = bootstrap_data[2]
 
         # Find moments with bootstrapped sample
-        bstrap_target_moments = get_target_moments(
-            data=w_to_y_data_bootstrap,
-            weights=empirical_weights_bootstrap,
-            groups=empirical_groups_bootstrap,
-            mapping=scf_mapping,
+        bootstrap_moments = get_targeted_moments(
+            data=data_bootstrap, weights=weights_bootstrap, groups=groups_bootstrap
         )
 
         # Make a temporary function for use in this estimation run
-        def smm_obj_func_bootstrap(parameters_to_estimate):
+        def smm_obj_func_bootstrap(params):
             return smm_obj_func(
-                DiscFacAdj=parameters_to_estimate[0],
-                CRRA=parameters_to_estimate[1],
+                DiscFacAdj=params[0],
+                CRRA=params[1],
                 agent=agent,
-                target_moments=bstrap_target_moments,
-                mapping=scf_mapping,
+                moments=bootstrap_moments,
             )
 
         # Estimate the model with the bootstrap data and add to list of estimates
@@ -371,7 +349,7 @@ def calculate_std_err_bootstrap(initial_estimate, N, agent, seed=0, verbose=Fals
 # =================================================================
 
 
-def estimate_model_opt(agent_name, estimation_agent, target_moments, initial_guess):
+def do_estimate_model(agent_name, estimation_agent, target_moments, initial_guess):
     print("----------------------------------------------------------------------")
     print(
         f"Now estimating the model using Nelder-Mead from an initial guess of {initial_guess}..."
@@ -379,17 +357,17 @@ def estimate_model_opt(agent_name, estimation_agent, target_moments, initial_gue
     print("----------------------------------------------------------------------")
 
     # Make a single-input lambda function for use in the optimizer
-    def smm_obj_func_redux(parameters_to_estimate):
+    def smm_obj_func_redux(params):
         """
         A "reduced form" of the SMM objective function, compatible with the optimizer.
         Identical to smmObjectiveFunction, but takes only a single input as a length-2
         list representing [DiscFacAdj,CRRA].
         """
         return smm_obj_func(
-            DiscFacAdj=parameters_to_estimate[0],
-            CRRA=parameters_to_estimate[1],
+            DiscFacAdj=params[0],
+            CRRA=params[1],
             agent=estimation_agent,
-            target_moments=target_moments,
+            moments=target_moments,
         )
 
     t_start_estimate = time()
@@ -417,7 +395,7 @@ def estimate_model_opt(agent_name, estimation_agent, target_moments, initial_gue
     return model_estimate, time_to_estimate
 
 
-def compute_std_err_bootstrap(
+def do_compute_se_boostrap(
     agent_name, estimation_agent, model_estimate, time_to_estimate
 ):
     # Estimate the model:
@@ -432,7 +410,7 @@ def compute_std_err_bootstrap(
     print(f"This will take approximately {int(minutes)} min, {int(seconds)} sec.")
 
     t_start_bootstrap = time()
-    std_errors = calculate_std_err_bootstrap(
+    std_errors = calculate_se_bootstrap(
         model_estimate,
         N=options["bootstrap_size"],
         agent=estimation_agent,
@@ -466,23 +444,14 @@ def compute_std_err_bootstrap(
         )
 
 
-def compute_sensitivity_measure(
-    agent_name, estimation_agent, model_estimate, initial_guess
-):
+def do_compute_sensitivity(agent_name, estimation_agent, model_estimate, initial_guess):
     print("``````````````````````````````````````````````````````````````````````")
     print("Computing sensitivity measure.")
     print("``````````````````````````````````````````````````````````````````````")
 
     # Find the Jacobian of the function that simulates moments
-    def simulate_moments_redux(x):
-        moments = simulate_moments(
-            x[0],
-            x[1],
-            agent=estimation_agent,
-            bounds_DiscFacAdj=options["bounds_DiscFacAdj"],
-            bounds_CRRA=options["bounds_CRRA"],
-            mapping=scf_mapping,
-        )
+    def simulate_moments_redux(params):
+        moments = simulate_moments(params[0], params[1], agent=estimation_agent)
 
         return moments
 
@@ -491,7 +460,7 @@ def compute_sensitivity_measure(
         [
             approx_fprime(
                 model_estimate,
-                lambda x: simulate_moments_redux(x)[j],
+                lambda params: simulate_moments_redux(params)[j],
                 epsilon=0.01,
             )
             for j in range(n_moments)
@@ -525,9 +494,7 @@ def compute_sensitivity_measure(
     plt.show()
 
 
-def make_contour_plot_obj_func(
-    agent_name, estimation_agent, model_estimate, target_moments
-):
+def do_make_contour_plot(agent_name, estimation_agent, model_estimate, target_moments):
     print("``````````````````````````````````````````````````````````````````````")
     print("Creating the contour plot.")
     print("``````````````````````````````````````````````````````````````````````")
@@ -549,7 +516,7 @@ def make_contour_plot_obj_func(
                 DiscFacAdj,
                 CRRA,
                 agent=estimation_agent,
-                target_moments=target_moments,
+                moments=target_moments,
             )
     smm_contour = plt.contourf(CRRA_mesh, DiscFacAdj_mesh, smm_obj_levels, level_count)
     t_end_contour = time()
@@ -572,7 +539,7 @@ def make_contour_plot_obj_func(
 def estimate(
     agent_name=local_agent_name,
     estimate_model=local_estimate_model,
-    compute_standard_errors=local_compute_standard_errors,
+    compute_se_bootstrap=local_compute_se_bootstrap,
     compute_sensitivity=local_compute_sensitivity,
     make_contour_plot=local_make_contour_plot,
     subjective_stock=local_subjective_stock,
@@ -603,31 +570,31 @@ def estimate(
         subjective_labor=subjective_labor,
     )
 
-    target_moments = get_target_moments()
+    target_moments = get_targeted_moments()
 
     initial_guess = get_initial_guess(agent_name)
 
     # Estimate the model using Nelder-Mead
     if estimate_model:
-        model_estimate, time_to_estimate = estimate_model_opt(
+        model_estimate, time_to_estimate = do_estimate_model(
             agent_name, estimation_agent, target_moments, initial_guess
         )
 
         # Compute standard errors by bootstrap
-        if compute_standard_errors:
-            compute_std_err_bootstrap(
+        if compute_se_bootstrap:
+            do_compute_se_boostrap(
                 agent_name, estimation_agent, model_estimate, time_to_estimate
             )
 
         # Compute sensitivity measure
         if compute_sensitivity:
-            compute_sensitivity_measure(
+            do_compute_sensitivity(
                 agent_name, estimation_agent, model_estimate, initial_guess
             )
 
         # Make a contour plot of the objective function
         if make_contour_plot:
-            make_contour_plot_obj_func(
+            do_make_contour_plot(
                 agent_name, estimation_agent, model_estimate, target_moments
             )
 
