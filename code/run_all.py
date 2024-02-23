@@ -75,6 +75,10 @@ def run_replication():
 
     dask.compute(*lazy_results)
 
+    client.close()
+
+    print("All replications complete.")
+
 
 if __name__ == "__main__":
     run_replication()

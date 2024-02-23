@@ -17,7 +17,7 @@ from HARK.datasets.life_tables.us_ssa.SSATools import parse_ssa_life_table
 exp_nest = 1  # Number of times to "exponentially nest" when constructing a_grid
 aXtraMin = 0.001  # Minimum end-of-period "assets above minimum" value
 aXtraMax = 100  # Maximum end-of-period "assets above minimum" value
-aXtraCount = 100  # Number of points in the grid of "assets above minimum"
+aXtraCount = 200  # Number of points in the grid of "assets above minimum"
 
 # Artificial borrowing constraint; imposed minimum level of end-of period assets
 BoroCnstArt = 0.0
