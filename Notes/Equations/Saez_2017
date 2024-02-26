@@ -1,0 +1,7 @@
+\begin{equation}
+\begin{aligned}
+U_i(c_i, k_i, z_i) = c_i + a_i(k_i) - h_i(z_i) + \delta_i(k_{i}^{init} - k_i)
+\end{aligned}
+\end{equation}
+
+where utility for may be specified as $$ a_i(k) = \eta_i \frac{k_i^{\gamma}}{\gamma}  $$. 

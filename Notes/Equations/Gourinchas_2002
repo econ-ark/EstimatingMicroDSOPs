@@ -1,0 +1,8 @@
+\begin{equation}
+\begin{aligned}
+V_{\tau}(X_{\tau}, P_{\tau}, Z_{\tau}) \quad & = \max_{c_{\tau}, \ldots, c_{T}} \bigg[ \sum_{t=\tau}^{T} \beta^{t-\tau} v(Z_t) \frac{C_{t}^{1-\rho}}{1-\rho} + \beta^{T+1-\tau} \kappa v(Z_{T+1}) (X_{T+1} + h P_{T+1})^{1-\rho} \bigg] \\
+\text{s.t.} \quad & X_{t+1} = R (X_t - C_t) + Y_{t+1} \\
+\end{aligned}
+\end{equation}
+
+where $X_{T+1}$ is cash on hand and $H_{T+1}$ is illiquid wealth in the first year of retirement.
