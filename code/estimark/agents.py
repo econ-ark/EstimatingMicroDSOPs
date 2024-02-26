@@ -9,35 +9,14 @@ consumption-saving model with idiosyncratic shocks to permanent and transitory
 income as defined in ConsIndShockModel.
 """
 
-# Parameters for the consumer type and the estimation
-
 from HARK.ConsumptionSaving.ConsBequestModel import (
     BequestWarmGlowConsumerType,
     BequestWarmGlowPortfolioType,
 )
-
-# Import modules from core HARK libraries:
-# The consumption-saving micro model
 from HARK.ConsumptionSaving.ConsIndShockModel import IndShockConsumerType
 from HARK.ConsumptionSaving.ConsPortfolioModel import PortfolioConsumerType
 from HARK.ConsumptionSaving.ConsWealthPortfolioModel import WealthPortfolioConsumerType
 from HARK.core import AgentType
-
-# Method for sampling from a discrete distribution
-
-# Estimation methods
-
-# Set booleans to determine which tasks should be done
-# Which agent type to estimate ("IndShock" or "Portfolio")
-local_estimation_agent = "IndShock"
-local_estimate_model = True  # Whether to estimate the model
-# Whether to get standard errors via bootstrap
-local_compute_standard_errors = False
-# Whether to compute a measure of estimates' sensitivity to moments
-local_compute_sensitivity = True
-# Whether to make a contour map of the objective function
-local_make_contour_plot = True
-
 
 # =====================================================
 # Define objects and functions used for the estimation

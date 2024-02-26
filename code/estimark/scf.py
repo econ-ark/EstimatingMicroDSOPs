@@ -2,14 +2,12 @@
 Sets up the SCF data for use in the EstimatingMicroDSOPs estimation.
 """
 
-from pathlib import Path
-
 import numpy as np  # Numerical Python
 import pandas as pd
 from estimark.parameters import initial_age
 
 # Get the directory containing the current file and construct the full path to the CSV file
-csv_file_path = Path(__file__).resolve().parent / ".." / "data" / "SCFdata.csv"
+csv_file_path = "code/data/SCFdata.csv"
 
 # Read the CSV file
 scf_full_data = pd.read_csv(csv_file_path)

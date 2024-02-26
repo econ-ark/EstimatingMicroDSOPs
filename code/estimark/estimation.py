@@ -136,9 +136,11 @@ def weighted_median(values, weights):
     return median
 
 
-def get_targeted_moments(data=scf_data, weights=scf_weights, groups=scf_groups):
+def get_targeted_moments(
+    data=scf_data, weights=scf_weights, groups=scf_groups, mapping=scf_mapping
+):
     # Initialize
-    group_count = len(scf_mapping)
+    group_count = len(mapping)
     target_moments = np.zeros(group_count)
 
     for g in range(group_count):
@@ -164,12 +166,14 @@ def get_initial_guess(agent_name):
 
 # Define the objective function for the simulated method of moments estimation
 # todo: params, bounds, agent
-def simulate_moments(DiscFacAdj, CRRA, agent):
+def simulate_moments(params, agent):
     """
     A quick check to make sure that the parameter values are within bounds.
     Far flung falues of DiscFacAdj or CRRA might cause an error during solution or
     simulation, so the objective function doesn't even bother with them.
     """
+
+    DiscFacAdj, CRRA = params
 
     bounds_DiscFacAdj = options["bounds_DiscFacAdj"]
     bounds_CRRA = options["bounds_CRRA"]
@@ -210,7 +214,7 @@ def simulate_moments(DiscFacAdj, CRRA, agent):
     return sim_moments
 
 
-def smm_obj_func(DiscFacAdj, CRRA, agent, moments):
+def smm_obj_func(params, agent, moments):
     """
     The objective function for the SMM estimation.  Given values of discount factor
     adjuster DiscFacAdj, coeffecient of relative risk aversion CRRA, a base consumer
@@ -258,7 +262,7 @@ def smm_obj_func(DiscFacAdj, CRRA, agent, moments):
         median wealth-to-permanent-income ratio in the simulation.
     """
 
-    sim_moments = simulate_moments(DiscFacAdj, CRRA, agent)
+    sim_moments = simulate_moments(params, agent)
     errors = moments - sim_moments
     loss = np.dot(errors, errors)
 
@@ -313,8 +317,7 @@ def calculate_se_bootstrap(initial_estimate, N, agent, seed=0, verbose=False):
         # Make a temporary function for use in this estimation run
         def smm_obj_func_bootstrap(params):
             return smm_obj_func(
-                DiscFacAdj=params[0],
-                CRRA=params[1],
+                params,
                 agent=agent,
                 moments=bootstrap_moments,
             )
@@ -358,8 +361,7 @@ def do_estimate_model(agent_name, estimation_agent, target_moments, initial_gues
         list representing [DiscFacAdj,CRRA].
         """
         return smm_obj_func(
-            DiscFacAdj=params[0],
-            CRRA=params[1],
+            params,
             agent=estimation_agent,
             moments=target_moments,
         )
@@ -445,9 +447,8 @@ def do_compute_sensitivity(agent_name, estimation_agent, model_estimate, initial
 
     # Find the Jacobian of the function that simulates moments
     def simulate_moments_redux(params):
-        moments = simulate_moments(params[0], params[1], agent=estimation_agent)
 
-        return moments
+        return simulate_moments(params, agent=estimation_agent)
 
     n_moments = len(scf_mapping)
     jac = np.array(
@@ -507,8 +508,7 @@ def do_make_contour_plot(agent_name, estimation_agent, model_estimate, target_mo
         for k in range(grid_density):
             CRRA = CRRA_list[k]
             smm_obj_levels[j, k] = smm_obj_func(
-                DiscFacAdj,
-                CRRA,
+                np.array([DiscFacAdj, CRRA]),
                 agent=estimation_agent,
                 moments=target_moments,
             )
