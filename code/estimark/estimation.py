@@ -10,7 +10,6 @@ income as defined in ConsIndShockModel.
 """
 
 import csv
-from pathlib import Path
 from time import time  # Timing utility
 
 import matplotlib.pyplot as plt
@@ -35,7 +34,7 @@ from estimark.agents import (
 )
 
 # Parameters for the consumer type and the estimation
-from estimark.calibration.parameters import (
+from estimark.parameters import (
     init_consumer_objects,
     init_subjective_labor,
     init_subjective_stock,
@@ -43,7 +42,7 @@ from estimark.calibration.parameters import (
 )
 
 # SCF 2004 data on household wealth
-from estimark.calibration.scf import (
+from estimark.scf import (
     age_groups,
     scf_array,
     scf_data,
@@ -54,7 +53,7 @@ from estimark.calibration.scf import (
 
 # Pathnames to the other files:
 # Relative directory for primitive parameter files
-tables_dir = "code/tables/"
+tables_dir = "content/tables/"
 # Relative directory for primitive parameter files
 figures_dir = "content/figures/"
 
@@ -152,12 +151,7 @@ def get_targeted_moments(data=scf_data, weights=scf_weights, groups=scf_groups):
 def get_initial_guess(agent_name):
     # start from previous estimation results if available
 
-    csv_file_path = (
-        Path(__file__).resolve().parent
-        / ".."
-        / "tables"
-        / (agent_name + "_estimate_results.csv")
-    )
+    csv_file_path = tables_dir + agent_name + "_estimate_results.csv"
 
     try:
         with open(csv_file_path, "r") as file:
@@ -385,7 +379,7 @@ def do_estimate_model(agent_name, estimation_agent, target_moments, initial_gues
     print(f"Estimated values: DiscFacAdj={model_estimate[0]}, CRRA={model_estimate[1]}")
 
     # Create the simple estimate table
-    estimate_results_file = tables_dir + "/" + agent_name + "_estimate_results.csv"
+    estimate_results_file = tables_dir + agent_name + "_estimate_results.csv"
 
     with open(estimate_results_file, "wt") as f:
         writer = csv.writer(f)
@@ -427,7 +421,7 @@ def do_compute_se_boostrap(
     print(f"Standard errors: DiscFacAdj--> {std_errors[0]}, CRRA--> {std_errors[1]}")
 
     # Create the simple bootstrap table
-    bootstrap_results_file = tables_dir + "/" + agent_name + "_bootstrap_results.csv"
+    bootstrap_results_file = tables_dir + agent_name + "_bootstrap_results.csv"
 
     with open(bootstrap_results_file, "wt") as f:
         writer = csv.writer(f)
@@ -487,9 +481,9 @@ def do_compute_sensitivity(agent_name, estimation_agent, model_estimate, initial
     axs[1].set_ylabel("Sensitivity")
     axs[1].set_xlabel("Median W/Y Ratio")
 
-    plt.savefig(figures_dir + "/" + agent_name + "Sensitivity.pdf")
-    plt.savefig(figures_dir + "/" + agent_name + "Sensitivity.png")
-    plt.savefig(figures_dir + "/" + agent_name + "Sensitivity.svg")
+    plt.savefig(figures_dir + agent_name + "Sensitivity.pdf")
+    plt.savefig(figures_dir + agent_name + "Sensitivity.png")
+    plt.savefig(figures_dir + agent_name + "Sensitivity.svg")
 
     plt.show()
 
@@ -530,9 +524,9 @@ def do_make_contour_plot(agent_name, estimation_agent, model_estimate, target_mo
     plt.plot(model_estimate[1], model_estimate[0], "*r", ms=15)
     plt.xlabel(r"coefficient of relative risk aversion $\rho$", fontsize=14)
     plt.ylabel(r"discount factor adjustment $\beth$", fontsize=14)
-    plt.savefig(figures_dir + "/" + agent_name + "SMMcontour.pdf")
-    plt.savefig(figures_dir + "/" + agent_name + "SMMcontour.png")
-    plt.savefig(figures_dir + "/" + agent_name + "SMMcontour.svg")
+    plt.savefig(figures_dir + agent_name + "SMMcontour.pdf")
+    plt.savefig(figures_dir + agent_name + "SMMcontour.png")
+    plt.savefig(figures_dir + agent_name + "SMMcontour.svg")
     plt.show()
 
 

@@ -6,7 +6,7 @@ from pathlib import Path
 
 import numpy as np  # Numerical Python
 import pandas as pd
-from estimark.calibration.parameters import initial_age
+from estimark.parameters import initial_age
 
 # Get the directory containing the current file and construct the full path to the CSV file
 csv_file_path = Path(__file__).resolve().parent / ".." / "data" / "SCFdata.csv"
