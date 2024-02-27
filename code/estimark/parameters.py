@@ -18,7 +18,7 @@ from HARK.datasets.life_tables.us_ssa.SSATools import parse_ssa_life_table
 exp_nest = 1  # Number of times to "exponentially nest" when constructing a_grid
 aXtraMin = 0.001  # Minimum end-of-period "assets above minimum" value
 aXtraMax = 100  # Maximum end-of-period "assets above minimum" value
-aXtraCount = 200  # Number of points in the grid of "assets above minimum"
+aXtraCount = 100  # Number of points in the grid of "assets above minimum"
 
 # Artificial borrowing constraint; imposed minimum level of end-of period assets
 BoroCnstArt = 0.0
@@ -47,9 +47,9 @@ init_CRRA = 5.0
 # Initial guess of the adjustment to the discount factor during estimation (beth)
 init_DiscFacAdj = 0.99
 # Bounds for beth; if violated, objective function returns "penalty value"
-bounds_DiscFacAdj = [0.0001, 15.0]
+bounds_DiscFacAdj = [0.5, 1.5]
 # Bounds for rho; if violated, objective function returns "penalty value"
-bounds_CRRA = [0.0001, 15.0]
+bounds_CRRA = [1.1, 10.0]
 
 # Income
 ss_variances = True

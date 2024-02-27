@@ -9,6 +9,8 @@ consumption-saving model with idiosyncratic shocks to permanent and transitory
 income as defined in ConsIndShockModel.
 """
 
+import pandas as pd
+
 import csv
 from time import time  # Timing utility
 
@@ -50,6 +52,8 @@ from estimark.scf import (
     scf_mapping,
     scf_weights,
 )
+
+import estimagic as em
 
 # Pathnames to the other files:
 # Relative directory for primitive parameter files
@@ -153,12 +157,12 @@ def get_targeted_moments(
 def get_initial_guess(agent_name):
     # start from previous estimation results if available
 
-    csv_file_path = tables_dir + agent_name + "_estimate_results.csv"
+    csv_file_path = f"{tables_dir}{agent_name}_estimate_results.csv"
 
     try:
-        with open(csv_file_path, "r") as file:
-            initial_guess = np.loadtxt(file, skiprows=1, delimiter=",")
-    except FileNotFoundError:
+        res = pd.read_csv(csv_file_path, header=None)
+        initial_guess = res.iloc[:2, 1].astype(float).tolist()
+    except (FileNotFoundError, IndexError):
         initial_guess = [options["init_DiscFacAdj"], options["init_CRRA"]]
 
     return initial_guess
@@ -175,6 +179,7 @@ def simulate_moments(params, agent):
 
     DiscFacAdj, CRRA = params
 
+    # todo: bounds should be handled by the optimizer
     bounds_DiscFacAdj = options["bounds_DiscFacAdj"]
     bounds_CRRA = options["bounds_CRRA"]
 
@@ -210,6 +215,10 @@ def simulate_moments(params, agent):
         sim_moments += [np.median(sim_w_history[cohort_indices])]
 
     sim_moments = np.array(sim_moments)
+
+    # todo: too many of these, check if solving/simulating has bug
+    if np.isnan(sim_moments).any():
+        return 1e30 * np.ones(len(scf_mapping))
 
     return sim_moments
 
@@ -367,12 +376,22 @@ def do_estimate_model(agent_name, estimation_agent, target_moments, initial_gues
         )
 
     t_start_estimate = time()
-    model_estimate = minimize_nelder_mead(
-        smm_obj_func_redux, initial_guess, verbose=True
+    res = em.minimize(
+        smm_obj_func_redux,
+        initial_guess,
+        algorithm="scipy_neldermead",
+        upper_bounds=np.array(
+            [options["bounds_DiscFacAdj"][1], options["bounds_CRRA"][1]]
+        ),
+        lower_bounds=np.array(
+            [options["bounds_DiscFacAdj"][0], options["bounds_CRRA"][0]]
+        ),
+        multistart=True,
     )
     t_end_estimate = time()
-
     time_to_estimate = t_end_estimate - t_start_estimate
+
+    model_estimate = res.params
 
     # Calculate minutes and remaining seconds
     minutes, seconds = divmod(time_to_estimate, 60)
@@ -385,8 +404,19 @@ def do_estimate_model(agent_name, estimation_agent, target_moments, initial_gues
 
     with open(estimate_results_file, "wt") as f:
         writer = csv.writer(f)
-        writer.writerow(["DiscFacAdj", "CRRA"])
-        writer.writerow([model_estimate[0], model_estimate[1]])
+
+        writer.writerow(["DiscFacAdj", model_estimate[0]])
+        writer.writerow(["CRRA", model_estimate[1]])
+        writer.writerow(["time_to_estimate", time_to_estimate])
+
+        for key in vars(res):
+            if key not in [
+                "history",
+                "convergence_report",
+                "multistart_info",
+                "algorithm_output",
+            ]:
+                writer.writerow([key, getattr(res, key)])
 
     return model_estimate, time_to_estimate
 
