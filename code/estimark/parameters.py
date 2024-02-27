@@ -3,6 +3,9 @@ Specifies the full set of calibrated values required to estimate the EstimatingM
 model.  The empirical data is stored in a separate csv file and is loaded in setup_scf_data.
 """
 
+from pathlib import Path
+
+
 import numpy as np
 from HARK.Calibration.Income.IncomeTools import CGM_income, parse_income_spec
 from HARK.ConsumptionSaving.ConsIndShockModel import init_lifecycle
@@ -62,7 +65,7 @@ inc_calib = parse_income_spec(
 
 # Age-varying discount factors over the lifecycle, lifted from Cagetti (2003)
 # Get the directory containing the current file and construct the full path to the CSV file
-csv_file_path = "code/data/Cagetti2003.csv"
+csv_file_path = Path(__file__).resolve().parent / ".." / "data" / "Cagetti2003.csv"
 timevary_DiscFac = np.genfromtxt(csv_file_path) * 0.0 + 1.0  # todo
 constant_DiscFac = np.ones_like(timevary_DiscFac)
 

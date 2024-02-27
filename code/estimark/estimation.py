@@ -447,7 +447,6 @@ def do_compute_sensitivity(agent_name, estimation_agent, model_estimate, initial
 
     # Find the Jacobian of the function that simulates moments
     def simulate_moments_redux(params):
-
         return simulate_moments(params, agent=estimation_agent)
 
     n_moments = len(scf_mapping)
