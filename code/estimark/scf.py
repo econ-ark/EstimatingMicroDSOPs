@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np  # Numerical Python
 import pandas as pd
 
-from estimark.parameters import initial_age
+from estimark.parameters import final_age_data, initial_age
 
 # Get the directory containing the current file and construct the full path to the CSV file
 csv_file_path = Path(__file__).resolve().parent / ".." / "data" / "SCFdata.csv"
@@ -21,7 +21,10 @@ scf_full_data = scf_full_data[scf_full_data.norminc > 0.0]
 
 # Age groups for the estimation: calculate average wealth-to-permanent income ratio
 # for consumers within each of these age groups, compare actual to simulated data
-age_groups = [list(range(start, start + 5)) for start in range(26, 61, 5)]
+age_groups = [
+    list(range(start, start + 5))
+    for start in range(initial_age + 1, final_age_data + 1, 5)
+]
 
 # Initialize empty lists for the data
 scf_data = []  # Ratio of wealth to permanent income

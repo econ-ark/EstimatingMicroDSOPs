@@ -1,15 +1,15 @@
-DiscFacAdj,0.9780667056185884
-CRRA,5.686287073172629
-time_to_estimate,30.298902988433838
-params,"[0.9780667056185884, 5.686287073172629]"
-criterion,2.51067111369706
-start_criterion,2.5102059170506967
-start_params,"[0.9780667056185884, 5.686287073172629]"
-algorithm,pounders
-direction,minimize
-n_free,2
-message,Norm of the gradient relative to the criterion value is less than relative_gradient_tolerance.
-success,True
-n_criterion_evaluations,
-n_derivative_evaluations,
-n_iterations,16
+DiscFacAdj,1.0108756957618867
+CRRA,9.465522890252362
+time_to_estimate,164.52021956443787
+params,"[1.0108756957618867, 9.465522890252362]"
+criterion,71.36314204921732
+start_criterion,71.35666118706878
+start_params,"[1.0108756957618867, 9.465522890252362]"
+algorithm,multistart_pounders
+direction,minimize
+n_free,2
+message,Norm of the gradient relative to the criterion value is less than relative_gradient_tolerance.
+success,True
+n_criterion_evaluations,
+n_derivative_evaluations,
+n_iterations,31

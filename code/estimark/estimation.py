@@ -52,6 +52,7 @@ from estimark.scf import (
     scf_mapping,
     scf_weights,
 )
+from estimark.snp import snp
 
 # Pathnames to the other files:
 # Relative directory for primitive parameter files
@@ -115,7 +116,10 @@ def make_estimation_agent(
     # Set the number of periods to simulate
     estimation_agent.T_sim = estimation_agent.T_cycle + 1
     # Choose to track bank balances as wealth
-    estimation_agent.track_vars = ["bNrm"]
+    track_vars = ["bNrm"]
+    if "Portfolio" in agent_name:
+        track_vars += ["Share"]
+    estimation_agent.track_vars = track_vars
     # Draw initial assets for each consumer
     estimation_agent.aNrmInit = DiscreteDistribution(
         options["prob_w_to_y"],
@@ -157,6 +161,14 @@ def get_targeted_moments(
     return target_moments
 
 
+share_moments = get_targeted_moments(
+    data=snp["S&P Target Date Equity allocation"].to_numpy(),
+    weights=np.ones(len(snp)),
+    groups=snp["age_groups"].to_numpy(),
+    mapping=scf_mapping,
+)
+
+
 def get_initial_guess(agent_name):
     # start from previous estimation results if available
 
@@ -172,35 +184,33 @@ def get_initial_guess(agent_name):
 
 
 # Define the objective function for the simulated method of moments estimation
-# TODO: params, bounds, agent
-def simulate_moments(params, agent):
+def simulate_moments(params, agent, agent_name):
     """A quick check to make sure that the parameter values are within bounds.
     Far flung falues of DiscFacAdj or CRRA might cause an error during solution or
     simulation, so the objective function doesn't even bother with them.
     """
     DiscFacAdj, CRRA = params
 
-    # # TODO: bounds should be handled by the optimizer
-    # bounds_DiscFacAdj = options["bounds_DiscFacAdj"]
-    # bounds_CRRA = options["bounds_CRRA"]
-
-    # if (
-    #     DiscFacAdj < bounds_DiscFacAdj[0]
-    #     or DiscFacAdj > bounds_DiscFacAdj[1]
-    #     or CRRA < bounds_CRRA[0]
-    #     or CRRA > bounds_CRRA[1]
-    # ):
-    #     return 1e30 * np.ones(len(scf_mapping))
-
     # Update the agent with a new path of DiscFac based on this DiscFacAdj (and a new CRRA)
     agent.DiscFac = [b * DiscFacAdj for b in options["timevary_DiscFac"]]
     agent.CRRA = CRRA
-    if hasattr(agent, "BeqCRRA"):
-        agent.BeqCRRA = CRRA
+    # if hasattr(agent, "BeqCRRA"):
+    #     agent.BeqCRRA = [CRRA] * len(options["timevary_DiscFac"])
     # Solve the model for these parameters, then simulate wealth data
     agent.solve()  # Solve the microeconomic model
     # "Unpack" the consumption function for convenient access
     # agent.unpack("cFunc")
+
+    # simulate with true parameters (override subjective beliefs)
+    if "(Stock)" in agent_name and "Portfolio" in agent_name:
+        agent.RiskyAvg = agent.RiskyAvgTrue
+        agent.RiskyStd = agent.RiskyStdTrue
+        agent.update_RiskyDstn()
+    if "(Labor)" in agent_name:
+        agent.TranShkStd = init_consumer_objects["TranShkStd"]
+        agent.PermShkStd = init_consumer_objects["PermShkStd"]
+        agent.update_income_process()
+
     max_sim_age = max([max(ages) for ages in scf_mapping]) + 1
     # Initialize the simulation by clearing histories, resetting initial values
     agent.initialize_sim()
@@ -219,14 +229,19 @@ def simulate_moments(params, agent):
 
     sim_moments = np.array(sim_moments)
 
-    # # TODO: too many of these, check if solving/simulating has bug
-    # if np.isnan(sim_moments).any():
-    #     return 1e30 * np.ones(len(scf_mapping))
+    if "Portfolio" in agent_name:
+        sim_share_history = agent.history["Share"]
+        share_moments = []
+        for g in range(group_count):
+            cohort_indices = scf_mapping[g]
+            share_moments += [np.median(sim_share_history[cohort_indices])]
+
+        sim_moments = np.append(sim_moments, share_moments)
 
     return sim_moments
 
 
-def smm_obj_func(params, agent, moments):
+def smm_obj_func(params, agent, moments, agent_name):
     """The objective function for the SMM estimation.  Given values of discount factor
     adjuster DiscFacAdj, coeffecient of relative risk aversion CRRA, a base consumer
     agent type, empirical data, and calibrated parameters, this function calculates
@@ -273,7 +288,10 @@ def smm_obj_func(params, agent, moments):
         median wealth-to-permanent-income ratio in the simulation.
 
     """
-    sim_moments = simulate_moments(params, agent)
+    if "Portfolio" in agent_name:
+        moments = np.append(moments, share_moments)
+
+    sim_moments = simulate_moments(params, agent, agent_name)
     errors = moments - sim_moments
     loss = np.dot(errors, errors)
 
@@ -281,7 +299,14 @@ def smm_obj_func(params, agent, moments):
 
 
 # Define the bootstrap procedure
-def calculate_se_bootstrap(initial_estimate, N, agent, seed=0, verbose=False):
+def calculate_se_bootstrap(
+    initial_estimate,
+    N,
+    agent,
+    agent_name,
+    seed=0,
+    verbose=False,
+):
     """Calculates standard errors by repeatedly re-estimating the model with datasets
     resampled from the actual data.
 
@@ -333,6 +358,7 @@ def calculate_se_bootstrap(initial_estimate, N, agent, seed=0, verbose=False):
                 params,
                 agent=agent,
                 moments=bootstrap_moments,
+                agent_name=agent_name,
             )
 
         # Estimate the model with the bootstrap data and add to list of estimates
@@ -376,6 +402,7 @@ def do_estimate_model(agent_name, estimation_agent, target_moments, initial_gues
             params,
             agent=estimation_agent,
             moments=target_moments,
+            agent_name=agent_name,
         )
 
     t_start_estimate = time()
@@ -389,7 +416,7 @@ def do_estimate_model(agent_name, estimation_agent, target_moments, initial_gues
         lower_bounds=np.array(
             [options["bounds_DiscFacAdj"][0], options["bounds_CRRA"][0]],
         ),
-        # multistart=True,
+        multistart=True,
         error_handling="continue",
     )
     t_end_estimate = time()
@@ -549,6 +576,7 @@ def do_make_contour_plot(agent_name, estimation_agent, model_estimate, target_mo
                 np.array([DiscFacAdj, CRRA]),
                 agent=estimation_agent,
                 moments=target_moments,
+                agent_name=agent_name,
             )
     smm_contour = plt.contourf(CRRA_mesh, DiscFacAdj_mesh, smm_obj_levels, level_count)
     t_end_contour = time()

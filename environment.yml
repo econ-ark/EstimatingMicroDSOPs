@@ -10,6 +10,7 @@ dependencies:
   - nbqa
   - dask 
   - estimagic
+  - openpyxl
   - pip
   - pip:
       - git+https://github.com/econ-ark/HARK@master

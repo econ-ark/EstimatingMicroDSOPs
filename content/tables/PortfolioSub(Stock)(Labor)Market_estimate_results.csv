@@ -1,15 +1,15 @@
-DiscFacAdj,0.9896568879310341
-CRRA,6.0341579680908435
-time_to_estimate,778.7828552722931
-params,"[0.9896568879310341, 6.0341579680908435]"
-criterion,4.987817857690127
-start_criterion,4.99090149328263
-start_params,"[0.9909656381251932, 6.010945374806884]"
-algorithm,multistart_scipy_lbfgsb
+DiscFacAdj,1.031663318004827
+CRRA,20.0
+time_to_estimate,348.846572637558
+params,"[1.031663318004827, 20.0]"
+criterion,100.12183532554437
+start_criterion,80.1310373062168
+start_params,"[1.012689853435823, 10.322378973016388]"
+algorithm,multistart_pounders
 direction,minimize
 n_free,2
-message,CONVERGENCE: REL_REDUCTION_OF_F_<=_FACTR*EPSMCH
+message,Norm of the gradient relative to the criterion value is less than relative_gradient_tolerance.
 success,True
-n_criterion_evaluations,168
-n_derivative_evaluations,168
-n_iterations,15
+n_criterion_evaluations,
+n_derivative_evaluations,
+n_iterations,77

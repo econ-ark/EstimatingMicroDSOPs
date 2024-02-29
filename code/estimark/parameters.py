@@ -16,7 +16,7 @@ from HARK.datasets.life_tables.us_ssa.SSATools import parse_ssa_life_table
 exp_nest = 1  # Number of times to "exponentially nest" when constructing a_grid
 aXtraMin = 0.001  # Minimum end-of-period "assets above minimum" value
 aXtraMax = 100  # Maximum end-of-period "assets above minimum" value
-aXtraCount = 100  # Number of points in the grid of "assets above minimum"
+aXtraCount = 20  # Number of points in the grid of "assets above minimum"
 
 # Artificial borrowing constraint; imposed minimum level of end-of period assets
 BoroCnstArt = 0.0
@@ -34,11 +34,13 @@ UnempPrbRet = 0.005  # Probability of "unemployment" while retired
 IncUnemp = 0.3  # Unemployment benefits replacement rate
 IncUnempRet = 0.0  # "Unemployment" benefits when retired
 
-final_age = 90  # Age at which the problem ends (die with certainty)
+final_age = 120  # Age at which the problem ends (die with certainty)
 retirement_age = 65  # Age at which the consumer retires
 initial_age = 25  # Age at which the consumer enters the model
 terminal_t = final_age - initial_age  # Total number of periods in the model
 retirement_t = retirement_age - initial_age - 1
+
+final_age_data = 95  # Age at which the data ends
 
 # Initial guess of the coefficient of relative risk aversion during estimation (rho)
 init_CRRA = 5.0
@@ -47,7 +49,7 @@ init_DiscFacAdj = 0.99
 # Bounds for beth; if violated, objective function returns "penalty value"
 bounds_DiscFacAdj = [0.5, 1.5]
 # Bounds for rho; if violated, objective function returns "penalty value"
-bounds_CRRA = [1.1, 10.0]
+bounds_CRRA = [1.1, 20.0]
 
 # Income
 ss_variances = True
@@ -64,8 +66,9 @@ inc_calib = parse_income_spec(
 # Age-varying discount factors over the lifecycle, lifted from Cagetti (2003)
 # Get the directory containing the current file and construct the full path to the CSV file
 csv_file_path = Path(__file__).resolve().parent / ".." / "data" / "Cagetti2003.csv"
-timevary_DiscFac = np.genfromtxt(csv_file_path) * 0.0 + 1.0  # TODO
-constant_DiscFac = np.ones_like(timevary_DiscFac)
+# timevary_DiscFac = np.genfromtxt(csv_file_path) * 0.0 + 1.0  # TODO
+# constant_DiscFac = np.ones_like(timevary_DiscFac)
+timevary_DiscFac = np.ones_like(inc_calib["PermShkStd"])
 
 # Survival probabilities over the lifecycle
 liv_prb = parse_ssa_life_table(
@@ -82,7 +85,7 @@ init_w_to_y = np.array([0.17, 0.5, 0.83])
 prob_w_to_y = np.array([0.33333, 0.33333, 0.33334])
 num_agents = 10000  # Number of agents to simulate
 bootstrap_size = 50  # Number of re-estimations to do during bootstrap
-seed = 31382  # Just an integer to seed the estimation
+seed = 1132023  # Just an integer to seed the estimation
 
 options = {
     "init_w_to_y": init_w_to_y,
