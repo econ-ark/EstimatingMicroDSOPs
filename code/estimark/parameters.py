@@ -1,10 +1,8 @@
-"""
-Specifies the full set of calibrated values required to estimate the EstimatingMicroDSOPs
+"""Specifies the full set of calibrated values required to estimate the EstimatingMicroDSOPs
 model.  The empirical data is stored in a separate csv file and is loaded in setup_scf_data.
 """
 
 from pathlib import Path
-
 
 import numpy as np
 from HARK.Calibration.Income.IncomeTools import CGM_income, parse_income_spec
@@ -66,7 +64,7 @@ inc_calib = parse_income_spec(
 # Age-varying discount factors over the lifecycle, lifted from Cagetti (2003)
 # Get the directory containing the current file and construct the full path to the CSV file
 csv_file_path = Path(__file__).resolve().parent / ".." / "data" / "Cagetti2003.csv"
-timevary_DiscFac = np.genfromtxt(csv_file_path) * 0.0 + 1.0  # todo
+timevary_DiscFac = np.genfromtxt(csv_file_path) * 0.0 + 1.0  # TODO
 constant_DiscFac = np.ones_like(timevary_DiscFac)
 
 # Survival probabilities over the lifecycle
@@ -106,35 +104,33 @@ options = {
 # Dictionary that can be passed to ConsumerType to instantiate
 init_consumer_objects = {
     **init_lifecycle,
-    **{
-        "CRRA": init_CRRA,
-        "Rfree": Rfree,
-        "PermGroFac": inc_calib["PermGroFac"],
-        "PermGroFacAgg": 1.0,
-        "BoroCnstArt": BoroCnstArt,
-        "PermShkStd": inc_calib["PermShkStd"],
-        "PermShkCount": PermShkCount,
-        "TranShkStd": inc_calib["TranShkStd"],
-        "TranShkCount": TranShkCount,
-        "T_cycle": terminal_t,
-        "UnempPrb": UnempPrb,
-        "UnempPrbRet": UnempPrbRet,
-        "T_retire": retirement_t,
-        "T_age": terminal_t,
-        "IncUnemp": IncUnemp,
-        "IncUnempRet": IncUnempRet,
-        "aXtraMin": aXtraMin,
-        "aXtraMax": aXtraMax,
-        "aXtraCount": aXtraCount,
-        "aXtraNestFac": exp_nest,
-        "LivPrb": liv_prb,
-        "DiscFac": timevary_DiscFac,
-        "AgentCount": num_agents,
-        "seed": seed,
-        "tax_rate": 0.0,
-        "vFuncBool": vFuncBool,
-        "CubicBool": CubicBool,
-    },
+    "CRRA": init_CRRA,
+    "Rfree": Rfree,
+    "PermGroFac": inc_calib["PermGroFac"],
+    "PermGroFacAgg": 1.0,
+    "BoroCnstArt": BoroCnstArt,
+    "PermShkStd": inc_calib["PermShkStd"],
+    "PermShkCount": PermShkCount,
+    "TranShkStd": inc_calib["TranShkStd"],
+    "TranShkCount": TranShkCount,
+    "T_cycle": terminal_t,
+    "UnempPrb": UnempPrb,
+    "UnempPrbRet": UnempPrbRet,
+    "T_retire": retirement_t,
+    "T_age": terminal_t,
+    "IncUnemp": IncUnemp,
+    "IncUnempRet": IncUnempRet,
+    "aXtraMin": aXtraMin,
+    "aXtraMax": aXtraMax,
+    "aXtraCount": aXtraCount,
+    "aXtraNestFac": exp_nest,
+    "LivPrb": liv_prb,
+    "DiscFac": timevary_DiscFac,
+    "AgentCount": num_agents,
+    "seed": seed,
+    "tax_rate": 0.0,
+    "vFuncBool": vFuncBool,
+    "CubicBool": CubicBool,
 }
 
 # from Mateo's JMP for College Educated

@@ -1,12 +1,12 @@
+import dask
+from dask.distributed import Client
+from estimark.estimation import estimate
 from estimark.options import (
     all_replications,
     high_resource,
     low_resource,
     medium_resource,
 )
-from estimark.estimation import estimate
-import dask
-from dask.distributed import Client
 
 
 # Ask the user which replication to run, and run it:

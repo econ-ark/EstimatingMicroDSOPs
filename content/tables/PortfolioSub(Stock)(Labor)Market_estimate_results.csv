@@ -1,15 +1,15 @@
-DiscFacAdj,0.9911785704835548
-CRRA,6.034152052728421
-time_to_estimate,641.9356205463409
-params,[0.991785704835548, 6.034152052728421]
-criterion,4.963398992709653
-start_criterion,4.963398992709666
-start_params,[0.9911785704835547, 6.034152052728421]
-algorithm,multistart_scipy_neldermead
-direction,minimize
-n_free,2
-message,Optimization terminated successfully.
-success,True
-n_criterion_evaluations,375
-n_derivative_evaluations,
-n_iterations,185
+DiscFacAdj,0.9896568879310341
+CRRA,6.0341579680908435
+time_to_estimate,778.7828552722931
+params,"[0.9896568879310341, 6.0341579680908435]"
+criterion,4.987817857690127
+start_criterion,4.99090149328263
+start_params,"[0.9909656381251932, 6.010945374806884]"
+algorithm,multistart_scipy_lbfgsb
+direction,minimize
+n_free,2
+message,CONVERGENCE: REL_REDUCTION_OF_F_<=_FACTR*EPSMCH
+success,True
+n_criterion_evaluations,168
+n_derivative_evaluations,168
+n_iterations,15

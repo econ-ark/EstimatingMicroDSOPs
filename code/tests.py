@@ -1,5 +1,5 @@
-from estimark.options import low_resource, medium_resource
 from estimark.estimation import estimate
+from estimark.options import low_resource, medium_resource
 
 
 def test_low_resource():

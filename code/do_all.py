@@ -1,5 +1,4 @@
-"""
-Run all of the plots and tables in EstimatingMicroDSOPs.
+"""Run all of the plots and tables in EstimatingMicroDSOPs.
 
 To execute, do the following on the Python command line:
 
@@ -46,29 +45,29 @@ Python PATH with the locations of the MicroDSOP directory structure so it can
 still run.
 """
 
+from estimark.estimation import estimate
 from estimark.options import (
     all_replications,
     high_resource,
     low_resource,
     medium_resource,
 )
-from estimark.estimation import estimate
 
 
 # Ask the user which replication to run, and run it:
 def run_replication():
     which_model = input(
         """Which model would you like to run?
-        
+
         [1] IndShockConsumerType
-        
+
          2  PortfolioConsumerType 
-        
+
          3  BequestWarmGlowConsumerType
-        
+
          4  BequestWarmGlowPortfolioType
-        
-         5  WealthPortfolioConsumerType \n\n"""
+
+         5  WealthPortfolioConsumerType \n\n""",
     )
 
     which_replication = input(
@@ -82,19 +81,19 @@ def run_replication():
 
          4  all:             ~40 min; output: all above.
 
-         q  quit: exit without executing.\n\n"""
+         q  quit: exit without executing.\n\n""",
     )
 
     subjective_markets = input(
         """Would you like to add subjective stock or labor market beliefs to the model?:
-        
+
         [1] No
-        
+
          2  Subjective Stock Market Beliefs
-        
+
          3  Subjective Labor Market Beliefs
-        
-         4  Both\n\n"""
+
+         4  Both\n\n""",
     )
 
     replication_specs = {}

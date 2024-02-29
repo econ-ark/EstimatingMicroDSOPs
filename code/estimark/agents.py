@@ -1,5 +1,4 @@
-"""
-Demonstrates an example estimation of microeconomic dynamic stochastic optimization
+"""Demonstrates an example estimation of microeconomic dynamic stochastic optimization
 problem, as described in Section 9 of Chris Carroll's EstimatingMicroDSOPs.pdf notes.
 The estimation attempts to match the age-conditional wealth profile of simulated
 consumers to the median wealth holdings of seven age groups in the 2004 SCF by
@@ -25,8 +24,7 @@ from HARK.core import AgentType
 
 class TempConsumerType(AgentType):
     def __init__(self, cycles=1, **kwds):
-        """
-        Make a new consumer type.
+        """Make a new consumer type.
 
         Parameters
         ----------
@@ -38,6 +36,7 @@ class TempConsumerType(AgentType):
         Returns
         -------
         None
+
         """
         # Initialize a basic AgentType
         super().__init__(cycles=cycles, **kwds)
@@ -50,8 +49,7 @@ class TempConsumerType(AgentType):
         return None
 
     def simBirth(self, which_agents):
-        """
-        Alternate method for simulating initial states for simulated agents, drawing from a finite
+        """Alternate method for simulating initial states for simulated agents, drawing from a finite
         distribution.  Used to overwrite IndShockConsumerType.simBirth, which uses lognormal distributions.
 
         Parameters
@@ -62,6 +60,7 @@ class TempConsumerType(AgentType):
         Returns
         -------
         None
+
         """
         # Get and store states for newly born agents
         # Take directly from pre-specified distribution
@@ -72,19 +71,16 @@ class TempConsumerType(AgentType):
         self.t_age[which_agents] = 0
         # Which period of the cycle each agents is currently in
         self.t_cycle[which_agents] = 0
-        return None
 
 
 class IndShkLifeCycleConsumerType(TempConsumerType, IndShockConsumerType):
-    """
-    A very lightly edited version of IndShockConsumerType.  Uses an alternate method of making new
+    """A very lightly edited version of IndShockConsumerType.  Uses an alternate method of making new
     consumers and specifies DiscFac as being age-dependent.  Called "temp" because only used here.
     """
 
 
 class PortfolioLifeCycleConsumerType(TempConsumerType, PortfolioConsumerType):
-    """
-    A very lightly edited version of PortfolioConsumerType.  Uses an alternate method of making new
+    """A very lightly edited version of PortfolioConsumerType.  Uses an alternate method of making new
     consumers and specifies DiscFac as being age-dependent.  Called "temp" because only used here.
     """
 
@@ -94,19 +90,19 @@ class PortfolioLifeCycleConsumerType(TempConsumerType, PortfolioConsumerType):
 
 
 class BequestWarmGlowLifeCycleConsumerType(
-    TempConsumerType, BequestWarmGlowConsumerType
+    TempConsumerType,
+    BequestWarmGlowConsumerType,
 ):
-    """
-    A very lightly edited version of BequestWarmGlowConsumerType.  Uses an alternate method of making new
+    """A very lightly edited version of BequestWarmGlowConsumerType.  Uses an alternate method of making new
     consumers and specifies DiscFac as being age-dependent.  Called "temp" because only used here.
     """
 
 
 class BequestWarmGlowLifeCyclePortfolioType(
-    TempConsumerType, BequestWarmGlowPortfolioType
+    TempConsumerType,
+    BequestWarmGlowPortfolioType,
 ):
-    """
-    A very lightly edited version of BequestWarmGlowPortfolioType.  Uses an alternate method of making new
+    """A very lightly edited version of BequestWarmGlowPortfolioType.  Uses an alternate method of making new
     consumers and specifies DiscFac as being age-dependent.  Called "temp" because only used here.
     """
 
@@ -116,9 +112,9 @@ class BequestWarmGlowLifeCyclePortfolioType(
 
 
 class WealthPortfolioLifeCycleConsumerType(
-    TempConsumerType, WealthPortfolioConsumerType
+    TempConsumerType,
+    WealthPortfolioConsumerType,
 ):
-    """
-    A very lightly edited version of WealthPortfolioConsumerType.  Uses an alternate method of making new
+    """A very lightly edited version of WealthPortfolioConsumerType.  Uses an alternate method of making new
     consumers and specifies DiscFac as being age-dependent.  Called "temp" because only used here.
     """

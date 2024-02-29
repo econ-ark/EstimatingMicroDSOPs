@@ -4,7 +4,10 @@ if ! conda env list | grep -q 'estimatingmicrodsops'; then
 fi
 
 # Activate the environment
-conda activate estimatingmicrodsops
+source activate estimatingmicrodsops
+
+# Add the code directory to the PYTHONPATH
+export PYTHONPATH=code:$PYTHONPATH
 
 # Execute script to reproduce figures
 python code/do_all.py

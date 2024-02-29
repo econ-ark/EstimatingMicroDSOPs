@@ -1,15 +1,15 @@
-DiscFacAdj,0.9809297742019563
-CRRA,5.618112957475339
-time_to_estimate,603.8376204967499
-params,[0.989297742019563, 5.618112957475339]
-criterion,2.665832181614686
-start_criterion,2.666329553441798
-start_params,[0.9809051537052127, 5.51663750438404]
-algorithm,multistart_scipy_neldermead
+DiscFacAdj,0.9809524880620337
+CRRA,5.6162525274026445
+time_to_estimate,26.98508930206299
+params,"[0.9809524880620337, 5.6162525274026445]"
+criterion,2.6662224673693493
+start_criterion,2.665819888658792
+start_params,"[0.9809524880620337, 5.6162525274026445]"
+algorithm,pounders
 direction,minimize
 n_free,2
-message,Optimization terminated successfully.
+message,Norm of the gradient is less than absolute_gradient_tolerance.
 success,True
-n_criterion_evaluations,335
+n_criterion_evaluations,
 n_derivative_evaluations,
-n_iterations,171
+n_iterations,14

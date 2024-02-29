@@ -1,5 +1,4 @@
-"""
-Demonstrates an example estimation of microeconomic dynamic stochastic optimization
+"""Demonstrates an example estimation of microeconomic dynamic stochastic optimization
 problem, as described in Section 9 of Chris Carroll's EstimatingMicroDSOPs.pdf notes.
 The estimation attempts to match the age-conditional wealth profile of simulated
 consumers to the median wealth holdings of seven age groups in the 2004 SCF by
@@ -9,19 +8,20 @@ consumption-saving model with idiosyncratic shocks to permanent and transitory
 income as defined in ConsIndShockModel.
 """
 
-import pandas as pd
-
 import csv
+from pathlib import Path
 from time import time  # Timing utility
 
+import estimagic as em
 import matplotlib.pyplot as plt
 import numpy as np  # Numeric Python
+import pandas as pd
 
 # Method for sampling from a discrete distribution
 from HARK.distribution import DiscreteDistribution
 
 # Estimation methods
-# todo: use estimagic
+# TODO: use estimagic
 from HARK.estimation import bootstrap_sample_from_data, minimize_nelder_mead
 from scipy.optimize import approx_fprime
 
@@ -53,13 +53,13 @@ from estimark.scf import (
     scf_weights,
 )
 
-import estimagic as em
-
 # Pathnames to the other files:
 # Relative directory for primitive parameter files
 tables_dir = "content/tables/"
+Path(tables_dir).mkdir(parents=True, exist_ok=True)
 # Relative directory for primitive parameter files
 figures_dir = "content/figures/"
+Path(figures_dir).mkdir(parents=True, exist_ok=True)
 
 
 # Set booleans to determine which tasks should be done
@@ -141,7 +141,10 @@ def weighted_median(values, weights):
 
 
 def get_targeted_moments(
-    data=scf_data, weights=scf_weights, groups=scf_groups, mapping=scf_mapping
+    data=scf_data,
+    weights=scf_weights,
+    groups=scf_groups,
+    mapping=scf_mapping,
 ):
     # Initialize
     group_count = len(mapping)
@@ -169,31 +172,31 @@ def get_initial_guess(agent_name):
 
 
 # Define the objective function for the simulated method of moments estimation
-# todo: params, bounds, agent
+# TODO: params, bounds, agent
 def simulate_moments(params, agent):
-    """
-    A quick check to make sure that the parameter values are within bounds.
+    """A quick check to make sure that the parameter values are within bounds.
     Far flung falues of DiscFacAdj or CRRA might cause an error during solution or
     simulation, so the objective function doesn't even bother with them.
     """
-
     DiscFacAdj, CRRA = params
 
-    # todo: bounds should be handled by the optimizer
-    bounds_DiscFacAdj = options["bounds_DiscFacAdj"]
-    bounds_CRRA = options["bounds_CRRA"]
+    # # TODO: bounds should be handled by the optimizer
+    # bounds_DiscFacAdj = options["bounds_DiscFacAdj"]
+    # bounds_CRRA = options["bounds_CRRA"]
 
-    if (
-        DiscFacAdj < bounds_DiscFacAdj[0]
-        or DiscFacAdj > bounds_DiscFacAdj[1]
-        or CRRA < bounds_CRRA[0]
-        or CRRA > bounds_CRRA[1]
-    ):
-        return 1e30 * np.ones(len(scf_mapping))
+    # if (
+    #     DiscFacAdj < bounds_DiscFacAdj[0]
+    #     or DiscFacAdj > bounds_DiscFacAdj[1]
+    #     or CRRA < bounds_CRRA[0]
+    #     or CRRA > bounds_CRRA[1]
+    # ):
+    #     return 1e30 * np.ones(len(scf_mapping))
 
     # Update the agent with a new path of DiscFac based on this DiscFacAdj (and a new CRRA)
     agent.DiscFac = [b * DiscFacAdj for b in options["timevary_DiscFac"]]
     agent.CRRA = CRRA
+    if hasattr(agent, "BeqCRRA"):
+        agent.BeqCRRA = CRRA
     # Solve the model for these parameters, then simulate wealth data
     agent.solve()  # Solve the microeconomic model
     # "Unpack" the consumption function for convenient access
@@ -216,16 +219,15 @@ def simulate_moments(params, agent):
 
     sim_moments = np.array(sim_moments)
 
-    # todo: too many of these, check if solving/simulating has bug
-    if np.isnan(sim_moments).any():
-        return 1e30 * np.ones(len(scf_mapping))
+    # # TODO: too many of these, check if solving/simulating has bug
+    # if np.isnan(sim_moments).any():
+    #     return 1e30 * np.ones(len(scf_mapping))
 
     return sim_moments
 
 
 def smm_obj_func(params, agent, moments):
-    """
-    The objective function for the SMM estimation.  Given values of discount factor
+    """The objective function for the SMM estimation.  Given values of discount factor
     adjuster DiscFacAdj, coeffecient of relative risk aversion CRRA, a base consumer
     agent type, empirical data, and calibrated parameters, this function calculates
     the weighted distance between data and the simulated wealth-to-permanent
@@ -269,19 +271,18 @@ def smm_obj_func(params, agent, moments):
     distance_sum : float
         Sum of distances between empirical data observations and the corresponding
         median wealth-to-permanent-income ratio in the simulation.
-    """
 
+    """
     sim_moments = simulate_moments(params, agent)
     errors = moments - sim_moments
     loss = np.dot(errors, errors)
 
-    return loss
+    return {"value": loss, "root_contributions": errors}
 
 
 # Define the bootstrap procedure
 def calculate_se_bootstrap(initial_estimate, N, agent, seed=0, verbose=False):
-    """
-    Calculates standard errors by repeatedly re-estimating the model with datasets
+    """Calculates standard errors by repeatedly re-estimating the model with datasets
     resampled from the actual data.
 
     Parameters
@@ -300,6 +301,7 @@ def calculate_se_bootstrap(initial_estimate, N, agent, seed=0, verbose=False):
     -------
     standard_errors : [float,float]
         Standard errors calculated by bootstrap: [DiscFacAdj_std_error, CRRA_std_error].
+
     """
     t_0 = time()
 
@@ -320,7 +322,9 @@ def calculate_se_bootstrap(initial_estimate, N, agent, seed=0, verbose=False):
 
         # Find moments with bootstrapped sample
         bootstrap_moments = get_targeted_moments(
-            data=data_bootstrap, weights=weights_bootstrap, groups=groups_bootstrap
+            data=data_bootstrap,
+            weights=weights_bootstrap,
+            groups=groups_bootstrap,
         )
 
         # Make a temporary function for use in this estimation run
@@ -339,7 +343,7 @@ def calculate_se_bootstrap(initial_estimate, N, agent, seed=0, verbose=False):
         # Report progress of the bootstrap
     if verbose:
         print(
-            f"Finished bootstrap estimation #{n + 1} of {N} in {t_now - t_start} seconds ({t_now - t_0} cumulative)"
+            f"Finished bootstrap estimation #{n + 1} of {N} in {t_now - t_start} seconds ({t_now - t_0} cumulative)",
         )
 
     # Calculate the standard errors for each parameter
@@ -358,14 +362,13 @@ def calculate_se_bootstrap(initial_estimate, N, agent, seed=0, verbose=False):
 def do_estimate_model(agent_name, estimation_agent, target_moments, initial_guess):
     print("----------------------------------------------------------------------")
     print(
-        f"Now estimating the model using Nelder-Mead from an initial guess of {initial_guess}..."
+        f"Now estimating the model using Nelder-Mead from an initial guess of {initial_guess}...",
     )
     print("----------------------------------------------------------------------")
 
     # Make a single-input lambda function for use in the optimizer
     def smm_obj_func_redux(params):
-        """
-        A "reduced form" of the SMM objective function, compatible with the optimizer.
+        """A "reduced form" of the SMM objective function, compatible with the optimizer.
         Identical to smmObjectiveFunction, but takes only a single input as a length-2
         list representing [DiscFacAdj,CRRA].
         """
@@ -379,14 +382,15 @@ def do_estimate_model(agent_name, estimation_agent, target_moments, initial_gues
     res = em.minimize(
         smm_obj_func_redux,
         initial_guess,
-        algorithm="scipy_neldermead",
+        algorithm="pounders",
         upper_bounds=np.array(
-            [options["bounds_DiscFacAdj"][1], options["bounds_CRRA"][1]]
+            [options["bounds_DiscFacAdj"][1], options["bounds_CRRA"][1]],
         ),
         lower_bounds=np.array(
-            [options["bounds_DiscFacAdj"][0], options["bounds_CRRA"][0]]
+            [options["bounds_DiscFacAdj"][0], options["bounds_CRRA"][0]],
         ),
-        multistart=True,
+        # multistart=True,
+        error_handling="continue",
     )
     t_end_estimate = time()
     time_to_estimate = t_end_estimate - t_start_estimate
@@ -396,13 +400,13 @@ def do_estimate_model(agent_name, estimation_agent, target_moments, initial_gues
     # Calculate minutes and remaining seconds
     minutes, seconds = divmod(time_to_estimate, 60)
     print(f"Time to estimate: {int(minutes)} min, {int(seconds)} sec.")
-
+    print(f"Estimated model: {agent_name}")
     print(f"Estimated values: DiscFacAdj={model_estimate[0]}, CRRA={model_estimate[1]}")
 
     # Create the simple estimate table
     estimate_results_file = tables_dir + agent_name + "_estimate_results.csv"
 
-    with open(estimate_results_file, "wt") as f:
+    with open(estimate_results_file, "w") as f:
         writer = csv.writer(f)
 
         writer.writerow(["DiscFacAdj", model_estimate[0]])
@@ -422,12 +426,15 @@ def do_estimate_model(agent_name, estimation_agent, target_moments, initial_gues
 
 
 def do_compute_se_boostrap(
-    agent_name, estimation_agent, model_estimate, time_to_estimate
+    agent_name,
+    estimation_agent,
+    model_estimate,
+    time_to_estimate,
 ):
     # Estimate the model:
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
     print(
-        f"Computing standard errors using {options['bootstrap_size']} bootstrap replications."
+        f"Computing standard errors using {options['bootstrap_size']} bootstrap replications.",
     )
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
@@ -455,7 +462,7 @@ def do_compute_se_boostrap(
     # Create the simple bootstrap table
     bootstrap_results_file = tables_dir + agent_name + "_bootstrap_results.csv"
 
-    with open(bootstrap_results_file, "wt") as f:
+    with open(bootstrap_results_file, "w") as f:
         writer = csv.writer(f)
         writer.writerow(
             [
@@ -463,10 +470,10 @@ def do_compute_se_boostrap(
                 "DiscFacAdj_standard_error",
                 "CRRA",
                 "CRRA_standard_error",
-            ]
+            ],
         )
         writer.writerow(
-            [model_estimate[0], std_errors[0], model_estimate[1], std_errors[1]]
+            [model_estimate[0], std_errors[0], model_estimate[1], std_errors[1]],
         )
 
 
@@ -488,7 +495,7 @@ def do_compute_sensitivity(agent_name, estimation_agent, model_estimate, initial
                 epsilon=0.01,
             )
             for j in range(n_moments)
-        ]
+        ],
     )
 
     # Compute sensitivity measure. (all moments weighted equally)
@@ -527,7 +534,9 @@ def do_make_contour_plot(agent_name, estimation_agent, model_estimate, target_mo
     grid_density = 20  # Number of parameter values in each dimension
     level_count = 100  # Number of contour levels to plot
     DiscFacAdj_list = np.linspace(
-        max(DiscFac_star - 0.25, 0.5), min(DiscFac_star + 0.25, 1.05), grid_density
+        max(DiscFac_star - 0.25, 0.5),
+        min(DiscFac_star + 0.25, 1.05),
+        grid_density,
     )
     CRRA_list = np.linspace(max(CRRA_star - 5, 2), min(CRRA_star + 5, 8), grid_density)
     CRRA_mesh, DiscFacAdj_mesh = np.meshgrid(CRRA_list, DiscFacAdj_list)
@@ -568,8 +577,7 @@ def estimate(
     subjective_stock=local_subjective_stock,
     subjective_labor=local_subjective_labor,
 ):
-    """
-    Run the main estimation procedure for SolvingMicroDSOP.
+    """Run the main estimation procedure for SolvingMicroDSOP.
 
     Parameters
     ----------
@@ -585,8 +593,8 @@ def estimate(
     Returns
     -------
     None
-    """
 
+    """
     estimation_agent, agent_name = make_estimation_agent(
         agent_name=agent_name,
         subjective_stock=subjective_stock,
@@ -600,25 +608,37 @@ def estimate(
     # Estimate the model using Nelder-Mead
     if estimate_model:
         model_estimate, time_to_estimate = do_estimate_model(
-            agent_name, estimation_agent, target_moments, initial_guess
+            agent_name,
+            estimation_agent,
+            target_moments,
+            initial_guess,
         )
 
         # Compute standard errors by bootstrap
         if compute_se_bootstrap:
             do_compute_se_boostrap(
-                agent_name, estimation_agent, model_estimate, time_to_estimate
+                agent_name,
+                estimation_agent,
+                model_estimate,
+                time_to_estimate,
             )
 
         # Compute sensitivity measure
         if compute_sensitivity:
             do_compute_sensitivity(
-                agent_name, estimation_agent, model_estimate, initial_guess
+                agent_name,
+                estimation_agent,
+                model_estimate,
+                initial_guess,
             )
 
         # Make a contour plot of the objective function
         if make_contour_plot:
             do_make_contour_plot(
-                agent_name, estimation_agent, model_estimate, target_moments
+                agent_name,
+                estimation_agent,
+                model_estimate,
+                target_moments,
             )
 
 

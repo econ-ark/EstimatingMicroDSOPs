@@ -1,11 +1,11 @@
-"""
-Sets up the SCF data for use in the EstimatingMicroDSOPs estimation.
+"""Sets up the SCF data for use in the EstimatingMicroDSOPs estimation.
 """
 
 from pathlib import Path
 
 import numpy as np  # Numerical Python
 import pandas as pd
+
 from estimark.parameters import initial_age
 
 # Get the directory containing the current file and construct the full path to the CSV file
