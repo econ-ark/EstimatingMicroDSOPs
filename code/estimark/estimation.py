@@ -194,6 +194,17 @@ def simulate_moments(params, agent, agent_name):
     # Update the agent with a new path of DiscFac based on this DiscFacAdj (and a new CRRA)
     agent.DiscFac = [b * DiscFacAdj for b in options["timevary_DiscFac"]]
     agent.CRRA = CRRA
+
+    if "(Stock)" in agent_name and "Portfolio" in agent_name:
+        agent.RiskyAvg = init_subjective_stock["RiskyAvg"]
+        agent.RiskyStd = init_subjective_stock["RiskyStd"]
+        agent.update_RiskyDstn()
+
+    if "(Labor)" in agent_name:
+        agent.TranShkStd = init_subjective_labor["TranShkStd"]
+        agent.PermShkStd = init_subjective_labor["PermShkStd"]
+        agent.update_income_process()
+
     # if hasattr(agent, "BeqCRRA"):
     #     agent.BeqCRRA = [CRRA] * len(options["timevary_DiscFac"])
     # Solve the model for these parameters, then simulate wealth data
@@ -206,6 +217,8 @@ def simulate_moments(params, agent, agent_name):
         agent.RiskyAvg = agent.RiskyAvgTrue
         agent.RiskyStd = agent.RiskyStdTrue
         agent.update_RiskyDstn()
+
+    # TODO: use perceived for simulation too
     if "(Labor)" in agent_name:
         agent.TranShkStd = init_consumer_objects["TranShkStd"]
         agent.PermShkStd = init_consumer_objects["PermShkStd"]

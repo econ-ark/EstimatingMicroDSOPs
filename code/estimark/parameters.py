@@ -53,7 +53,7 @@ bounds_CRRA = [1.1, 20.0]
 
 # Income
 ss_variances = True
-income_spec = CGM_income["HS"]
+income_spec = CGM_income["HS"]  # College?
 # Replace retirement age
 income_spec["age_ret"] = retirement_age
 inc_calib = parse_income_spec(
