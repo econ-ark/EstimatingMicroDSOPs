@@ -157,7 +157,7 @@ def get_initial_guess(agent_name):
         res = pd.read_csv(csv_file_path, header=None)
         initial_guess = res.iloc[:2, 1].astype(float).tolist()
     except (FileNotFoundError, IndexError):
-        initial_guess = [options["init_DiscFacAdj"], options["init_CRRA"]]
+        initial_guess = [options["init_DiscFac"], options["init_CRRA"]]
 
     return initial_guess
 
@@ -165,13 +165,13 @@ def get_initial_guess(agent_name):
 # Define the objective function for the simulated method of moments estimation
 def simulate_moments(params, agent, agent_name):
     """A quick check to make sure that the parameter values are within bounds.
-    Far flung falues of DiscFacAdj or CRRA might cause an error during solution or
+    Far flung falues of DiscFac or CRRA might cause an error during solution or
     simulation, so the objective function doesn't even bother with them.
     """
-    DiscFacAdj, CRRA = params
+    DiscFac, CRRA = params
 
-    # Update the agent with a new path of DiscFac based on this DiscFacAdj (and a new CRRA)
-    agent.DiscFac = [b * DiscFacAdj for b in options["timevary_DiscFac"]]
+    # Update the agent with a new path of DiscFac based on this DiscFac (and a new CRRA)
+    agent.DiscFac = DiscFac
     agent.CRRA = CRRA
 
     if "(Stock)" in agent_name and "Portfolio" in agent_name:
@@ -227,31 +227,31 @@ def simulate_moments(params, agent, agent_name):
 
 def smm_obj_func(params, agent, moments, agent_name):
     """The objective function for the SMM estimation.  Given values of discount factor
-    adjuster DiscFacAdj, coeffecient of relative risk aversion CRRA, a base consumer
+    adjuster DiscFac, coeffecient of relative risk aversion CRRA, a base consumer
     agent type, empirical data, and calibrated parameters, this function calculates
     the weighted distance between data and the simulated wealth-to-permanent
     income ratio.
 
     Steps:
-        a) solve for consumption functions for (DiscFacAdj, CRRA)
+        a) solve for consumption functions for (DiscFac, CRRA)
         b) simulate wealth holdings for many consumers over time
         c) sum distances between empirical data and simulated medians within
             seven age groupings
 
     Parameters
     ----------
-    DiscFacAdj : float
+    DiscFac : float
         An adjustment factor to a given age-varying sequence of discount factors.
-        I.e. DiscFac[t] = DiscFacAdj*timevary_DiscFac[t].
+        I.e. DiscFac[t] = DiscFac*timevary_DiscFac[t].
     CRRA : float
         Coefficient of relative risk aversion.
     agent : ConsumerType
         The consumer type to be used in the estimation, with all necessary para-
         meters defined except the discount factor and CRRA.
-    bounds_DiscFacAdj : (float,float)
-        Lower and upper bounds on DiscFacAdj; if outside these bounds, the function
+    bounds_DiscFac : (float,float)
+        Lower and upper bounds on DiscFac; if outside these bounds, the function
         simply returns a "penalty value".
-    bounds_DiscFacAdj : (float,float)
+    bounds_DiscFac : (float,float)
         Lower and upper bounds on CRRA; if outside these bounds, the function
         simply returns a "penalty value".
     empirical_data : np.array
@@ -297,7 +297,7 @@ def calculate_se_bootstrap(
     Parameters
     ----------
     initial_estimate : [float,float]
-        The estimated [DiscFacAdj,CRRA], for use as an initial guess for each
+        The estimated [DiscFac,CRRA], for use as an initial guess for each
         re-estimation in the bootstrap procedure.
     N : int
         Number of times to resample data and re-estimate the model.
@@ -309,7 +309,7 @@ def calculate_se_bootstrap(
     Returns
     -------
     standard_errors : [float,float]
-        Standard errors calculated by bootstrap: [DiscFacAdj_std_error, CRRA_std_error].
+        Standard errors calculated by bootstrap: [DiscFac_std_error, CRRA_std_error].
 
     """
     t_0 = time()
@@ -358,10 +358,10 @@ def calculate_se_bootstrap(
 
     # Calculate the standard errors for each parameter
     estimate_array = (np.array(estimate_list)).T
-    DiscFacAdj_std_error = np.std(estimate_array[0])
+    DiscFac_std_error = np.std(estimate_array[0])
     CRRA_std_error = np.std(estimate_array[1])
 
-    return [DiscFacAdj_std_error, CRRA_std_error]
+    return [DiscFac_std_error, CRRA_std_error]
 
 
 # =================================================================
@@ -380,7 +380,7 @@ def do_estimate_model(agent_name, estimation_agent, target_moments, initial_gues
     def smm_obj_func_redux(params):
         """A "reduced form" of the SMM objective function, compatible with the optimizer.
         Identical to smmObjectiveFunction, but takes only a single input as a length-2
-        list representing [DiscFacAdj,CRRA].
+        list representing [DiscFac,CRRA].
         """
         return smm_obj_func(
             params,
@@ -395,10 +395,10 @@ def do_estimate_model(agent_name, estimation_agent, target_moments, initial_gues
         initial_guess,
         algorithm="scipy_neldermead",
         upper_bounds=np.array(
-            [options["bounds_DiscFacAdj"][1], options["bounds_CRRA"][1]],
+            [options["bounds_DiscFac"][1], options["bounds_CRRA"][1]],
         ),
         lower_bounds=np.array(
-            [options["bounds_DiscFacAdj"][0], options["bounds_CRRA"][0]],
+            [options["bounds_DiscFac"][0], options["bounds_CRRA"][0]],
         ),
         # multistart=True,
         error_handling="continue",
@@ -412,7 +412,7 @@ def do_estimate_model(agent_name, estimation_agent, target_moments, initial_gues
     minutes, seconds = divmod(time_to_estimate, 60)
     print(f"Time to estimate: {int(minutes)} min, {int(seconds)} sec.")
     print(f"Estimated model: {agent_name}")
-    print(f"Estimated values: DiscFacAdj={model_estimate[0]}, CRRA={model_estimate[1]}")
+    print(f"Estimated values: DiscFac={model_estimate[0]}, CRRA={model_estimate[1]}")
 
     # Create the simple estimate table
     estimate_results_file = tables_dir + agent_name + "_estimate_results.csv"
@@ -420,7 +420,7 @@ def do_estimate_model(agent_name, estimation_agent, target_moments, initial_gues
     with open(estimate_results_file, "w") as f:
         writer = csv.writer(f)
 
-        writer.writerow(["DiscFacAdj", model_estimate[0]])
+        writer.writerow(["DiscFac", model_estimate[0]])
         writer.writerow(["CRRA", model_estimate[1]])
         writer.writerow(["time_to_estimate", time_to_estimate])
 
@@ -469,7 +469,7 @@ def do_compute_se_boostrap(
     minutes, seconds = divmod(time_to_bootstrap, 60)
     print(f"Time to bootstrap: {int(minutes)} min, {int(seconds)} sec.")
 
-    print(f"Standard errors: DiscFacAdj--> {std_errors[0]}, CRRA--> {std_errors[1]}")
+    print(f"Standard errors: DiscFac--> {std_errors[0]}, CRRA--> {std_errors[1]}")
 
     # Create the simple bootstrap table
     bootstrap_results_file = tables_dir + agent_name + "_bootstrap_results.csv"
@@ -478,8 +478,8 @@ def do_compute_se_boostrap(
         writer = csv.writer(f)
         writer.writerow(
             [
-                "DiscFacAdj",
-                "DiscFacAdj_standard_error",
+                "DiscFac",
+                "DiscFac_standard_error",
                 "CRRA",
                 "CRRA_standard_error",
             ],
@@ -521,7 +521,7 @@ def do_compute_sensitivity(agent_name, estimation_agent, model_estimate, initial
     fig.set_tight_layout(True)
 
     axs[0].bar(range(n_moments), sensitivity[0, :], tick_label=moment_labels)
-    axs[0].set_title("DiscFacAdj")
+    axs[0].set_title("DiscFac")
     axs[0].set_ylabel("Sensitivity")
     axs[0].set_xlabel("Median W/Y Ratio")
 
@@ -545,25 +545,25 @@ def do_make_contour_plot(agent_name, estimation_agent, model_estimate, target_mo
     DiscFac_star, CRRA_star = model_estimate
     grid_density = 20  # Number of parameter values in each dimension
     level_count = 100  # Number of contour levels to plot
-    DiscFacAdj_list = np.linspace(
+    DiscFac_list = np.linspace(
         max(DiscFac_star - 0.25, 0.5),
         min(DiscFac_star + 0.25, 1.05),
         grid_density,
     )
     CRRA_list = np.linspace(max(CRRA_star - 5, 2), min(CRRA_star + 5, 8), grid_density)
-    CRRA_mesh, DiscFacAdj_mesh = np.meshgrid(CRRA_list, DiscFacAdj_list)
+    CRRA_mesh, DiscFac_mesh = np.meshgrid(CRRA_list, DiscFac_list)
     smm_obj_levels = np.empty([grid_density, grid_density])
     for j in range(grid_density):
-        DiscFacAdj = DiscFacAdj_list[j]
+        DiscFac = DiscFac_list[j]
         for k in range(grid_density):
             CRRA = CRRA_list[k]
             smm_obj_levels[j, k] = smm_obj_func(
-                np.array([DiscFacAdj, CRRA]),
+                np.array([DiscFac, CRRA]),
                 agent=estimation_agent,
                 moments=target_moments,
                 agent_name=agent_name,
             )
-    smm_contour = plt.contourf(CRRA_mesh, DiscFacAdj_mesh, smm_obj_levels, level_count)
+    smm_contour = plt.contourf(CRRA_mesh, DiscFac_mesh, smm_obj_levels, level_count)
     t_end_contour = time()
     time_to_contour = t_end_contour - t_start_contour
 

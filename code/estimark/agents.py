@@ -23,27 +23,6 @@ from HARK.core import AgentType
 
 
 class TempConsumerType(AgentType):
-    def __init__(self, cycles=1, **kwds):
-        """Make a new consumer type.
-
-        Parameters
-        ----------
-        cycles : int
-            Number of times the sequence of periods should be solved.
-        time_flow : boolean
-            Whether time is currently "flowing" forward for this instance.
-
-        Returns
-        -------
-        None
-
-        """
-        # Initialize a basic AgentType
-        super().__init__(cycles=cycles, **kwds)
-        # This estimation uses age-varying discount factors as
-        # estimated by Cagetti (2003), so switch from time_inv to time_vary
-        self.add_to_time_vary("DiscFac")
-        self.del_from_time_inv("DiscFac")
 
     def check_restrictions(self):
         return None

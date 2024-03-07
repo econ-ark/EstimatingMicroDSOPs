@@ -1,15 +1,15 @@
-DiscFacAdj,1.0079244332693316
-CRRA,4.734637245990195
-time_to_estimate,358.2434706687927
-params,"[1.0079244332693316, 4.734637245990195]"
-criterion,135.7586043995409
-start_criterion,135.75860440184317
-start_params,"[1.007924433267865, 4.734637245969525]"
+DiscFac,1.0079244332693773
+CRRA,4.734637245990841
+time_to_estimate,398.02410554885864
+params,"[1.0079244332693773, 4.734637245990841]"
+criterion,135.75860439946902
+start_criterion,135.7586043995409
+start_params,"[1.0079244332693316, 4.734637245990195]"
 algorithm,scipy_neldermead
 direction,minimize
 n_free,2
 message,Optimization terminated successfully.
 success,True
-n_criterion_evaluations,143
+n_criterion_evaluations,163
 n_derivative_evaluations,
-n_iterations,36
+n_iterations,41

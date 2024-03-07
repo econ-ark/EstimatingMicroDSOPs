@@ -46,9 +46,9 @@ age_interval = 5  # Interval between age groups
 # Initial guess of the coefficient of relative risk aversion during estimation (rho)
 init_CRRA = 5.0
 # Initial guess of the adjustment to the discount factor during estimation (beth)
-init_DiscFacAdj = 0.99
+init_DiscFac = 0.99
 # Bounds for beth; if violated, objective function returns "penalty value"
-bounds_DiscFacAdj = [0.5, 1.5]
+bounds_DiscFac = [0.5, 1.5]
 # Bounds for rho; if violated, objective function returns "penalty value"
 bounds_CRRA = [1.1, 20.0]
 
@@ -64,12 +64,12 @@ inc_calib = parse_income_spec(
     SabelhausSong=ss_variances,
 )
 
-# Age-varying discount factors over the lifecycle, lifted from Cagetti (2003)
-# Get the directory containing the current file and construct the full path to the CSV file
-csv_file_path = Path(__file__).resolve().parent / ".." / "data" / "Cagetti2003.csv"
-# timevary_DiscFac = np.genfromtxt(csv_file_path) * 0.0 + 1.0  # TODO
-# constant_DiscFac = np.ones_like(timevary_DiscFac)
-timevary_DiscFac = np.ones_like(inc_calib["PermShkStd"])
+# # Age-varying discount factors over the lifecycle, lifted from Cagetti (2003)
+# # Get the directory containing the current file and construct the full path to the CSV file
+# csv_file_path = Path(__file__).resolve().parent / ".." / "data" / "Cagetti2003.csv"
+# # timevary_DiscFac = np.genfromtxt(csv_file_path) * 0.0 + 1.0  # TODO
+# # constant_DiscFac = np.ones_like(timevary_DiscFac)
+# timevary_DiscFac = np.ones_like(inc_calib["PermShkStd"])
 
 # Survival probabilities over the lifecycle
 liv_prb = parse_ssa_life_table(
@@ -116,11 +116,10 @@ options = {
     "num_agents": num_agents,
     "bootstrap_size": bootstrap_size,
     "seed": seed,
-    "init_DiscFacAdj": init_DiscFacAdj,
+    "init_DiscFac": init_DiscFac,
     "init_CRRA": init_CRRA,
-    "bounds_DiscFacAdj": bounds_DiscFacAdj,
+    "bounds_DiscFac": bounds_DiscFac,
     "bounds_CRRA": bounds_CRRA,
-    "timevary_DiscFac": timevary_DiscFac,
 }
 
 # -----------------------------------------------------------------------------
@@ -131,6 +130,7 @@ options = {
 init_consumer_objects = {
     **init_lifecycle,
     "CRRA": init_CRRA,
+    "DiscFac": init_DiscFac,
     "Rfree": Rfree,
     "PermGroFac": inc_calib["PermGroFac"],
     "PermGroFacAgg": 1.0,
@@ -151,7 +151,6 @@ init_consumer_objects = {
     "aXtraCount": aXtraCount,
     "aXtraNestFac": exp_nest,
     "LivPrb": liv_prb,
-    "DiscFac": timevary_DiscFac,
     "AgentCount": num_agents,
     "seed": seed,
     "tax_rate": 0.0,

@@ -1,6 +1,6 @@
-DiscFacAdj,0.5
+DiscFac,0.5
 CRRA,16.02486136184392
-time_to_estimate,160.68801999092102
+time_to_estimate,168.6807029247284
 params,"[0.5, 16.02486136184392]"
 criterion,276.8831690170802
 start_criterion,276.8831690170802
