@@ -1,15 +1,15 @@
-DiscFacAdj,0.9976039026142594
-CRRA,4.095522480963624
-time_to_estimate,612.3351926803589
-params,"[0.9976039026142594, 4.095522480963624]"
-criterion,145.71371169657658
-start_criterion,145.71607086728125
-start_params,"[0.9975066419890767, 4.0968998585220975]"
-algorithm,multistart_scipy_neldermead
-direction,minimize
-n_free,2
-message,Optimization terminated successfully.
-success,True
-n_criterion_evaluations,359
-n_derivative_evaluations,
-n_iterations,147
+DiscFacAdj,0.9976039026204292
+CRRA,4.095522481063449
+time_to_estimate,371.09520864486694
+params,"[0.9976039026204292, 4.095522481063449]"
+criterion,132.55119356289453
+start_criterion,132.55119356367635
+start_params,"[0.9976039026200663, 4.09552248105898]"
+algorithm,scipy_neldermead
+direction,minimize
+n_free,2
+message,Optimization terminated successfully.
+success,True
+n_criterion_evaluations,151
+n_derivative_evaluations,
+n_iterations,38

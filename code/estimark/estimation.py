@@ -10,11 +10,11 @@ income as defined in ConsIndShockModel.
 
 import csv
 from pathlib import Path
-from time import time  # Timing utility
+from time import time
 
 import estimagic as em
 import matplotlib.pyplot as plt
-import numpy as np  # Numeric Python
+import numpy as np
 import pandas as pd
 
 # Method for sampling from a discrete distribution
@@ -37,22 +37,17 @@ from estimark.agents import (
 
 # Parameters for the consumer type and the estimation
 from estimark.parameters import (
+    age_mapping,
     init_consumer_objects,
     init_subjective_labor,
     init_subjective_stock,
     options,
+    sim_mapping,
 )
 
 # SCF 2004 data on household wealth
-from estimark.scf import (
-    age_groups,
-    scf_array,
-    scf_data,
-    scf_groups,
-    scf_mapping,
-    scf_weights,
-)
-from estimark.snp import snp
+from estimark.scf import scf_data
+from estimark.snp import snp_data
 
 # Pathnames to the other files:
 # Relative directory for primitive parameter files
@@ -63,31 +58,12 @@ figures_dir = "content/figures/"
 Path(figures_dir).mkdir(parents=True, exist_ok=True)
 
 
-# Set booleans to determine which tasks should be done
-# Which agent type to estimate ("IndShock" or "Portfolio")
-local_agent_name = "IndShock"
-local_estimate_model = True  # Whether to estimate the model
-# Whether to get standard errors via bootstrap
-local_compute_se_bootstrap = False
-# Whether to compute a measure of estimates' sensitivity to moments
-local_compute_sensitivity = True
-# Whether to make a contour map of the objective function
-local_make_contour_plot = True
-# Whether to use subjective beliefs
-local_subjective_stock = False
-local_subjective_labor = False
-
-
 # =====================================================
 # Define objects and functions used for the estimation
 # =====================================================
 
 
-def make_estimation_agent(
-    agent_name=local_agent_name,
-    subjective_stock=local_subjective_stock,
-    subjective_labor=local_subjective_labor,
-):
+def make_estimation_agent(agent_name, subjective_stock=False, subjective_labor=False):
     if agent_name == "IndShock":
         agent_type = IndShkLifeCycleConsumerType
     elif agent_name == "Portfolio":
@@ -144,29 +120,32 @@ def weighted_median(values, weights):
     return median
 
 
-def get_targeted_moments(
-    data=scf_data,
-    weights=scf_weights,
-    groups=scf_groups,
-    mapping=scf_mapping,
-):
-    # Initialize
-    group_count = len(mapping)
-    target_moments = np.zeros(group_count)
+def get_targeted_moments(data, variable, weights=None, groups=None, mapping=None):
+    # Common variables that don't depend on whether weights are None or not
+    data_variable = data[variable]
+    data_groups = data[groups]
+    data_weights = data[weights] if weights else None
 
-    for g in range(group_count):
-        group_indices = groups == (g + 1)  # groups are numbered from 1
-        target_moments[g] = weighted_median(data[group_indices], weights[group_indices])
+    target_moments = {}
+    for key in mapping:
+        group_data = data_variable[data_groups == key]
+        group_weights = data_weights[data_groups == key] if weights else None
+
+        # Check if the group has any data
+        if not group_data.empty:
+            if weights is None:
+                target_moments[key] = group_data.median()
+            else:
+                target_moments[key] = weighted_median(
+                    group_data.to_numpy(),
+                    group_weights.to_numpy(),
+                )
+        else:
+            print(f"Warning: Group {key} does not have any data.")
+            # Uncomment the following line if you want to assign a default value
+            # target_moments[key] = 0
 
     return target_moments
-
-
-share_moments = get_targeted_moments(
-    data=snp["S&P Target Date Equity allocation"].to_numpy(),
-    weights=np.ones(len(snp)),
-    groups=snp["age_groups"].to_numpy(),
-    mapping=scf_mapping,
-)
 
 
 def get_initial_guess(agent_name):
@@ -224,7 +203,7 @@ def simulate_moments(params, agent, agent_name):
         agent.PermShkStd = init_consumer_objects["PermShkStd"]
         agent.update_income_process()
 
-    max_sim_age = max([max(ages) for ages in scf_mapping]) + 1
+    max_sim_age = agent.T_cycle + 1
     # Initialize the simulation by clearing histories, resetting initial values
     agent.initialize_sim()
     agent.simulate(max_sim_age)  # Simulate histories of consumption and wealth
@@ -232,24 +211,16 @@ def simulate_moments(params, agent, agent_name):
     sim_w_history = agent.history["bNrm"]
 
     # Find the distance between empirical data and simulated medians for each age group
-    group_count = len(scf_mapping)
-    sim_moments = []
-    for g in range(group_count):
-        # The simulated time indices corresponding to this age group
-        cohort_indices = scf_mapping[g]
-        # The median of simulated wealth-to-income for this age group
-        sim_moments += [np.median(sim_w_history[cohort_indices])]
 
-    sim_moments = np.array(sim_moments)
+    sim_moments = {}
+    for key, cohort_idx in sim_mapping.items():
+        sim_moments[key] = np.median(sim_w_history[cohort_idx])
 
     if "Portfolio" in agent_name:
         sim_share_history = agent.history["Share"]
-        share_moments = []
-        for g in range(group_count):
-            cohort_indices = scf_mapping[g]
-            share_moments += [np.median(sim_share_history[cohort_indices])]
-
-        sim_moments = np.append(sim_moments, share_moments)
+        suffix = "_port"
+        for key, cohort_idx in sim_mapping.items():
+            sim_moments[key + suffix] = np.median(sim_share_history[cohort_idx])
 
     return sim_moments
 
@@ -301,11 +272,11 @@ def smm_obj_func(params, agent, moments, agent_name):
         median wealth-to-permanent-income ratio in the simulation.
 
     """
-    if "Portfolio" in agent_name:
-        moments = np.append(moments, share_moments)
-
     sim_moments = simulate_moments(params, agent, agent_name)
-    errors = moments - sim_moments
+
+    common_moments = list(set(sim_moments) & set(moments))
+    errors = np.array([sim_moments[key] - moments[key] for key in common_moments])
+
     loss = np.dot(errors, errors)
 
     return {"value": loss, "root_contributions": errors}
@@ -422,14 +393,14 @@ def do_estimate_model(agent_name, estimation_agent, target_moments, initial_gues
     res = em.minimize(
         smm_obj_func_redux,
         initial_guess,
-        algorithm="pounders",
+        algorithm="scipy_neldermead",
         upper_bounds=np.array(
             [options["bounds_DiscFacAdj"][1], options["bounds_CRRA"][1]],
         ),
         lower_bounds=np.array(
             [options["bounds_DiscFacAdj"][0], options["bounds_CRRA"][0]],
         ),
-        multistart=True,
+        # multistart=True,
         error_handling="continue",
     )
     t_end_estimate = time()
@@ -487,6 +458,7 @@ def do_compute_se_boostrap(
         model_estimate,
         N=options["bootstrap_size"],
         agent=estimation_agent,
+        agent_name=agent_name,
         seed=options["seed"],
         verbose=True,
     )
@@ -524,7 +496,7 @@ def do_compute_sensitivity(agent_name, estimation_agent, model_estimate, initial
 
     # Find the Jacobian of the function that simulates moments
     def simulate_moments_redux(params):
-        return simulate_moments(params, agent=estimation_agent)
+        return simulate_moments(params, agent=estimation_agent, agent_name=agent_name)
 
     n_moments = len(scf_mapping)
     jac = np.array(
@@ -610,13 +582,13 @@ def do_make_contour_plot(agent_name, estimation_agent, model_estimate, target_mo
 
 
 def estimate(
-    agent_name=local_agent_name,
-    estimate_model=local_estimate_model,
-    compute_se_bootstrap=local_compute_se_bootstrap,
-    compute_sensitivity=local_compute_sensitivity,
-    make_contour_plot=local_make_contour_plot,
-    subjective_stock=local_subjective_stock,
-    subjective_labor=local_subjective_labor,
+    agent_name,
+    estimate_model=True,
+    compute_se_bootstrap=False,
+    compute_sensitivity=False,
+    make_contour_plot=False,
+    subjective_stock=False,
+    subjective_labor=False,
 ):
     """Run the main estimation procedure for SolvingMicroDSOP.
 
@@ -642,7 +614,25 @@ def estimate(
         subjective_labor=subjective_labor,
     )
 
-    target_moments = get_targeted_moments()
+    target_moments = get_targeted_moments(
+        data=scf_data,
+        variable="wealth_income_ratio",
+        weights="weight",
+        groups="age_group",
+        mapping=age_mapping,
+    )
+
+    if "Portfolio" in agent_name:
+        share_moments = get_targeted_moments(
+            data=snp_data,
+            variable="share",
+            groups="age_group",
+            mapping=age_mapping,
+        )
+
+        suffix = "_port"
+        for key, value in share_moments.items():
+            target_moments[key + suffix] = value
 
     initial_guess = get_initial_guess(agent_name)
 
@@ -684,4 +674,26 @@ def estimate(
 
 
 if __name__ == "__main__":
-    estimate()
+    # Set booleans to determine which tasks should be done
+    # Which agent type to estimate ("IndShock" or "Portfolio")
+    local_agent_name = "Portfolio"
+    local_estimate_model = True  # Whether to estimate the model
+    # Whether to get standard errors via bootstrap
+    local_compute_se_bootstrap = False
+    # Whether to compute a measure of estimates' sensitivity to moments
+    local_compute_sensitivity = False
+    # Whether to make a contour map of the objective function
+    local_make_contour_plot = False
+    # Whether to use subjective beliefs
+    local_subjective_stock = False
+    local_subjective_labor = False
+
+    estimate(
+        agent_name=local_agent_name,
+        estimate_model=local_estimate_model,
+        compute_se_bootstrap=local_compute_se_bootstrap,
+        compute_sensitivity=local_compute_sensitivity,
+        make_contour_plot=local_make_contour_plot,
+        subjective_stock=local_subjective_stock,
+        subjective_labor=local_subjective_labor,
+    )

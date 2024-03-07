@@ -1,25 +1,41 @@
+"""Sets up the S&P data for use in the EstimatingMicroDSOPs estimation.
+"""
+
 from pathlib import Path
 
-import numpy as np  # Numerical Python
 import pandas as pd
 
-from estimark.parameters import final_age_data, initial_age
+from estimark.parameters import (
+    age_mapping,
+    final_age_data,
+    initial_age,
+    remove_ages_from_snp,
+)
 
 file_path = (
     Path(__file__).resolve().parent / ".." / "data" / "S&P Target Date glidepath.xlsx"
 )
 
-# Load data
-snp = pd.read_excel(file_path)
+# Define column mapping and columns to keep
+column_mapping = {"Current Age": "age", "S&P Target Date Equity allocation": "share"}
 
-# Filter data using loc
-snp = snp.loc[
-    (snp["Current Age"] >= initial_age) & (snp["Current Age"] <= final_age_data)
+# Load data, rename columns, filter data
+snp_data = (
+    pd.read_excel(file_path, usecols=column_mapping.keys())
+    .rename(columns=column_mapping)
+    .query(f"{initial_age} < age <= {final_age_data}")
+)
+
+# Assign age groups
+bins = [initial_age + 1] + [group[-1] + 1 for group in age_mapping.values()]
+labels = list(age_mapping.keys())
+
+snp_data = snp_data.assign(
+    age_group=pd.cut(snp_data["age"], bins=bins, labels=labels, right=False),
+)
+
+# Remove ages
+snp_data = snp_data.loc[
+    ~snp_data.age.isin(remove_ages_from_snp),
+    ["age", "share", "age_group"],
 ]
-
-# Create age groups and code NaNs as 0
-bins = range(initial_age, final_age_data + 1, 5)
-labels = np.arange(1, len(bins))
-snp["age_groups"] = pd.cut(snp["Current Age"], bins=bins, labels=labels)
-
-# Get targeted moments

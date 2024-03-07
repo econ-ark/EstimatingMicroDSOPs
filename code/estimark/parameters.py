@@ -41,6 +41,7 @@ terminal_t = final_age - initial_age  # Total number of periods in the model
 retirement_t = retirement_age - initial_age - 1
 
 final_age_data = 95  # Age at which the data ends
+age_interval = 5  # Interval between age groups
 
 # Initial guess of the coefficient of relative risk aversion during estimation (rho)
 init_CRRA = 5.0
@@ -86,6 +87,28 @@ prob_w_to_y = np.array([0.33333, 0.33333, 0.33334])
 num_agents = 10000  # Number of agents to simulate
 bootstrap_size = 50  # Number of re-estimations to do during bootstrap
 seed = 1132023  # Just an integer to seed the estimation
+
+
+# Age groups for the estimation: calculate average wealth-to-permanent income ratio
+# for consumers within each of these age groups, compare actual to simulated data
+
+age_groups = [
+    list(range(start, start + age_interval))
+    for start in range(initial_age + 1, final_age_data + 1, age_interval)
+]
+
+# generate labels as (25,30], (30,35], ...
+age_labels = [f"({group[0]-1},{group[-1]}]" for group in age_groups]
+
+# Generate mappings between the real ages in the groups and the indices of simulated data
+age_mapping = dict(zip(age_labels, map(np.array, age_groups)))
+sim_mapping = {
+    label: np.array(group) - initial_age for label, group in zip(age_labels, age_groups)
+}
+
+remove_ages_from_scf = np.arange(61, 71)  # remove retirement ages 61-70
+remove_ages_from_snp = np.arange(71)  # only match ages 71 and older
+
 
 options = {
     "init_w_to_y": init_w_to_y,
