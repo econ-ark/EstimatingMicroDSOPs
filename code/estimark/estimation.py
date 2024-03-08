@@ -17,9 +17,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-# Method for sampling from a discrete distribution
-from HARK.distribution import DiscreteDistribution
-
 # Estimation methods
 # TODO: use estimagic
 from HARK.estimation import bootstrap_sample_from_data, minimize_nelder_mead
@@ -38,10 +35,12 @@ from estimark.agents import (
 # Parameters for the consumer type and the estimation
 from estimark.parameters import (
     age_mapping,
+    bootstrap_options,
     init_consumer_objects,
+    init_params_options,
     init_subjective_labor,
     init_subjective_stock,
-    options,
+    minimize_options,
     sim_mapping,
 )
 
@@ -57,54 +56,55 @@ Path(tables_dir).mkdir(parents=True, exist_ok=True)
 figures_dir = "content/figures/"
 Path(figures_dir).mkdir(parents=True, exist_ok=True)
 
-
 # =====================================================
 # Define objects and functions used for the estimation
 # =====================================================
 
 
-def make_estimation_agent(agent_name, subjective_stock=False, subjective_labor=False):
-    if agent_name == "IndShock":
+def make_agent(
+    init_agent_name,
+    subjective_stock=False,
+    subjective_labor=False,
+):
+    if init_agent_name == "IndShock":
         agent_type = IndShkLifeCycleConsumerType
-    elif agent_name == "Portfolio":
+    elif init_agent_name == "Portfolio":
         agent_type = PortfolioLifeCycleConsumerType
-    elif agent_name == "WarmGlow":
+    elif init_agent_name == "WarmGlow":
         agent_type = BequestWarmGlowLifeCycleConsumerType
-    elif agent_name == "WarmGlowPortfolio":
+    elif init_agent_name == "WarmGlowPortfolio":
         agent_type = BequestWarmGlowLifeCyclePortfolioType
-    elif agent_name == "WealthPortfolio":
+    elif init_agent_name == "WealthPortfolio":
         agent_type = WealthPortfolioLifeCycleConsumerType
+
+    local_consumer_objects = init_consumer_objects.copy()
+    agent_name = init_agent_name
 
     if subjective_stock or subjective_labor:
         agent_name += "Sub"
         if subjective_stock:
             agent_name += "(Stock)"
-            init_consumer_objects.update(init_subjective_stock)
+            local_consumer_objects.update(init_subjective_stock)
         if subjective_labor:
             agent_name += "(Labor)"
-            init_consumer_objects.update(init_subjective_labor)
+            local_consumer_objects.update(init_subjective_labor)
         agent_name += "Market"
 
     # Make a lifecycle consumer to be used for estimation, including simulated
     # shocks (plus an initial distribution of wealth)
     # Make a TempConsumerType for estimation
-    estimation_agent = agent_type(**init_consumer_objects)
+    agent = agent_type(**local_consumer_objects)
     # Set the number of periods to simulate
-    estimation_agent.T_sim = estimation_agent.T_cycle + 1
+    agent.T_sim = agent.T_cycle + 1
     # Choose to track bank balances as wealth
     track_vars = ["bNrm"]
     if "Portfolio" in agent_name:
         track_vars += ["Share"]
-    estimation_agent.track_vars = track_vars
-    # Draw initial assets for each consumer
-    estimation_agent.aNrmInit = DiscreteDistribution(
-        options["prob_w_to_y"],
-        options["init_w_to_y"],
-        seed=options["seed"],
-    ).draw(N=options["num_agents"])
-    estimation_agent.make_shock_history()
+    agent.track_vars = track_vars
 
-    return estimation_agent, agent_name
+    agent.name = agent_name
+
+    return agent
 
 
 def weighted_median(values, weights):
@@ -120,7 +120,13 @@ def weighted_median(values, weights):
     return median
 
 
-def get_targeted_moments(data, variable, weights=None, groups=None, mapping=None):
+def get_targeted_moments(
+    data,
+    variable,
+    weights=None,
+    groups=None,
+    mapping=None,
+):
     # Common variables that don't depend on whether weights are None or not
     data_variable = data[variable]
     data_groups = data[groups]
@@ -142,13 +148,11 @@ def get_targeted_moments(data, variable, weights=None, groups=None, mapping=None
                 )
         else:
             print(f"Warning: Group {key} does not have any data.")
-            # Uncomment the following line if you want to assign a default value
-            # target_moments[key] = 0
 
     return target_moments
 
 
-def get_initial_guess(agent_name):
+def get_initial_guess(agent_name, init_DiscFac=0.99, init_CRRA=2.0):
     # start from previous estimation results if available
 
     csv_file_path = f"{tables_dir}{agent_name}_estimate_results.csv"
@@ -157,13 +161,13 @@ def get_initial_guess(agent_name):
         res = pd.read_csv(csv_file_path, header=None)
         initial_guess = res.iloc[:2, 1].astype(float).tolist()
     except (FileNotFoundError, IndexError):
-        initial_guess = [options["init_DiscFac"], options["init_CRRA"]]
+        initial_guess = [init_DiscFac, init_CRRA]
 
     return initial_guess
 
 
 # Define the objective function for the simulated method of moments estimation
-def simulate_moments(params, agent, agent_name):
+def simulate_moments(params, agent):
     """A quick check to make sure that the parameter values are within bounds.
     Far flung falues of DiscFac or CRRA might cause an error during solution or
     simulation, so the objective function doesn't even bother with them.
@@ -174,38 +178,29 @@ def simulate_moments(params, agent, agent_name):
     agent.DiscFac = DiscFac
     agent.CRRA = CRRA
 
-    if "(Stock)" in agent_name and "Portfolio" in agent_name:
+    # Homothetic
+    # if hasattr(agent, "BeqCRRA"):
+    #     agent.BeqCRRA = CRRA
+
+    # ensure subjective beliefs are used for solution
+    if "(Stock)" in agent.name and "Portfolio" in agent.name:
         agent.RiskyAvg = init_subjective_stock["RiskyAvg"]
         agent.RiskyStd = init_subjective_stock["RiskyStd"]
         agent.update_RiskyDstn()
 
-    if "(Labor)" in agent_name:
-        agent.TranShkStd = init_subjective_labor["TranShkStd"]
-        agent.PermShkStd = init_subjective_labor["PermShkStd"]
-        agent.update_income_process()
-
-    # if hasattr(agent, "BeqCRRA"):
-    #     agent.BeqCRRA = [CRRA] * len(options["timevary_DiscFac"])
     # Solve the model for these parameters, then simulate wealth data
     agent.solve()  # Solve the microeconomic model
-    # "Unpack" the consumption function for convenient access
-    # agent.unpack("cFunc")
 
     # simulate with true parameters (override subjective beliefs)
-    if "(Stock)" in agent_name and "Portfolio" in agent_name:
+    if "(Stock)" in agent.name and "Portfolio" in agent.name:
         agent.RiskyAvg = agent.RiskyAvgTrue
         agent.RiskyStd = agent.RiskyStdTrue
         agent.update_RiskyDstn()
 
-    # TODO: use perceived for simulation too
-    if "(Labor)" in agent_name:
-        agent.TranShkStd = init_consumer_objects["TranShkStd"]
-        agent.PermShkStd = init_consumer_objects["PermShkStd"]
-        agent.update_income_process()
-
     max_sim_age = agent.T_cycle + 1
     # Initialize the simulation by clearing histories, resetting initial values
     agent.initialize_sim()
+    # agent.make_shock_history()
     agent.simulate(max_sim_age)  # Simulate histories of consumption and wealth
     # Take "wealth" to mean bank balances before receiving labor income
     sim_w_history = agent.history["bNrm"]
@@ -216,7 +211,7 @@ def simulate_moments(params, agent, agent_name):
     for key, cohort_idx in sim_mapping.items():
         sim_moments[key] = np.median(sim_w_history[cohort_idx])
 
-    if "Portfolio" in agent_name:
+    if "Portfolio" in agent.name:
         sim_share_history = agent.history["Share"]
         suffix = "_port"
         for key, cohort_idx in sim_mapping.items():
@@ -225,7 +220,7 @@ def simulate_moments(params, agent, agent_name):
     return sim_moments
 
 
-def smm_obj_func(params, agent, moments, agent_name):
+def smm_obj_func(params, agent, moments):
     """The objective function for the SMM estimation.  Given values of discount factor
     adjuster DiscFac, coeffecient of relative risk aversion CRRA, a base consumer
     agent type, empirical data, and calibrated parameters, this function calculates
@@ -272,8 +267,10 @@ def smm_obj_func(params, agent, moments, agent_name):
         median wealth-to-permanent-income ratio in the simulation.
 
     """
-    sim_moments = simulate_moments(params, agent, agent_name)
+    sim_moments = simulate_moments(params, agent)
 
+    # TODO: make sure all keys in moments have a corresponding
+    # key in sim_moments, raise an error if not
     common_moments = list(set(sim_moments) & set(moments))
     errors = np.array([sim_moments[key] - moments[key] for key in common_moments])
 
@@ -284,10 +281,9 @@ def smm_obj_func(params, agent, moments, agent_name):
 
 # Define the bootstrap procedure
 def calculate_se_bootstrap(
-    initial_estimate,
-    N,
     agent,
-    agent_name,
+    initial_estimate,
+    n_draws=50,
     seed=0,
     verbose=False,
 ):
@@ -316,11 +312,11 @@ def calculate_se_bootstrap(
 
     # Generate a list of seeds for generating bootstrap samples
     RNG = np.random.default_rng(seed)
-    seed_list = RNG.integers(2**31 - 1, size=N)
+    seed_list = RNG.integers(2**31 - 1, size=n_draws)
 
     # Estimate the model N times, recording each set of estimated parameters
     estimate_list = []
-    for n in range(N):
+    for n in range(n_draws):
         t_start = time()
 
         # Bootstrap a new dataset by resampling from the original data
@@ -342,7 +338,6 @@ def calculate_se_bootstrap(
                 params,
                 agent=agent,
                 moments=bootstrap_moments,
-                agent_name=agent_name,
             )
 
         # Estimate the model with the bootstrap data and add to list of estimates
@@ -353,7 +348,7 @@ def calculate_se_bootstrap(
         # Report progress of the bootstrap
     if verbose:
         print(
-            f"Finished bootstrap estimation #{n + 1} of {N} in {t_now - t_start} seconds ({t_now - t_0} cumulative)",
+            f"Finished bootstrap estimation #{n + 1} of {n_draws} in {t_now - t_start} seconds ({t_now - t_0} cumulative)",
         )
 
     # Calculate the standard errors for each parameter
@@ -369,7 +364,12 @@ def calculate_se_bootstrap(
 # =================================================================
 
 
-def do_estimate_model(agent_name, estimation_agent, target_moments, initial_guess):
+def do_estimate_model(
+    agent,
+    target_moments,
+    initial_guess,
+    minimize_options=None,
+):
     print("----------------------------------------------------------------------")
     print(
         f"Now estimating the model using Nelder-Mead from an initial guess of {initial_guess}...",
@@ -384,25 +384,12 @@ def do_estimate_model(agent_name, estimation_agent, target_moments, initial_gues
         """
         return smm_obj_func(
             params,
-            agent=estimation_agent,
+            agent=agent,
             moments=target_moments,
-            agent_name=agent_name,
         )
 
     t_start_estimate = time()
-    res = em.minimize(
-        smm_obj_func_redux,
-        initial_guess,
-        algorithm="scipy_neldermead",
-        upper_bounds=np.array(
-            [options["bounds_DiscFac"][1], options["bounds_CRRA"][1]],
-        ),
-        lower_bounds=np.array(
-            [options["bounds_DiscFac"][0], options["bounds_CRRA"][0]],
-        ),
-        # multistart=True,
-        error_handling="continue",
-    )
+    res = em.minimize(smm_obj_func_redux, initial_guess, **minimize_options)
     t_end_estimate = time()
     time_to_estimate = t_end_estimate - t_start_estimate
 
@@ -411,11 +398,11 @@ def do_estimate_model(agent_name, estimation_agent, target_moments, initial_gues
     # Calculate minutes and remaining seconds
     minutes, seconds = divmod(time_to_estimate, 60)
     print(f"Time to estimate: {int(minutes)} min, {int(seconds)} sec.")
-    print(f"Estimated model: {agent_name}")
+    print(f"Estimated model: {agent.name}")
     print(f"Estimated values: DiscFac={model_estimate[0]}, CRRA={model_estimate[1]}")
 
     # Create the simple estimate table
-    estimate_results_file = tables_dir + agent_name + "_estimate_results.csv"
+    estimate_results_file = tables_dir + agent.name + "_estimate_results.csv"
 
     with open(estimate_results_file, "w") as f:
         writer = csv.writer(f)
@@ -437,29 +424,29 @@ def do_estimate_model(agent_name, estimation_agent, target_moments, initial_gues
 
 
 def do_compute_se_boostrap(
-    agent_name,
-    estimation_agent,
+    agent,
     model_estimate,
     time_to_estimate,
+    bootstrap_size=50,
+    seed=0,
 ):
     # Estimate the model:
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
     print(
-        f"Computing standard errors using {options['bootstrap_size']} bootstrap replications.",
+        f"Computing standard errors using {bootstrap_size} bootstrap replications.",
     )
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
-    t_bootstrap_guess = time_to_estimate * options["bootstrap_size"]
+    t_bootstrap_guess = time_to_estimate * bootstrap_size
     minutes, seconds = divmod(t_bootstrap_guess, 60)
     print(f"This will take approximately {int(minutes)} min, {int(seconds)} sec.")
 
     t_start_bootstrap = time()
     std_errors = calculate_se_bootstrap(
         model_estimate,
-        N=options["bootstrap_size"],
-        agent=estimation_agent,
-        agent_name=agent_name,
-        seed=options["seed"],
+        n_draws=bootstrap_size,
+        agent=agent,
+        seed=seed,
         verbose=True,
     )
     t_end_bootstrap = time()
@@ -472,7 +459,7 @@ def do_compute_se_boostrap(
     print(f"Standard errors: DiscFac--> {std_errors[0]}, CRRA--> {std_errors[1]}")
 
     # Create the simple bootstrap table
-    bootstrap_results_file = tables_dir + agent_name + "_bootstrap_results.csv"
+    bootstrap_results_file = tables_dir + agent.name + "_bootstrap_results.csv"
 
     with open(bootstrap_results_file, "w") as f:
         writer = csv.writer(f)
@@ -489,14 +476,14 @@ def do_compute_se_boostrap(
         )
 
 
-def do_compute_sensitivity(agent_name, estimation_agent, model_estimate, initial_guess):
+def do_compute_sensitivity(agent, model_estimate, initial_guess):
     print("``````````````````````````````````````````````````````````````````````")
     print("Computing sensitivity measure.")
     print("``````````````````````````````````````````````````````````````````````")
 
     # Find the Jacobian of the function that simulates moments
     def simulate_moments_redux(params):
-        return simulate_moments(params, agent=estimation_agent, agent_name=agent_name)
+        return simulate_moments(params, agent=agent)
 
     n_moments = len(scf_mapping)
     jac = np.array(
@@ -530,14 +517,14 @@ def do_compute_sensitivity(agent_name, estimation_agent, model_estimate, initial
     axs[1].set_ylabel("Sensitivity")
     axs[1].set_xlabel("Median W/Y Ratio")
 
-    plt.savefig(figures_dir + agent_name + "Sensitivity.pdf")
-    plt.savefig(figures_dir + agent_name + "Sensitivity.png")
-    plt.savefig(figures_dir + agent_name + "Sensitivity.svg")
+    plt.savefig(figures_dir + agent.name + "Sensitivity.pdf")
+    plt.savefig(figures_dir + agent.name + "Sensitivity.png")
+    plt.savefig(figures_dir + agent.name + "Sensitivity.svg")
 
     plt.show()
 
 
-def do_make_contour_plot(agent_name, estimation_agent, model_estimate, target_moments):
+def do_make_contour_plot(agent, model_estimate, target_moments):
     print("``````````````````````````````````````````````````````````````````````")
     print("Creating the contour plot.")
     print("``````````````````````````````````````````````````````````````````````")
@@ -559,9 +546,8 @@ def do_make_contour_plot(agent_name, estimation_agent, model_estimate, target_mo
             CRRA = CRRA_list[k]
             smm_obj_levels[j, k] = smm_obj_func(
                 np.array([DiscFac, CRRA]),
-                agent=estimation_agent,
+                agent=agent,
                 moments=target_moments,
-                agent_name=agent_name,
             )
     smm_contour = plt.contourf(CRRA_mesh, DiscFac_mesh, smm_obj_levels, level_count)
     t_end_contour = time()
@@ -575,14 +561,14 @@ def do_make_contour_plot(agent_name, estimation_agent, model_estimate, target_mo
     plt.plot(model_estimate[1], model_estimate[0], "*r", ms=15)
     plt.xlabel(r"coefficient of relative risk aversion $\rho$", fontsize=14)
     plt.ylabel(r"discount factor adjustment $\beth$", fontsize=14)
-    plt.savefig(figures_dir + agent_name + "SMMcontour.pdf")
-    plt.savefig(figures_dir + agent_name + "SMMcontour.png")
-    plt.savefig(figures_dir + agent_name + "SMMcontour.svg")
+    plt.savefig(figures_dir + agent.name + "SMMcontour.pdf")
+    plt.savefig(figures_dir + agent.name + "SMMcontour.png")
+    plt.savefig(figures_dir + agent.name + "SMMcontour.svg")
     plt.show()
 
 
 def estimate(
-    agent_name,
+    init_agent_name,
     estimate_model=True,
     compute_se_bootstrap=False,
     compute_sensitivity=False,
@@ -608,8 +594,8 @@ def estimate(
     None
 
     """
-    estimation_agent, agent_name = make_estimation_agent(
-        agent_name=agent_name,
+    agent = make_agent(
+        init_agent_name=init_agent_name,
         subjective_stock=subjective_stock,
         subjective_labor=subjective_labor,
     )
@@ -622,7 +608,7 @@ def estimate(
         mapping=age_mapping,
     )
 
-    if "Portfolio" in agent_name:
+    if "Portfolio" in agent.name:
         share_moments = get_targeted_moments(
             data=snp_data,
             variable="share",
@@ -634,31 +620,30 @@ def estimate(
         for key, value in share_moments.items():
             target_moments[key + suffix] = value
 
-    initial_guess = get_initial_guess(agent_name)
+    initial_guess = get_initial_guess(agent.name, **init_params_options)
 
     # Estimate the model using Nelder-Mead
     if estimate_model:
         model_estimate, time_to_estimate = do_estimate_model(
-            agent_name,
-            estimation_agent,
+            agent,
             target_moments,
             initial_guess,
+            minimize_options=minimize_options,
         )
 
         # Compute standard errors by bootstrap
         if compute_se_bootstrap:
             do_compute_se_boostrap(
-                agent_name,
-                estimation_agent,
+                agent,
                 model_estimate,
                 time_to_estimate,
+                **bootstrap_options,
             )
 
         # Compute sensitivity measure
         if compute_sensitivity:
             do_compute_sensitivity(
-                agent_name,
-                estimation_agent,
+                agent,
                 model_estimate,
                 initial_guess,
             )
@@ -666,8 +651,7 @@ def estimate(
         # Make a contour plot of the objective function
         if make_contour_plot:
             do_make_contour_plot(
-                agent_name,
-                estimation_agent,
+                agent,
                 model_estimate,
                 target_moments,
             )
@@ -689,7 +673,7 @@ if __name__ == "__main__":
     local_subjective_labor = False
 
     estimate(
-        agent_name=local_agent_name,
+        init_agent_name=local_agent_name,
         estimate_model=local_estimate_model,
         compute_se_bootstrap=local_compute_se_bootstrap,
         compute_sensitivity=local_compute_sensitivity,

@@ -1,5 +1,4 @@
-"""Sets up the S&P data for use in the EstimatingMicroDSOPs estimation.
-"""
+"""Sets up the S&P data for use in the EstimatingMicroDSOPs estimation."""
 
 from pathlib import Path
 

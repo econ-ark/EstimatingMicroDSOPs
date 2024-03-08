@@ -1,15 +1,15 @@
-DiscFac,1.0154424685349777
-CRRA,9.806412073325795
-time_to_estimate,355.2289125919342
-params,"[1.0154424685349777, 9.806412073325795]"
-criterion,65.97027813743722
-start_criterion,65.97027813743722
+DiscFac,0.97142958573396
+CRRA,13.81956746082277
+time_to_estimate,2032.6699523925781
+params,"[0.97142958573396, 13.81956746082277]"
+criterion,126.8840660215122
+start_criterion,66.43894799279691
 start_params,"[1.0154424685349777, 9.806412073325795]"
-algorithm,scipy_neldermead
+algorithm,multistart_pounders
 direction,minimize
 n_free,2
-message,Optimization terminated successfully.
+message,Identical model used in successive iterations.
 success,True
-n_criterion_evaluations,133
+n_criterion_evaluations,
 n_derivative_evaluations,
-n_iterations,69
+n_iterations,864

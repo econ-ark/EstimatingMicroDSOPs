@@ -23,7 +23,6 @@ from HARK.core import AgentType
 
 
 class TempConsumerType(AgentType):
-
     def check_restrictions(self):
         return None
 

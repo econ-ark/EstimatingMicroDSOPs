@@ -24,20 +24,20 @@ def run_replication():
             replication_specs = {}
 
             if which_model == "1" or which_model == "":
-                replication_specs["agent_name"] = "IndShock"
+                replication_specs["init_agent_name"] = "IndShock"
             elif which_model == "2":
-                replication_specs["agent_name"] = "Portfolio"
+                replication_specs["init_agent_name"] = "Portfolio"
             elif which_model == "3":
-                replication_specs["agent_name"] = "WarmGlow"
+                replication_specs["init_agent_name"] = "WarmGlow"
             elif which_model == "4":
-                replication_specs["agent_name"] = "WarmGlowPortfolio"
+                replication_specs["init_agent_name"] = "WarmGlowPortfolio"
             elif which_model == "5":
-                replication_specs["agent_name"] = "WealthPortfolio"
+                replication_specs["init_agent_name"] = "WealthPortfolio"
             else:
                 print("Invalid model choice.")
                 return
 
-            print("Model: ", replication_specs["agent_name"])
+            print("Model: ", replication_specs["init_agent_name"])
 
             if which_replication == "q":
                 return

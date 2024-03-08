@@ -2,12 +2,13 @@
 model.  The empirical data is stored in a separate csv file and is loaded in setup_scf_data.
 """
 
-from pathlib import Path
-
 import numpy as np
 from HARK.Calibration.Income.IncomeTools import CGM_income, parse_income_spec
 from HARK.ConsumptionSaving.ConsIndShockModel import init_lifecycle
 from HARK.datasets.life_tables.us_ssa.SSATools import parse_ssa_life_table
+
+# Method for sampling from a discrete distribution
+from HARK.distribution import DiscreteDistribution
 
 # ---------------------------------------------------------------------------------
 # - Define all of the model parameters for EstimatingMicroDSOPs and ConsumerExamples -
@@ -57,37 +58,12 @@ ss_variances = True
 income_spec = CGM_income["HS"]  # College?
 # Replace retirement age
 income_spec["age_ret"] = retirement_age
-inc_calib = parse_income_spec(
-    age_min=initial_age,
-    age_max=final_age,
-    **income_spec,
-    SabelhausSong=ss_variances,
-)
-
-# # Age-varying discount factors over the lifecycle, lifted from Cagetti (2003)
-# # Get the directory containing the current file and construct the full path to the CSV file
-# csv_file_path = Path(__file__).resolve().parent / ".." / "data" / "Cagetti2003.csv"
-# # timevary_DiscFac = np.genfromtxt(csv_file_path) * 0.0 + 1.0  # TODO
-# # constant_DiscFac = np.ones_like(timevary_DiscFac)
-# timevary_DiscFac = np.ones_like(inc_calib["PermShkStd"])
-
-# Survival probabilities over the lifecycle
-liv_prb = parse_ssa_life_table(
-    female=False,
-    min_age=initial_age,
-    max_age=final_age - 1,
-    cohort=1960,
-)
-
 
 # Three point discrete distribution of initial w
 init_w_to_y = np.array([0.17, 0.5, 0.83])
 # Equiprobable discrete distribution of initial w
 prob_w_to_y = np.array([0.33333, 0.33333, 0.33334])
 num_agents = 10000  # Number of agents to simulate
-bootstrap_size = 50  # Number of re-estimations to do during bootstrap
-seed = 1132023  # Just an integer to seed the estimation
-
 
 # Age groups for the estimation: calculate average wealth-to-permanent income ratio
 # for consumers within each of these age groups, compare actual to simulated data
@@ -109,17 +85,51 @@ sim_mapping = {
 remove_ages_from_scf = np.arange(61, 71)  # remove retirement ages 61-70
 remove_ages_from_snp = np.arange(71)  # only match ages 71 and older
 
+# Bootstrap options
+bootstrap_size = 50  # Number of re-estimations to do during bootstrap
+seed = 1132023  # Just an integer to seed the estimation
 
-options = {
-    "init_w_to_y": init_w_to_y,
-    "prob_w_to_y": prob_w_to_y,
-    "num_agents": num_agents,
+params_to_estimate = ["CRRA", "DiscFac"]
+init_params = [init_CRRA, init_DiscFac]
+init_bounds = [bounds_CRRA, bounds_DiscFac]
+
+inc_calib = parse_income_spec(
+    age_min=initial_age,
+    age_max=final_age,
+    **income_spec,
+    SabelhausSong=ss_variances,
+)
+
+# Survival probabilities over the lifecycle
+liv_prb = parse_ssa_life_table(
+    female=False,
+    min_age=initial_age,
+    max_age=final_age - 1,
+    cohort=1960,
+)
+
+aNrmInit = DiscreteDistribution(
+    prob_w_to_y,
+    init_w_to_y,
+    seed=seed,
+).draw(N=num_agents)
+
+init_params_options = {
+    "init_CRRA": init_CRRA,
+    "init_DiscFac": init_DiscFac,
+}
+
+bootstrap_options = {
     "bootstrap_size": bootstrap_size,
     "seed": seed,
-    "init_DiscFac": init_DiscFac,
-    "init_CRRA": init_CRRA,
-    "bounds_DiscFac": bounds_DiscFac,
-    "bounds_CRRA": bounds_CRRA,
+}
+
+minimize_options = {
+    "algorithm": "scipy_neldermead",
+    "upper_bounds": np.array([bounds_DiscFac[1], bounds_CRRA[1]]),
+    "lower_bounds": np.array([bounds_DiscFac[0], bounds_CRRA[0]]),
+    "multistart": True,
+    "error_handling": "continue",
 }
 
 # -----------------------------------------------------------------------------
@@ -156,6 +166,7 @@ init_consumer_objects = {
     "tax_rate": 0.0,
     "vFuncBool": vFuncBool,
     "CubicBool": CubicBool,
+    "aNrmInit": aNrmInit,
 }
 
 # from Mateo's JMP for College Educated
@@ -177,7 +188,6 @@ init_subjective_labor = {  # from Tao's JMP
     "TranShkStd": [0.03] * len(inc_calib["TranShkStd"]),
     "PermShkStd": [0.03] * len(inc_calib["PermShkStd"]),
 }
-
 
 if __name__ == "__main__":
     print("Sorry, estimation_parameters doesn't actually do anything on its own.")
