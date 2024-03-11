@@ -5,10 +5,10 @@ from pathlib import Path
 import pandas as pd
 
 from estimark.parameters import (
+    education,
     final_age_data,
     initial_age,
     remove_ages_from_scf,
-    education,
 )
 
 # Get the directory containing the current file and construct the full path to the CSV file

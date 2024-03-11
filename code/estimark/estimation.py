@@ -144,8 +144,8 @@ def get_empirical_moments(
                     group_data.to_numpy(),
                     group_weights.to_numpy(),
                 )
-        else:
-            print(f"Warning: Group {key} does not have any data.")
+        # else:
+        #     print(f"Warning: Group {key} does not have any data.")
 
     return emp_moments
 
@@ -165,7 +165,7 @@ def get_initial_guess(agent_name, init_DiscFac=0.99, init_CRRA=2.0):
 
 
 # Define the objective function for the simulated method of moments estimation
-def simulate_moments(params, agent):
+def simulate_moments(params, agent=None):
     """A quick check to make sure that the parameter values are within bounds.
     Far flung falues of DiscFac or CRRA might cause an error during solution or
     simulation, so the objective function doesn't even bother with them.
@@ -285,7 +285,7 @@ def smm_obj_func(params, agent, emp_moments):
 
     if modify:
         max_fac = max(
-            (v for k, v in emp_moments.items() if "_port" not in k), default=1.0
+            (v for k, v in emp_moments.items() if "_port" not in k), default=1.0,
         )
 
         for key in emp_moments:
