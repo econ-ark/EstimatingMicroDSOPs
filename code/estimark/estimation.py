@@ -18,8 +18,7 @@ import numpy as np
 import pandas as pd
 
 # Estimation methods
-# TODO: use estimagic
-from HARK.estimation import bootstrap_sample_from_data, minimize_nelder_mead
+from estimagic.inference import get_bootstrap_samples
 from scipy.optimize import approx_fprime
 
 # Import modules from core HARK libraries:
@@ -101,6 +100,7 @@ def make_agent(
     if "Portfolio" in agent_name:
         track_vars += ["Share"]
     agent.track_vars = track_vars
+    agent.make_shock_history()
 
     agent.name = agent_name
 
@@ -115,12 +115,10 @@ def weighted_median(values, weights):
     wsum = np.cumsum(inds)
     ind = np.where(wsum > wsum[-1] / 2)[0][0]
 
-    median = values[ind]
-
-    return median
+    return values[ind]
 
 
-def get_targeted_moments(
+def get_empirical_moments(
     data,
     variable,
     weights=None,
@@ -132,7 +130,7 @@ def get_targeted_moments(
     data_groups = data[groups]
     data_weights = data[weights] if weights else None
 
-    target_moments = {}
+    emp_moments = {}
     for key in mapping:
         group_data = data_variable[data_groups == key]
         group_weights = data_weights[data_groups == key] if weights else None
@@ -140,16 +138,16 @@ def get_targeted_moments(
         # Check if the group has any data
         if not group_data.empty:
             if weights is None:
-                target_moments[key] = group_data.median()
+                emp_moments[key] = group_data.median()
             else:
-                target_moments[key] = weighted_median(
+                emp_moments[key] = weighted_median(
                     group_data.to_numpy(),
                     group_weights.to_numpy(),
                 )
         else:
             print(f"Warning: Group {key} does not have any data.")
 
-    return target_moments
+    return emp_moments
 
 
 def get_initial_guess(agent_name, init_DiscFac=0.99, init_CRRA=2.0):
@@ -172,11 +170,9 @@ def simulate_moments(params, agent):
     Far flung falues of DiscFac or CRRA might cause an error during solution or
     simulation, so the objective function doesn't even bother with them.
     """
-    DiscFac, CRRA = params
-
     # Update the agent with a new path of DiscFac based on this DiscFac (and a new CRRA)
-    agent.DiscFac = DiscFac
-    agent.CRRA = CRRA
+    agent.DiscFac = params[0]
+    agent.CRRA = params[1]
 
     # Homothetic
     # if hasattr(agent, "BeqCRRA"):
@@ -186,16 +182,27 @@ def simulate_moments(params, agent):
     if "(Stock)" in agent.name and "Portfolio" in agent.name:
         agent.RiskyAvg = init_subjective_stock["RiskyAvg"]
         agent.RiskyStd = init_subjective_stock["RiskyStd"]
+        agent.Rfree = init_subjective_stock["Rfree"]
         agent.update_RiskyDstn()
+    if "(Labor)" in agent.name:
+        agent.TranShkStd = init_subjective_labor["TranShkStd"]
+        agent.PermShkStd = init_subjective_labor["PermShkStd"]
+        agent.update_income_process()
 
     # Solve the model for these parameters, then simulate wealth data
     agent.solve()  # Solve the microeconomic model
 
     # simulate with true parameters (override subjective beliefs)
     if "(Stock)" in agent.name and "Portfolio" in agent.name:
-        agent.RiskyAvg = agent.RiskyAvgTrue
-        agent.RiskyStd = agent.RiskyStdTrue
+        agent.RiskyAvg = init_subjective_stock["RiskyAvgTrue"]
+        agent.RiskyStd = init_subjective_stock["RiskyStdTrue"]
+        agent.Rfree = init_subjective_stock["Rfree"]
         agent.update_RiskyDstn()
+    # for labor keep same process as subjective beliefs
+    if "(Labor)" in agent.name:
+        agent.TranShkStd = init_subjective_labor["TranShkStd"]
+        agent.PermShkStd = init_subjective_labor["PermShkStd"]
+        agent.update_income_process()
 
     max_sim_age = agent.T_cycle + 1
     # Initialize the simulation by clearing histories, resetting initial values
@@ -207,20 +214,24 @@ def simulate_moments(params, agent):
 
     # Find the distance between empirical data and simulated medians for each age group
 
-    sim_moments = {}
-    for key, cohort_idx in sim_mapping.items():
-        sim_moments[key] = np.median(sim_w_history[cohort_idx])
+    sim_moments = {
+        key: np.median(sim_w_history[cohort_idx])
+        for key, cohort_idx in sim_mapping.items()
+    }
 
     if "Portfolio" in agent.name:
         sim_share_history = agent.history["Share"]
-        suffix = "_port"
-        for key, cohort_idx in sim_mapping.items():
-            sim_moments[key + suffix] = np.median(sim_share_history[cohort_idx])
+        sim_moments.update(
+            {
+                key + "_port": np.median(sim_share_history[cohort_idx])
+                for key, cohort_idx in sim_mapping.items()
+            },
+        )
 
     return sim_moments
 
 
-def smm_obj_func(params, agent, moments):
+def smm_obj_func(params, agent, emp_moments):
     """The objective function for the SMM estimation.  Given values of discount factor
     adjuster DiscFac, coeffecient of relative risk aversion CRRA, a base consumer
     agent type, empirical data, and calibrated parameters, this function calculates
@@ -269,14 +280,33 @@ def smm_obj_func(params, agent, moments):
     """
     sim_moments = simulate_moments(params, agent)
 
+    # normalize wealth moments by the maximum value in the empirical moments
+    modify = any("_port" in key for key in emp_moments)
+
+    if modify:
+        max_fac = max(
+            (v for k, v in emp_moments.items() if "_port" not in k), default=1.0
+        )
+
+        for key in emp_moments:
+            if "_port" not in key:
+                sim_moments[key] /= max_fac
+                emp_moments[key] /= max_fac
+
     # TODO: make sure all keys in moments have a corresponding
     # key in sim_moments, raise an error if not
-    common_moments = list(set(sim_moments) & set(moments))
-    errors = np.array([sim_moments[key] - moments[key] for key in common_moments])
+    errors = np.array(
+        [sim_moments[key] - emp_moments[key] for key in emp_moments],
+    )
 
-    loss = np.dot(errors, errors)
+    squared_errors = np.square(errors)
+    loss = np.sum(squared_errors)
 
-    return {"value": loss, "root_contributions": errors}
+    return {
+        "value": loss,
+        "contributions": squared_errors,
+        "root_contributions": errors,
+    }
 
 
 # Define the bootstrap procedure
@@ -320,28 +350,24 @@ def calculate_se_bootstrap(
         t_start = time()
 
         # Bootstrap a new dataset by resampling from the original data
-        bootstrap_data = (bootstrap_sample_from_data(scf_array, seed=seed_list[n])).T
-        data_bootstrap = bootstrap_data[0]
-        groups_bootstrap = bootstrap_data[1]
-        weights_bootstrap = bootstrap_data[2]
+        bootstrap_data = get_bootstrap_samples(data=scf_data, rng=RNG)
 
         # Find moments with bootstrapped sample
-        bootstrap_moments = get_targeted_moments(
-            data=data_bootstrap,
-            weights=weights_bootstrap,
-            groups=groups_bootstrap,
+        bootstrap_moments = get_empirical_moments(
+            data=bootstrap_data,
+            variable="wealth_income_ratio",
+            weights="weight",
+            groups="age_group",
+            mapping=age_mapping,
         )
 
-        # Make a temporary function for use in this estimation run
-        def smm_obj_func_bootstrap(params):
-            return smm_obj_func(
-                params,
-                agent=agent,
-                moments=bootstrap_moments,
-            )
-
         # Estimate the model with the bootstrap data and add to list of estimates
-        this_estimate = minimize_nelder_mead(smm_obj_func_bootstrap, initial_estimate)
+        this_estimate = em.minimize(
+            smm_obj_func,
+            initial_estimate,
+            criterion_kwargs={"agent": agent, "emp_moments": bootstrap_moments},
+            **minimize_options,
+        ).params
         estimate_list.append(this_estimate)
         t_now = time()
 
@@ -366,30 +392,29 @@ def calculate_se_bootstrap(
 
 def do_estimate_model(
     agent,
-    target_moments,
+    emp_moments,
     initial_guess,
     minimize_options=None,
 ):
-    print("----------------------------------------------------------------------")
-    print(
-        f"Now estimating the model using Nelder-Mead from an initial guess of {initial_guess}...",
-    )
-    print("----------------------------------------------------------------------")
 
-    # Make a single-input lambda function for use in the optimizer
-    def smm_obj_func_redux(params):
-        """A "reduced form" of the SMM objective function, compatible with the optimizer.
-        Identical to smmObjectiveFunction, but takes only a single input as a length-2
-        list representing [DiscFac,CRRA].
-        """
-        return smm_obj_func(
-            params,
-            agent=agent,
-            moments=target_moments,
-        )
+    fmt_init_guess = ", ".join([f"{x:.3f}" for x in initial_guess])
+    statement = (
+        f"Estimating model using {minimize_options['algorithm']} "
+        f"from an initial guess of [{fmt_init_guess}]"
+    )
+    dash_line = "-" * len(statement)
+
+    print(dash_line)
+    print(statement)
+    print(dash_line)
 
     t_start_estimate = time()
-    res = em.minimize(smm_obj_func_redux, initial_guess, **minimize_options)
+    res = em.minimize(
+        smm_obj_func,
+        initial_guess,
+        criterion_kwargs={"agent": agent, "emp_moments": emp_moments},
+        **minimize_options,
+    )
     t_end_estimate = time()
     time_to_estimate = t_end_estimate - t_start_estimate
 
@@ -399,7 +424,11 @@ def do_estimate_model(
     minutes, seconds = divmod(time_to_estimate, 60)
     print(f"Time to estimate: {int(minutes)} min, {int(seconds)} sec.")
     print(f"Estimated model: {agent.name}")
-    print(f"Estimated values: DiscFac={model_estimate[0]}, CRRA={model_estimate[1]}")
+    print(
+        f"Estimated values: DiscFac={model_estimate[0]:.3f}, ",
+        f"CRRA={model_estimate[1]:.3f}",
+    )
+    print(dash_line)
 
     # Create the simple estimate table
     estimate_results_file = tables_dir + agent.name + "_estimate_results.csv"
@@ -443,9 +472,9 @@ def do_compute_se_boostrap(
 
     t_start_bootstrap = time()
     std_errors = calculate_se_bootstrap(
+        agent,
         model_estimate,
         n_draws=bootstrap_size,
-        agent=agent,
         seed=seed,
         verbose=True,
     )
@@ -476,21 +505,19 @@ def do_compute_se_boostrap(
         )
 
 
-def do_compute_sensitivity(agent, model_estimate, initial_guess):
+def do_compute_sensitivity(agent, model_estimate, emp_moments):
     print("``````````````````````````````````````````````````````````````````````")
     print("Computing sensitivity measure.")
     print("``````````````````````````````````````````````````````````````````````")
 
     # Find the Jacobian of the function that simulates moments
-    def simulate_moments_redux(params):
-        return simulate_moments(params, agent=agent)
 
-    n_moments = len(scf_mapping)
+    n_moments = len(emp_moments)
     jac = np.array(
         [
             approx_fprime(
                 model_estimate,
-                lambda params: simulate_moments_redux(params)[j],
+                lambda params: simulate_moments(params, agent=agent)[j],
                 epsilon=0.01,
             )
             for j in range(n_moments)
@@ -501,10 +528,10 @@ def do_compute_sensitivity(agent, model_estimate, initial_guess):
     sensitivity = np.dot(np.linalg.inv(np.dot(jac.T, jac)), jac.T)
 
     # Create lables for moments in the plots
-    moment_labels = ["[" + str(min(x)) + "," + str(max(x)) + "]" for x in age_groups]
+    moment_labels = emp_moments.keys()
 
     # Plot
-    fig, axs = plt.subplots(len(initial_guess))
+    fig, axs = plt.subplots(len(model_estimate))
     fig.set_tight_layout(True)
 
     axs[0].bar(range(n_moments), sensitivity[0, :], tick_label=moment_labels)
@@ -524,7 +551,7 @@ def do_compute_sensitivity(agent, model_estimate, initial_guess):
     plt.show()
 
 
-def do_make_contour_plot(agent, model_estimate, target_moments):
+def do_make_contour_plot(agent, model_estimate, emp_moments):
     print("``````````````````````````````````````````````````````````````````````")
     print("Creating the contour plot.")
     print("``````````````````````````````````````````````````````````````````````")
@@ -547,7 +574,7 @@ def do_make_contour_plot(agent, model_estimate, target_moments):
             smm_obj_levels[j, k] = smm_obj_func(
                 np.array([DiscFac, CRRA]),
                 agent=agent,
-                moments=target_moments,
+                emp_moments=emp_moments,
             )
     smm_contour = plt.contourf(CRRA_mesh, DiscFac_mesh, smm_obj_levels, level_count)
     t_end_contour = time()
@@ -600,7 +627,7 @@ def estimate(
         subjective_labor=subjective_labor,
     )
 
-    target_moments = get_targeted_moments(
+    emp_moments = get_empirical_moments(
         data=scf_data,
         variable="wealth_income_ratio",
         weights="weight",
@@ -609,7 +636,7 @@ def estimate(
     )
 
     if "Portfolio" in agent.name:
-        share_moments = get_targeted_moments(
+        share_moments = get_empirical_moments(
             data=snp_data,
             variable="share",
             groups="age_group",
@@ -618,7 +645,7 @@ def estimate(
 
         suffix = "_port"
         for key, value in share_moments.items():
-            target_moments[key + suffix] = value
+            emp_moments[key + suffix] = value
 
     initial_guess = get_initial_guess(agent.name, **init_params_options)
 
@@ -626,7 +653,7 @@ def estimate(
     if estimate_model:
         model_estimate, time_to_estimate = do_estimate_model(
             agent,
-            target_moments,
+            emp_moments,
             initial_guess,
             minimize_options=minimize_options,
         )
@@ -653,7 +680,7 @@ def estimate(
             do_make_contour_plot(
                 agent,
                 model_estimate,
-                target_moments,
+                emp_moments,
             )
 
 

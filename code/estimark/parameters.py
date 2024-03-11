@@ -14,27 +14,30 @@ from HARK.distribution import DiscreteDistribution
 # - Define all of the model parameters for EstimatingMicroDSOPs and ConsumerExamples -
 # ---------------------------------------------------------------------------------
 
+# Assets grid
 exp_nest = 1  # Number of times to "exponentially nest" when constructing a_grid
 aXtraMin = 0.001  # Minimum end-of-period "assets above minimum" value
-aXtraMax = 100  # Maximum end-of-period "assets above minimum" value
+aXtraMax = 20  # Maximum end-of-period "assets above minimum" value
 aXtraCount = 20  # Number of points in the grid of "assets above minimum"
 
 # Artificial borrowing constraint; imposed minimum level of end-of period assets
 BoroCnstArt = 0.0
+Rfree = 1.03  # Interest factor on assets
 # Use cubic spline interpolation when True, linear interpolation when False
 CubicBool = False
 vFuncBool = False  # Whether to calculate the value function during solution
 
-Rfree = 1.03  # Interest factor on assets
+# Income process parameters
 # Number of points in discrete approximation to permanent income shocks
 PermShkCount = 7
 # Number of points in discrete approximation to transitory income shocks
 TranShkCount = 7
 UnempPrb = 0.05  # Probability of unemployment while working
-UnempPrbRet = 0.005  # Probability of "unemployment" while retired
+UnempPrbRet = 0.005  # Probability of "unemployment" while retired # maybe one more zero
 IncUnemp = 0.3  # Unemployment benefits replacement rate
 IncUnempRet = 0.0  # "Unemployment" benefits when retired
 
+# Population age parameters
 final_age = 120  # Age at which the problem ends (die with certainty)
 retirement_age = 65  # Age at which the consumer retires
 initial_age = 25  # Age at which the consumer enters the model
@@ -47,15 +50,16 @@ age_interval = 5  # Interval between age groups
 # Initial guess of the coefficient of relative risk aversion during estimation (rho)
 init_CRRA = 5.0
 # Initial guess of the adjustment to the discount factor during estimation (beth)
-init_DiscFac = 0.99
+init_DiscFac = 0.95
 # Bounds for beth; if violated, objective function returns "penalty value"
-bounds_DiscFac = [0.5, 1.5]
+bounds_DiscFac = [0.5, 1.0]
 # Bounds for rho; if violated, objective function returns "penalty value"
 bounds_CRRA = [1.1, 20.0]
 
 # Income
 ss_variances = True
-income_spec = CGM_income["HS"]  # College?
+education = "College"
+income_spec = CGM_income[education]  # College?
 # Replace retirement age
 income_spec["age_ret"] = retirement_age
 
@@ -130,6 +134,12 @@ minimize_options = {
     "lower_bounds": np.array([bounds_DiscFac[0], bounds_CRRA[0]]),
     "multistart": True,
     "error_handling": "continue",
+    "algo_options": {
+        "convergence.absolute_params_tolerance": 1e-3,
+        "convergence.absolute_criterion_tolerance": 1e-3,
+    },
+    # "algorithm": "scipy_lbfgsb",
+    "numdiff_options": {"n_cores": 12},
 }
 
 # -----------------------------------------------------------------------------
@@ -184,13 +194,8 @@ init_subjective_stock = {
     "RiskyStdTrue": np.sqrt(np.exp(2 * TrueElnR + TrueVlnR) * (np.exp(TrueVlnR) - 1)),
 }
 
-init_subjective_labor = {  # from Tao's JMP
+# from Tao's JMP
+init_subjective_labor = {
     "TranShkStd": [0.03] * len(inc_calib["TranShkStd"]),
     "PermShkStd": [0.03] * len(inc_calib["PermShkStd"]),
 }
-
-if __name__ == "__main__":
-    print("Sorry, estimation_parameters doesn't actually do anything on its own.")
-    print("This module is imported by estimation, providing calibrated ")
-    print("parameters for the example estimation.  Please see that module if you ")
-    print("want more interesting output.")
