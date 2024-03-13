@@ -34,6 +34,8 @@ def estimate_msm(
     params_to_estimate=None,
     subjective_stock=False,
     subjective_labor=False,
+    emp_moments=None,
+    moments_cov=None,
 ):
     ############################################################
     # Make agent
@@ -48,26 +50,32 @@ def estimate_msm(
     print("Agent created: ", agent.name)
 
     ############################################################
+    # Get initial guess
+    ############################################################
+
+    initial_guess = get_initial_guess(agent.name, params_to_estimate, tables_dir)
+
+    print(initial_guess)
+
+    ############################################################
     # Get empirical moments
     ############################################################
 
-    emp_moments = get_empirical_moments(agent.name)
+    if emp_moments is None:
 
-    print("Calculated empirical moments.")
+        emp_moments = get_empirical_moments(agent.name)
+
+        print("Calculated empirical moments.")
 
     ############################################################
     # Get moments covariance matrix
     ############################################################
 
-    moments_cov = get_moments_cov(agent.name, emp_moments)
+    if moments_cov is None:
 
-    print("Calculated moments covariance matrix.")
+        moments_cov = get_moments_cov(agent.name, emp_moments)
 
-    ############################################################
-    # Get initial guess
-    ############################################################
-
-    initial_guess = get_initial_guess(agent.name, params_to_estimate, tables_dir)
+        print("Calculated moments covariance matrix.")
 
     print("Estimating MSM...")
 
@@ -106,13 +114,13 @@ def estimate_msm(
 if __name__ == "__main__":
     # Set booleans to determine which tasks should be done
     # Which agent type to estimate ("IndShock" or "Portfolio")
-    local_agent_name = "Portfolio"
+    local_agent_name = "WealthPortfolio"
 
     # Whether to use subjective beliefs
     local_subjective_stock = False
     local_subjective_labor = False
 
-    local_params_to_estimate = ["CRRA", "DiscFac"]
+    local_params_to_estimate = ["CRRA", "DiscFac", "WealthShare"]
 
     estimate_msm(
         init_agent_name=local_agent_name,

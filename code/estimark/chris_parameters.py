@@ -40,7 +40,7 @@ education = "College"  # Education level for income process
 
 # Population age parameters
 final_age = 120  # Age at which the problem ends (die with certainty)
-retirement_age = 65  # Age at which the consumer retires
+retirement_age = 125  # Age at which the consumer retires
 initial_age = 25  # Age at which the consumer enters the model
 final_age_data = 95  # Age at which the data ends
 age_interval = 5  # Interval between age groups
@@ -56,11 +56,11 @@ bootstrap_size = 50  # Number of re-estimations to do during bootstrap
 seed = 1132023  # Just an integer to seed the estimation
 
 
-params_to_estimate = ["CRRA", "DiscFac"]
+params_to_estimate = ["CRRA"]
 # Initial guess of the coefficient of relative risk aversion during estimation (rho)
 init_CRRA = 5.0
 # Initial guess of the adjustment to the discount factor during estimation (beth)
-init_DiscFac = 0.95
+init_DiscFac = 1.0
 # Bounds for beth; if violated, objective function returns "penalty value"
 bounds_DiscFac = [0.5, 1.1]
 # Bounds for rho; if violated, objective function returns "penalty value"
