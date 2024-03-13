@@ -35,7 +35,7 @@ from estimark.agents import (
 from estimark.parameters import (
     age_mapping,
     bootstrap_options,
-    init_consumer_objects,
+    init_calibration,
     init_params_options,
     init_subjective_labor,
     init_subjective_stock,
@@ -76,23 +76,23 @@ def make_agent(
     elif init_agent_name == "WealthPortfolio":
         agent_type = WealthPortfolioLifeCycleConsumerType
 
-    local_consumer_objects = init_consumer_objects.copy()
+    calibration = init_calibration.copy()
     agent_name = init_agent_name
 
     if subjective_stock or subjective_labor:
         agent_name += "Sub"
         if subjective_stock:
             agent_name += "(Stock)"
-            local_consumer_objects.update(init_subjective_stock)
+            calibration.update(init_subjective_stock)
         if subjective_labor:
             agent_name += "(Labor)"
-            local_consumer_objects.update(init_subjective_labor)
+            calibration.update(init_subjective_labor)
         agent_name += "Market"
 
     # Make a lifecycle consumer to be used for estimation, including simulated
     # shocks (plus an initial distribution of wealth)
     # Make a TempConsumerType for estimation
-    agent = agent_type(**local_consumer_objects)
+    agent = agent_type(**calibration)
     # Set the number of periods to simulate
     agent.T_sim = agent.T_cycle + 1
     # Choose to track bank balances as wealth
@@ -100,7 +100,6 @@ def make_agent(
     if "Portfolio" in agent_name:
         track_vars += ["Share"]
     agent.track_vars = track_vars
-    agent.make_shock_history()
 
     agent.name = agent_name
 
@@ -118,7 +117,7 @@ def weighted_median(values, weights):
     return values[ind]
 
 
-def get_empirical_moments(
+def get_weighted_moments(
     data,
     variable,
     weights=None,
@@ -150,33 +149,61 @@ def get_empirical_moments(
     return emp_moments
 
 
-def get_initial_guess(agent_name, init_DiscFac=0.99, init_CRRA=2.0):
-    # start from previous estimation results if available
+def get_empirical_moments(agent_name):
+    emp_moments = get_weighted_moments(
+        data=scf_data,
+        variable="wealth_income_ratio",
+        weights="weight",
+        groups="age_group",
+        mapping=age_mapping,
+    )
 
-    csv_file_path = f"{tables_dir}{agent_name}_estimate_results.csv"
+    # Add share moments if agent is a portfolio type
+
+    if "Portfolio" in agent_name:
+        share_moments = get_weighted_moments(
+            data=snp_data,
+            variable="share",
+            groups="age_group",
+            mapping=age_mapping,
+        )
+
+        suffix = "_port"
+        for key, value in share_moments.items():
+            emp_moments[key + suffix] = value
+
+    return emp_moments
+
+
+def get_initial_guess(agent_name, params_to_estimate, dir):
+    # start from previous estimation results if available
+    csv_file_path = f"{dir}{agent_name}_estimate_results.csv"
+    initial_guess = {}
 
     try:
         res = pd.read_csv(csv_file_path, header=None)
-        initial_guess = res.iloc[:2, 1].astype(float).tolist()
+        temp_dict = res.set_index(res.columns[0])[res.columns[1]].to_dict()
     except (FileNotFoundError, IndexError):
-        initial_guess = [init_DiscFac, init_CRRA]
+        temp_dict = init_params_options.get("init_guess", {})
+
+    initial_guess = {
+        key: float(value)
+        for key, value in temp_dict.items()
+        if key in params_to_estimate
+    }
 
     return initial_guess
 
 
 # Define the objective function for the simulated method of moments estimation
-def simulate_moments(params, agent=None):
+def simulate_moments(params, agent=None, emp_moments=None):
     """A quick check to make sure that the parameter values are within bounds.
     Far flung falues of DiscFac or CRRA might cause an error during solution or
     simulation, so the objective function doesn't even bother with them.
     """
     # Update the agent with a new path of DiscFac based on this DiscFac (and a new CRRA)
-    agent.DiscFac = params[0]
-    agent.CRRA = params[1]
 
-    # Homothetic
-    # if hasattr(agent, "BeqCRRA"):
-    #     agent.BeqCRRA = CRRA
+    agent.assign_parameters(**params)
 
     # ensure subjective beliefs are used for solution
     if "(Stock)" in agent.name and "Portfolio" in agent.name:
@@ -217,16 +244,17 @@ def simulate_moments(params, agent=None):
     sim_moments = {
         key: np.median(sim_w_history[cohort_idx])
         for key, cohort_idx in sim_mapping.items()
+        if key in emp_moments
     }
 
     if "Portfolio" in agent.name:
         sim_share_history = agent.history["Share"]
-        sim_moments.update(
-            {
-                key + "_port": np.median(sim_share_history[cohort_idx])
-                for key, cohort_idx in sim_mapping.items()
-            },
-        )
+        share_moments = {}
+        for key, cohort_idx in sim_mapping.items():
+            key_port = key + "_port"
+            if key_port in emp_moments:
+                share_moments[key_port] = np.median(sim_share_history[cohort_idx])
+        sim_moments.update(share_moments)
 
     return sim_moments
 
@@ -278,14 +306,15 @@ def smm_obj_func(params, agent, emp_moments):
         median wealth-to-permanent-income ratio in the simulation.
 
     """
-    sim_moments = simulate_moments(params, agent)
+    sim_moments = simulate_moments(params, agent, emp_moments)
 
     # normalize wealth moments by the maximum value in the empirical moments
     modify = any("_port" in key for key in emp_moments)
 
     if modify:
         max_fac = max(
-            (v for k, v in emp_moments.items() if "_port" not in k), default=1.0,
+            (v for k, v in emp_moments.items() if "_port" not in k),
+            default=1.0,
         )
 
         for key in emp_moments:
@@ -353,7 +382,7 @@ def calculate_se_bootstrap(
         bootstrap_data = get_bootstrap_samples(data=scf_data, rng=RNG)
 
         # Find moments with bootstrapped sample
-        bootstrap_moments = get_empirical_moments(
+        bootstrap_moments = get_weighted_moments(
             data=bootstrap_data,
             variable="wealth_income_ratio",
             weights="weight",
@@ -396,16 +425,20 @@ def do_estimate_model(
     initial_guess,
     minimize_options=None,
 ):
+    fmt_init_guess = [f"{key} = {value:.3f}" for key, value in initial_guess.items()]
+    multistart_text = " with multistart" if minimize_options.get("multistart") else ""
+    statement1 = f"Estimating model using {minimize_options['algorithm']}{multistart_text} from an initial guess of"
+    statement2 = ", ".join(fmt_init_guess)
+    max_len = max(len(statement1), len(statement2))
+    dash_line = "-" * max_len
 
-    fmt_init_guess = ", ".join([f"{x:.3f}" for x in initial_guess])
-    statement = (
-        f"Estimating model using {minimize_options['algorithm']} "
-        f"from an initial guess of [{fmt_init_guess}]"
-    )
-    dash_line = "-" * len(statement)
+    # Use f-string for padding
+    statement1 = f"{statement1:^{max_len}}"
+    statement2 = f"{statement2:^{max_len}}"
 
     print(dash_line)
-    print(statement)
+    print(statement1)
+    print(statement2)
     print(dash_line)
 
     t_start_estimate = time()
@@ -413,43 +446,73 @@ def do_estimate_model(
         smm_obj_func,
         initial_guess,
         criterion_kwargs={"agent": agent, "emp_moments": emp_moments},
+        upper_bounds={
+            key: value
+            for key, value in init_params_options["upper_bounds"].items()
+            if key in initial_guess
+        },
+        lower_bounds={
+            key: value
+            for key, value in init_params_options["lower_bounds"].items()
+            if key in initial_guess
+        },
         **minimize_options,
     )
     t_end_estimate = time()
     time_to_estimate = t_end_estimate - t_start_estimate
 
-    model_estimate = res.params
+    keys_to_save = [
+        key
+        for key in vars(res)
+        if key
+        not in ["history", "convergence_report", "multistart_info", "algorithm_output"]
+    ]
+
+    model_estimate = save_results(
+        res,
+        agent.name,
+        time_to_estimate,
+        tables_dir,
+        params_key="params",
+        keys_to_save=keys_to_save,
+    )
+
+    return model_estimate, time_to_estimate
+
+
+def save_results(
+    res, agent_name, time_to_estimate, dir, params_key=None, keys_to_save=None
+):
+    model_estimate = getattr(res, params_key)
 
     # Calculate minutes and remaining seconds
     minutes, seconds = divmod(time_to_estimate, 60)
-    print(f"Time to estimate: {int(minutes)} min, {int(seconds)} sec.")
-    print(f"Estimated model: {agent.name}")
-    print(
-        f"Estimated values: DiscFac={model_estimate[0]:.3f}, ",
-        f"CRRA={model_estimate[1]:.3f}",
-    )
-    print(dash_line)
+    statement1 = f"Estimated model: {agent_name}"
+    statement2 = f"Time to estimate: {int(minutes)} min, {int(seconds)} sec."
+    estimates = [f"{key} = {value:.3f}" for key, value in model_estimate.items()]
+    statement3 = "Estimated values: " + ", ".join(estimates)
+    dash_len = max(len(statement1), len(statement2), len(statement3))
+    print(statement1)
+    print(statement2)
+    print(statement3)
+    print("-" * dash_len)
 
     # Create the simple estimate table
-    estimate_results_file = tables_dir + agent.name + "_estimate_results.csv"
+    estimate_results_file = dir + agent_name + "_estimate_results.csv"
 
     with open(estimate_results_file, "w") as f:
         writer = csv.writer(f)
 
-        writer.writerow(["DiscFac", model_estimate[0]])
-        writer.writerow(["CRRA", model_estimate[1]])
+        for key in model_estimate:
+            writer.writerow([key, model_estimate[key]])
+
         writer.writerow(["time_to_estimate", time_to_estimate])
 
-        for key in vars(res):
-            if key not in [
-                "history",
-                "convergence_report",
-                "multistart_info",
-                "algorithm_output",
-            ]:
+        if keys_to_save is not None:
+            for key in keys_to_save:
                 writer.writerow([key, getattr(res, key)])
 
-    return model_estimate, time_to_estimate
+    return model_estimate
 
 
 def do_compute_se_boostrap(
@@ -596,6 +659,7 @@ def do_make_contour_plot(agent, model_estimate, emp_moments):
 
 def estimate(
     init_agent_name,
+    params_to_estimate,
     estimate_model=True,
     compute_se_bootstrap=False,
     compute_sensitivity=False,
@@ -621,35 +685,36 @@ def estimate(
     None
 
     """
+    ############################################################
+    # Make agent
+    ############################################################
+
     agent = make_agent(
         init_agent_name=init_agent_name,
         subjective_stock=subjective_stock,
         subjective_labor=subjective_labor,
     )
 
-    emp_moments = get_empirical_moments(
-        data=scf_data,
-        variable="wealth_income_ratio",
-        weights="weight",
-        groups="age_group",
-        mapping=age_mapping,
+    ############################################################
+    # Get empirical moments
+    ############################################################
+
+    emp_moments = get_empirical_moments(agent.name)
+
+    ############################################################
+    # Get initial guess
+    ############################################################
+
+    initial_guess = get_initial_guess(
+        agent.name,
+        params_to_estimate,
+        tables_dir,
     )
 
-    if "Portfolio" in agent.name:
-        share_moments = get_empirical_moments(
-            data=snp_data,
-            variable="share",
-            groups="age_group",
-            mapping=age_mapping,
-        )
+    ############################################################
+    # Estimate model
+    ############################################################
 
-        suffix = "_port"
-        for key, value in share_moments.items():
-            emp_moments[key + suffix] = value
-
-    initial_guess = get_initial_guess(agent.name, **init_params_options)
-
-    # Estimate the model using Nelder-Mead
     if estimate_model:
         model_estimate, time_to_estimate = do_estimate_model(
             agent,
@@ -687,7 +752,8 @@ def estimate(
 if __name__ == "__main__":
     # Set booleans to determine which tasks should be done
     # Which agent type to estimate ("IndShock" or "Portfolio")
-    local_agent_name = "Portfolio"
+    local_agent_name = "IndShock"
+    local_params_to_estimate = ["CRRA", "DiscFac"]
     local_estimate_model = True  # Whether to estimate the model
     # Whether to get standard errors via bootstrap
     local_compute_se_bootstrap = False
@@ -701,6 +767,7 @@ if __name__ == "__main__":
 
     estimate(
         init_agent_name=local_agent_name,
+        params_to_estimate=local_params_to_estimate,
         estimate_model=local_estimate_model,
         compute_se_bootstrap=local_compute_se_bootstrap,
         compute_sensitivity=local_compute_sensitivity,

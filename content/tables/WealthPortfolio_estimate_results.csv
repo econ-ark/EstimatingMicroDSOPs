@@ -1,10 +1,10 @@
-DiscFac,0.5
 CRRA,1.1
-time_to_estimate,237.45027232170105
-params,"[0.5, 1.1]"
-criterion,6.668610211284288
-start_criterion,1.6311593035142105
-start_params,"[0.9439832838535612, 4.649514361736811]"
+DiscFac,0.5
+time_to_estimate,239.4185471534729
+params,"{'CRRA': 1.1, 'DiscFac': 0.5}"
+criterion,6.5458132852367
+start_criterion,1.618676051720708
+start_params,"{'CRRA': 5.0, 'DiscFac': 0.95}"
 algorithm,multistart_scipy_neldermead
 direction,minimize
 n_free,2

@@ -1,8 +1,11 @@
 # Define settings for "main()" function in StructuralEstiamtion.py based on
 # resource requirements:
 
+params_to_estimate = ["CRRA", "DiscFac"]
+
 low_resource = {
     "estimate_model": True,
+    "params_to_estimate": params_to_estimate,
     "make_contour_plot": False,
     "compute_se_bootstrap": False,
     "compute_sensitivity": False,
@@ -15,6 +18,7 @@ low_resource = {
 
 medium_resource = {
     "estimate_model": True,
+    "params_to_estimate": params_to_estimate,
     "make_contour_plot": True,
     "compute_se_bootstrap": False,
     "compute_sensitivity": True,
@@ -27,6 +31,7 @@ medium_resource = {
 
 high_resource = {
     "estimate_model": True,
+    "params_to_estimate": params_to_estimate,
     "make_contour_plot": False,
     "compute_se_bootstrap": True,
     "compute_sensitivity": True,
@@ -39,6 +44,7 @@ high_resource = {
 
 all_replications = {
     "estimate_model": True,
+    "params_to_estimate": params_to_estimate,
     "make_contour_plot": True,
     "compute_se_bootstrap": True,
     "compute_sensitivity": True,

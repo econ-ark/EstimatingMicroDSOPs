@@ -6,8 +6,6 @@ import numpy as np
 from HARK.Calibration.Income.IncomeTools import CGM_income, parse_income_spec
 from HARK.ConsumptionSaving.ConsIndShockModel import init_lifecycle
 from HARK.datasets.life_tables.us_ssa.SSATools import parse_ssa_life_table
-
-# Method for sampling from a discrete distribution
 from HARK.distribution import DiscreteDistribution
 
 # ---------------------------------------------------------------------------------
@@ -20,9 +18,10 @@ aXtraMin = 0.001  # Minimum end-of-period "assets above minimum" value
 aXtraMax = 20  # Maximum end-of-period "assets above minimum" value
 aXtraCount = 20  # Number of points in the grid of "assets above minimum"
 
-# Artificial borrowing constraint; imposed minimum level of end-of period assets
-BoroCnstArt = 0.0
+# Artificial borrowing constraint
+BoroCnstArt = 0.0  # imposed minimum level of end-of period assets
 Rfree = 1.03  # Interest factor on assets
+
 # Use cubic spline interpolation when True, linear interpolation when False
 CubicBool = False
 vFuncBool = False  # Whether to calculate the value function during solution
@@ -36,17 +35,28 @@ UnempPrb = 0.05  # Probability of unemployment while working
 UnempPrbRet = 0.005  # Probability of "unemployment" while retired # maybe one more zero
 IncUnemp = 0.3  # Unemployment benefits replacement rate
 IncUnempRet = 0.0  # "Unemployment" benefits when retired
+ss_variances = True  # Use the Sabelhaus-Song variance profiles
+education = "College"  # Education level for income process
 
 # Population age parameters
 final_age = 120  # Age at which the problem ends (die with certainty)
 retirement_age = 65  # Age at which the consumer retires
 initial_age = 25  # Age at which the consumer enters the model
-terminal_t = final_age - initial_age  # Total number of periods in the model
-retirement_t = retirement_age - initial_age - 1
-
 final_age_data = 95  # Age at which the data ends
 age_interval = 5  # Interval between age groups
 
+# Three point discrete distribution of initial w
+init_w_to_y = np.array([0.17, 0.5, 0.83])
+# Equiprobable discrete distribution of initial w
+prob_w_to_y = np.array([0.33333, 0.33333, 0.33334])
+num_agents = 10000  # Number of agents to simulate
+
+# Bootstrap options
+bootstrap_size = 50  # Number of re-estimations to do during bootstrap
+seed = 1132023  # Just an integer to seed the estimation
+
+
+params_to_estimate = ["CRRA", "DiscFac"]
 # Initial guess of the coefficient of relative risk aversion during estimation (rho)
 init_CRRA = 5.0
 # Initial guess of the adjustment to the discount factor during estimation (beth)
@@ -56,18 +66,25 @@ bounds_DiscFac = [0.5, 1.0]
 # Bounds for rho; if violated, objective function returns "penalty value"
 bounds_CRRA = [1.1, 20.0]
 
+
+######################################################################
+# Constructed parameters
+######################################################################
+
+# Total number of periods in the model
+terminal_t = final_age - initial_age
+retirement_t = retirement_age - initial_age - 1
+
 # Income
-ss_variances = True
-education = "College"
-income_spec = CGM_income[education]  # College?
+income_spec = CGM_income[education]
 # Replace retirement age
 income_spec["age_ret"] = retirement_age
-
-# Three point discrete distribution of initial w
-init_w_to_y = np.array([0.17, 0.5, 0.83])
-# Equiprobable discrete distribution of initial w
-prob_w_to_y = np.array([0.33333, 0.33333, 0.33334])
-num_agents = 10000  # Number of agents to simulate
+inc_calib = parse_income_spec(
+    age_min=initial_age,
+    age_max=final_age,
+    **income_spec,
+    SabelhausSong=ss_variances,
+)
 
 # Age groups for the estimation: calculate average wealth-to-permanent income ratio
 # for consumers within each of these age groups, compare actual to simulated data
@@ -86,23 +103,21 @@ sim_mapping = {
     label: np.array(group) - initial_age for label, group in zip(age_labels, age_groups)
 }
 
-remove_ages_from_scf = np.arange(61, 71)  # remove retirement ages 61-70
-remove_ages_from_snp = np.arange(71)  # only match ages 71 and older
+remove_ages_from_scf = np.arange(
+    retirement_age - age_interval + 1,
+    retirement_age + age_interval + 1,
+)  # remove retirement ages 61-70
+remove_ages_from_snp = np.arange(
+    retirement_age + age_interval + 1,
+)  # only match ages 71 and older
 
-# Bootstrap options
-bootstrap_size = 50  # Number of re-estimations to do during bootstrap
-seed = 1132023  # Just an integer to seed the estimation
 
-params_to_estimate = ["CRRA", "DiscFac"]
-init_params = [init_CRRA, init_DiscFac]
-init_bounds = [bounds_CRRA, bounds_DiscFac]
+init_params_options = {
+    "init_guess": {"CRRA": init_CRRA, "DiscFac": init_DiscFac},
+    "upper_bounds": {"CRRA": bounds_CRRA[1], "DiscFac": bounds_DiscFac[1]},
+    "lower_bounds": {"CRRA": bounds_CRRA[0], "DiscFac": bounds_DiscFac[0]},
+}
 
-inc_calib = parse_income_spec(
-    age_min=initial_age,
-    age_max=final_age,
-    **income_spec,
-    SabelhausSong=ss_variances,
-)
 
 # Survival probabilities over the lifecycle
 liv_prb = parse_ssa_life_table(
@@ -118,11 +133,6 @@ aNrmInit = DiscreteDistribution(
     seed=seed,
 ).draw(N=num_agents)
 
-init_params_options = {
-    "init_CRRA": init_CRRA,
-    "init_DiscFac": init_DiscFac,
-}
-
 bootstrap_options = {
     "bootstrap_size": bootstrap_size,
     "seed": seed,
@@ -130,8 +140,6 @@ bootstrap_options = {
 
 minimize_options = {
     "algorithm": "scipy_neldermead",
-    "upper_bounds": np.array([bounds_DiscFac[1], bounds_CRRA[1]]),
-    "lower_bounds": np.array([bounds_DiscFac[0], bounds_CRRA[0]]),
     "multistart": True,
     "error_handling": "continue",
     "algo_options": {
@@ -139,7 +147,7 @@ minimize_options = {
         "convergence.absolute_criterion_tolerance": 1e-3,
     },
     # "algorithm": "scipy_lbfgsb",
-    "numdiff_options": {"n_cores": 12},
+    # "numdiff_options": {"n_cores": 12},
 }
 
 # -----------------------------------------------------------------------------
@@ -147,7 +155,7 @@ minimize_options = {
 # -----------------------------------------------------------------------------
 
 # Dictionary that can be passed to ConsumerType to instantiate
-init_consumer_objects = {
+init_calibration = {
     **init_lifecycle,
     "CRRA": init_CRRA,
     "DiscFac": init_DiscFac,

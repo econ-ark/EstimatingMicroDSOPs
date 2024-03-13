@@ -1,15 +1,15 @@
+CRRA,6.590661406517029
 DiscFac,1.0
-CRRA,6.385897638023813
-time_to_estimate,779.0257663726807
-params,"[1.0, 6.385897638023813]"
-criterion,774.1713834705762
-start_criterion,773.9986243442254
-start_params,"[1.0, 6.385897638023522]"
+time_to_estimate,607.3060421943665
+params,"{'CRRA': 6.590661406517029, 'DiscFac': 1.0}"
+criterion,781.5156069337606
+start_criterion,1077.2295229251981
+start_params,"{'CRRA': 5.0, 'DiscFac': 0.95}"
 algorithm,multistart_scipy_neldermead
 direction,minimize
 n_free,2
 message,Optimization terminated successfully.
 success,True
-n_criterion_evaluations,269
+n_criterion_evaluations,180
 n_derivative_evaluations,
-n_iterations,92
+n_iterations,85
