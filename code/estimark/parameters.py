@@ -15,7 +15,7 @@ from HARK.distribution import DiscreteDistribution
 # Assets grid
 exp_nest = 1  # Number of times to "exponentially nest" when constructing a_grid
 aXtraMin = 0.001  # Minimum end-of-period "assets above minimum" value
-aXtraMax = 20  # Maximum end-of-period "assets above minimum" value
+aXtraMax = 100  # Maximum end-of-period "assets above minimum" value
 aXtraCount = 20  # Number of points in the grid of "assets above minimum"
 
 # Artificial borrowing constraint
@@ -145,8 +145,10 @@ minimize_options = {
     "algo_options": {
         "convergence.absolute_params_tolerance": 1e-3,
         "convergence.absolute_criterion_tolerance": 1e-3,
+        "stopping.max_iterations": 50,
+        "stopping.max_criterion_evaluations": 100,
+        # "n_cores": 12,
     },
-    # "algorithm": "scipy_lbfgsb",
     # "numdiff_options": {"n_cores": 12},
 }
 

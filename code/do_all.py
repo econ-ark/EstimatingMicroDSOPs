@@ -45,7 +45,7 @@ Python PATH with the locations of the MicroDSOP directory structure so it can
 still run.
 """
 
-from estimark.estimation import estimate
+from estimark.min import estimate_min
 from estimark.options import (
     all_replications,
     high_resource,
@@ -143,7 +143,7 @@ def run_replication():
         replication_specs["subjective_labor"] = True
         print("Adding subjective labor market beliefs...")
 
-    estimate(**replication_specs)
+    estimate_min(**replication_specs)
 
 
 if __name__ == "__main__":

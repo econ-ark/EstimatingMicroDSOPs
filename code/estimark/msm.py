@@ -1,58 +1,32 @@
-import csv
 from pathlib import Path
 from time import time
 
 import estimagic as em
-import numpy as np
 
 from estimark.estimation import (
     get_empirical_moments,
     get_initial_guess,
-    get_weighted_moments,
+    get_moments_cov,
     make_agent,
-    simulate_moments,
     save_results,
+    simulate_moments,
 )
 
 # Parameters for the consumer type and the estimation
 from estimark.parameters import (
-    age_mapping,
     init_params_options,
     minimize_options,
 )
 
 # SCF 2004 data on household wealth
-from estimark.scf import scf_data
 
-msm_dir = "content/tables/msm/"
-Path(msm_dir).mkdir(parents=True, exist_ok=True)
-
-
-def get_moments_cov(agent_name, emp_moments):
-    moments_cov = em.get_moments_cov(
-        scf_data,
-        get_weighted_moments,
-        moment_kwargs={
-            "variable": "wealth_income_ratio",
-            "weights": "weight",
-            "groups": "age_group",
-            "mapping": age_mapping,
-        },
-    )
-
-    if "Port" in agent_name:
-        # how many keys in emp_moments contain "_port"
-        n_port = sum("_port" in key for key in emp_moments.keys())
-        share_moments_cov = np.diag(np.ones(n_port))
-
-        moments_cov = np.block(
-            [
-                [moments_cov, np.zeros((moments_cov.shape[0], n_port))],
-                [np.zeros((n_port, moments_cov.shape[1])), share_moments_cov],
-            ],
-        )
-
-    return moments_cov
+# Pathnames to the other files:
+# Relative directory for primitive parameter files
+tables_dir = "content/tables/msm/"
+Path(tables_dir).mkdir(parents=True, exist_ok=True)
+# Relative directory for primitive parameter files
+figures_dir = "content/figures/msm/"
+Path(figures_dir).mkdir(parents=True, exist_ok=True)
 
 
 def estimate_msm(
@@ -93,7 +67,7 @@ def estimate_msm(
     # Get initial guess
     ############################################################
 
-    initial_guess = get_initial_guess(agent.name, params_to_estimate, msm_dir)
+    initial_guess = get_initial_guess(agent.name, params_to_estimate, tables_dir)
 
     print("Estimating MSM...")
 
@@ -126,13 +100,13 @@ def estimate_msm(
 
     print("MSM estimation complete.")
 
-    save_results(res, agent.name, time_to_estimate, msm_dir, "_params")
+    save_results(res, agent.name, time_to_estimate, tables_dir, "_params")
 
 
 if __name__ == "__main__":
     # Set booleans to determine which tasks should be done
     # Which agent type to estimate ("IndShock" or "Portfolio")
-    local_agent_name = "IndShock"
+    local_agent_name = "Portfolio"
 
     # Whether to use subjective beliefs
     local_subjective_stock = False

@@ -34,7 +34,6 @@ from estimark.agents import (
 # Parameters for the consumer type and the estimation
 from estimark.parameters import (
     age_mapping,
-    bootstrap_options,
     init_calibration,
     init_params_options,
     init_subjective_labor,
@@ -47,13 +46,6 @@ from estimark.parameters import (
 from estimark.scf import scf_data
 from estimark.snp import snp_data
 
-# Pathnames to the other files:
-# Relative directory for primitive parameter files
-tables_dir = "content/tables/"
-Path(tables_dir).mkdir(parents=True, exist_ok=True)
-# Relative directory for primitive parameter files
-figures_dir = "content/figures/"
-Path(figures_dir).mkdir(parents=True, exist_ok=True)
 
 # =====================================================
 # Define objects and functions used for the estimation
@@ -147,6 +139,40 @@ def get_weighted_moments(
         #     print(f"Warning: Group {key} does not have any data.")
 
     return emp_moments
+
+
+def get_moments_cov(agent_name, emp_moments):
+    moments_cov = em.get_moments_cov(
+        scf_data,
+        get_weighted_moments,
+        moment_kwargs={
+            "variable": "wealth_income_ratio",
+            "weights": "weight",
+            "groups": "age_group",
+            "mapping": age_mapping,
+        },
+    )
+
+    if "Port" in agent_name:
+
+        for key1 in emp_moments:
+            # Check if key1 exists in moments_cov dictionary
+            if key1 not in moments_cov:
+                # If it doesn't exist, create a new dictionary for this key
+                moments_cov[key1] = {}
+
+            for key2 in emp_moments:
+                # Check if key2 exists in the nested dictionary under key1
+                if key2 not in moments_cov[key1]:
+                    # If it doesn't exist, we need to add it
+                    if key1 == key2:
+                        # If key1 is equal to key2, set the value to 1.0
+                        moments_cov[key1][key2] = 1.0
+                    else:
+                        # Otherwise, set the value to 0.0
+                        moments_cov[key1][key2] = 0.0
+
+    return moments_cov
 
 
 def get_empirical_moments(agent_name):
@@ -420,10 +446,7 @@ def calculate_se_bootstrap(
 
 
 def do_estimate_model(
-    agent,
-    emp_moments,
-    initial_guess,
-    minimize_options=None,
+    agent, emp_moments, initial_guess, minimize_options=None, tables_dir=None
 ):
     fmt_init_guess = [f"{key} = {value:.3f}" for key, value in initial_guess.items()]
     multistart_text = " with multistart" if minimize_options.get("multistart") else ""
@@ -481,7 +504,12 @@ def do_estimate_model(
 
 
 def save_results(
-    res, agent_name, time_to_estimate, dir, params_key=None, keys_to_save=None
+    res,
+    agent_name,
+    time_to_estimate,
+    dir,
+    params_key=None,
+    keys_to_save=None,
 ):
     model_estimate = getattr(res, params_key)
 
@@ -521,6 +549,7 @@ def do_compute_se_boostrap(
     time_to_estimate,
     bootstrap_size=50,
     seed=0,
+    tables_dir=None,
 ):
     # Estimate the model:
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
@@ -568,7 +597,7 @@ def do_compute_se_boostrap(
         )
 
 
-def do_compute_sensitivity(agent, model_estimate, emp_moments):
+def do_compute_sensitivity(agent, model_estimate, emp_moments, figures_dir=None):
     print("``````````````````````````````````````````````````````````````````````")
     print("Computing sensitivity measure.")
     print("``````````````````````````````````````````````````````````````````````")
@@ -614,7 +643,7 @@ def do_compute_sensitivity(agent, model_estimate, emp_moments):
     plt.show()
 
 
-def do_make_contour_plot(agent, model_estimate, emp_moments):
+def do_make_contour_plot(agent, model_estimate, emp_moments, figures_dir=None):
     print("``````````````````````````````````````````````````````````````````````")
     print("Creating the contour plot.")
     print("``````````````````````````````````````````````````````````````````````")
@@ -655,123 +684,3 @@ def do_make_contour_plot(agent, model_estimate, emp_moments):
     plt.savefig(figures_dir + agent.name + "SMMcontour.png")
     plt.savefig(figures_dir + agent.name + "SMMcontour.svg")
     plt.show()
-
-
-def estimate(
-    init_agent_name,
-    params_to_estimate,
-    estimate_model=True,
-    compute_se_bootstrap=False,
-    compute_sensitivity=False,
-    make_contour_plot=False,
-    subjective_stock=False,
-    subjective_labor=False,
-):
-    """Run the main estimation procedure for SolvingMicroDSOP.
-
-    Parameters
-    ----------
-    estimate_model : bool
-        Whether to estimate the model using Nelder-Mead. When True, this is a low-time, low-memory operation.
-
-    compute_standard_errors : bool
-        Whether to compute standard errors on the estiamtion of the model.
-
-    make_contour_plot : bool
-        Whether to make the contour plot associate with the estiamte.
-
-    Returns
-    -------
-    None
-
-    """
-    ############################################################
-    # Make agent
-    ############################################################
-
-    agent = make_agent(
-        init_agent_name=init_agent_name,
-        subjective_stock=subjective_stock,
-        subjective_labor=subjective_labor,
-    )
-
-    ############################################################
-    # Get empirical moments
-    ############################################################
-
-    emp_moments = get_empirical_moments(agent.name)
-
-    ############################################################
-    # Get initial guess
-    ############################################################
-
-    initial_guess = get_initial_guess(
-        agent.name,
-        params_to_estimate,
-        tables_dir,
-    )
-
-    ############################################################
-    # Estimate model
-    ############################################################
-
-    if estimate_model:
-        model_estimate, time_to_estimate = do_estimate_model(
-            agent,
-            emp_moments,
-            initial_guess,
-            minimize_options=minimize_options,
-        )
-
-        # Compute standard errors by bootstrap
-        if compute_se_bootstrap:
-            do_compute_se_boostrap(
-                agent,
-                model_estimate,
-                time_to_estimate,
-                **bootstrap_options,
-            )
-
-        # Compute sensitivity measure
-        if compute_sensitivity:
-            do_compute_sensitivity(
-                agent,
-                model_estimate,
-                initial_guess,
-            )
-
-        # Make a contour plot of the objective function
-        if make_contour_plot:
-            do_make_contour_plot(
-                agent,
-                model_estimate,
-                emp_moments,
-            )
-
-
-if __name__ == "__main__":
-    # Set booleans to determine which tasks should be done
-    # Which agent type to estimate ("IndShock" or "Portfolio")
-    local_agent_name = "IndShock"
-    local_params_to_estimate = ["CRRA", "DiscFac"]
-    local_estimate_model = True  # Whether to estimate the model
-    # Whether to get standard errors via bootstrap
-    local_compute_se_bootstrap = False
-    # Whether to compute a measure of estimates' sensitivity to moments
-    local_compute_sensitivity = False
-    # Whether to make a contour map of the objective function
-    local_make_contour_plot = False
-    # Whether to use subjective beliefs
-    local_subjective_stock = False
-    local_subjective_labor = False
-
-    estimate(
-        init_agent_name=local_agent_name,
-        params_to_estimate=local_params_to_estimate,
-        estimate_model=local_estimate_model,
-        compute_se_bootstrap=local_compute_se_bootstrap,
-        compute_sensitivity=local_compute_sensitivity,
-        make_contour_plot=local_make_contour_plot,
-        subjective_stock=local_subjective_stock,
-        subjective_labor=local_subjective_labor,
-    )

@@ -1,6 +1,6 @@
 import dask
 from dask.distributed import Client
-from estimark.estimation import estimate
+from estimark.min import estimate_min
 from estimark.options import (
     all_replications,
     high_resource,
@@ -70,7 +70,7 @@ def run_replication():
                 replication_specs["subjective_labor"] = True
                 print("Adding subjective labor market beliefs...")
 
-            lazy_result = dask.delayed(estimate)(**replication_specs)
+            lazy_result = dask.delayed(estimate_min)(**replication_specs)
             lazy_results.append(lazy_result)
 
     dask.compute(*lazy_results)

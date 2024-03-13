@@ -1,0 +1,15 @@
+CRRA,5.865453132577567
+DiscFac,0.5
+time_to_estimate,755.4963464736938
+params,"{'CRRA': 5.865453132577567, 'DiscFac': 0.5}"
+criterion,0.923070680889991
+start_criterion,5.276425253120833
+start_params,"{'CRRA': 5.0, 'DiscFac': 0.95}"
+algorithm,multistart_scipy_neldermead
+direction,minimize
+n_free,2
+message,Maximum number of iterations has been exceeded.
+success,False
+n_criterion_evaluations,268
+n_derivative_evaluations,
+n_iterations,100
