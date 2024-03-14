@@ -1,15 +1,14 @@
-CRRA,1.2462065213787068
-DiscFac,0.5
-time_to_estimate,384.6623764038086
-params,"{'CRRA': 1.2462065213787068, 'DiscFac': 0.5}"
-criterion,5.833521811732498
-start_criterion,4.020725417438446
-start_params,"{'CRRA': 1.4163626423462197, 'DiscFac': 0.5}"
-algorithm,multistart_scipy_neldermead
+CRRA,5.0
+time_to_estimate,363.36753010749817
+params,{'CRRA': 5.0}
+criterion,673.7835424026754
+start_criterion,7.534427217351783
+start_params,{'CRRA': 5.0}
+algorithm,scipy_neldermead
 direction,minimize
-n_free,2
-message,Optimization terminated successfully.
-success,True
-n_criterion_evaluations,73
+n_free,1
+message,Maximum number of function evaluations has been exceeded.
+success,False
+n_criterion_evaluations,100
 n_derivative_evaluations,
-n_iterations,36
+n_iterations,33

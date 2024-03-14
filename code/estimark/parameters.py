@@ -40,7 +40,7 @@ education = "College"  # Education level for income process
 
 # Population age parameters
 final_age = 120  # Age at which the problem ends (die with certainty)
-retirement_age = 65  # Age at which the consumer retires
+retirement_age = 125  # Age at which the consumer retires
 initial_age = 25  # Age at which the consumer enters the model
 final_age_data = 95  # Age at which the data ends
 age_interval = 5  # Interval between age groups
@@ -60,7 +60,7 @@ params_to_estimate = ["CRRA", "DiscFac"]
 # Initial guess of the coefficient of relative risk aversion during estimation (rho)
 init_CRRA = 5.0
 # Initial guess of the adjustment to the discount factor during estimation (beth)
-init_DiscFac = 0.95
+init_DiscFac = 1.0
 # Bounds for beth; if violated, objective function returns "penalty value"
 bounds_DiscFac = [0.5, 1.1]
 # Bounds for rho; if violated, objective function returns "penalty value"
@@ -155,13 +155,13 @@ bootstrap_options = {
 
 minimize_options = {
     "algorithm": "scipy_neldermead",
-    "multistart": True,
+    "multistart": False,
     "error_handling": "continue",
     "algo_options": {
         "convergence.absolute_params_tolerance": 1e-3,
         "convergence.absolute_criterion_tolerance": 1e-3,
-        "stopping.max_iterations": 50,
-        "stopping.max_criterion_evaluations": 100,
+        "stopping.max_iterations": 100,
+        "stopping.max_criterion_evaluations": 200,
         # "n_cores": 12,
     },
     # "numdiff_options": {"n_cores": 12},
@@ -203,6 +203,8 @@ init_calibration = {
     "CubicBool": CubicBool,
     "aNrmInit": aNrmInit,
 }
+
+print(init_calibration["DiscFac"])
 
 # from Mateo's JMP for College Educated
 ElnR = 0.020

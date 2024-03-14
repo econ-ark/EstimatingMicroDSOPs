@@ -335,7 +335,7 @@ def smm_obj_func(params, agent, emp_moments):
     sim_moments = simulate_moments(params, agent, emp_moments)
 
     # normalize wealth moments by the maximum value in the empirical moments
-    modify = any("_port" in key for key in emp_moments)
+    modify = sum("_port" in key for key in emp_moments)
 
     if modify:
         max_fac = max(
@@ -347,6 +347,10 @@ def smm_obj_func(params, agent, emp_moments):
             if "_port" not in key:
                 sim_moments[key] /= max_fac
                 emp_moments[key] /= max_fac
+            else:
+                factor = len(emp_moments) / modify
+                sim_moments[key] *= factor
+                emp_moments[key] *= factor
 
     # TODO: make sure all keys in moments have a corresponding
     # key in sim_moments, raise an error if not
