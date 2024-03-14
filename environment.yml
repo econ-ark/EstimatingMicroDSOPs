@@ -13,6 +13,6 @@ dependencies:
   - openpyxl
   - pip
   - pip:
-      - git+https://github.com/alanlujan91/HARK@fix_cons_bequest
+      - git+https://github.com/econ-ark/HARK@SimplifySolvers
       - black[jupyter]
       - -e ./code/
