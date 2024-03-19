@@ -55,7 +55,6 @@ num_agents = 10000  # Number of agents to simulate
 bootstrap_size = 50  # Number of re-estimations to do during bootstrap
 seed = 1132023  # Just an integer to seed the estimation
 
-
 params_to_estimate = ["CRRA"]
 # Initial guess of the coefficient of relative risk aversion during estimation (rho)
 init_CRRA = 5.0
@@ -68,7 +67,6 @@ bounds_CRRA = [1.1, 20.0]
 
 init_WealthShare = 0.5  # Initial guess of the wealth share parameter
 bounds_WealthShare = [0.0, 1.0]  # Bounds for the wealth share parameter
-
 
 ######################################################################
 # Constructed parameters
@@ -114,7 +112,6 @@ remove_ages_from_snp = np.arange(
     retirement_age + age_interval + 1,
 )  # only match ages 71 and older
 
-
 init_params_options = {
     "init_guess": {
         "CRRA": init_CRRA,
@@ -132,7 +129,6 @@ init_params_options = {
         "WealthShare": bounds_WealthShare[0],
     },
 }
-
 
 # Survival probabilities over the lifecycle
 liv_prb = parse_ssa_life_table(

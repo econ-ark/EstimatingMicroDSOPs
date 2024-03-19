@@ -34,6 +34,7 @@ from estimark.agents import (
 # Parameters for the consumer type and the estimation
 from estimark.parameters import (
     age_mapping,
+    bootstrap_options,
     init_calibration,
     init_params_options,
     init_subjective_labor,
@@ -46,40 +47,32 @@ from estimark.parameters import (
 from estimark.scf import scf_data
 from estimark.snp import snp_data
 
-
 # =====================================================
 # Define objects and functions used for the estimation
 # =====================================================
 
+agent_types = {
+    "IndShock": IndShkLifeCycleConsumerType,
+    "Portfolio": PortfolioLifeCycleConsumerType,
+    "WarmGlow": BequestWarmGlowLifeCycleConsumerType,
+    "WarmGlowPortfolio": BequestWarmGlowLifeCyclePortfolioType,
+    "WealthPortfolio": WealthPortfolioLifeCycleConsumerType,
+}
 
-def make_agent(
-    init_agent_name,
-    subjective_stock=False,
-    subjective_labor=False,
-):
-    if init_agent_name == "IndShock":
-        agent_type = IndShkLifeCycleConsumerType
-    elif init_agent_name == "Portfolio":
-        agent_type = PortfolioLifeCycleConsumerType
-    elif init_agent_name == "WarmGlow":
-        agent_type = BequestWarmGlowLifeCycleConsumerType
-    elif init_agent_name == "WarmGlowPortfolio":
-        agent_type = BequestWarmGlowLifeCyclePortfolioType
-    elif init_agent_name == "WealthPortfolio":
-        agent_type = WealthPortfolioLifeCycleConsumerType
+
+def make_agent(agent_name):
+    for key, value in agent_types.items():
+        if key in agent_name:
+            agent_type = value
+            break
 
     calibration = init_calibration.copy()
-    agent_name = init_agent_name
 
-    if subjective_stock or subjective_labor:
-        agent_name += "Sub"
-        if subjective_stock:
-            agent_name += "(Stock)"
+    if "Sub" in agent_name:
+        if "(Stock)" in agent_name:
             calibration.update(init_subjective_stock)
-        if subjective_labor:
-            agent_name += "(Labor)"
+        if "(Labor)" in agent_name:
             calibration.update(init_subjective_labor)
-        agent_name += "Market"
 
     # Make a lifecycle consumer to be used for estimation, including simulated
     # shocks (plus an initial distribution of wealth)
@@ -111,7 +104,7 @@ def weighted_median(values, weights):
 
 def get_weighted_moments(
     data,
-    variable,
+    variable=None,
     weights=None,
     groups=None,
     mapping=None,
@@ -154,7 +147,6 @@ def get_moments_cov(agent_name, emp_moments):
     )
 
     if "Port" in agent_name:
-
         for key1 in emp_moments:
             # Check if key1 exists in moments_cov dictionary
             if key1 not in moments_cov:
@@ -201,10 +193,9 @@ def get_empirical_moments(agent_name):
     return emp_moments
 
 
-def get_initial_guess(agent_name, params_to_estimate, dir):
+def get_initial_guess(agent_name, params_to_estimate, save_dir):
     # start from previous estimation results if available
-    csv_file_path = f"{dir}{agent_name}_estimate_results.csv"
-    initial_guess = {}
+    csv_file_path = save_dir / (agent_name + "_estimate_results.csv")
 
     try:
         res = pd.read_csv(csv_file_path, header=None)
@@ -213,9 +204,8 @@ def get_initial_guess(agent_name, params_to_estimate, dir):
         temp_dict = init_params_options.get("init_guess", {})
 
     initial_guess = {
-        key: float(value)
-        for key, value in temp_dict.items()
-        if key in params_to_estimate
+        key: float(temp_dict.get(key, init_params_options["init_guess"][key]))
+        for key in params_to_estimate
     }
 
     return initial_guess
@@ -285,7 +275,7 @@ def simulate_moments(params, agent=None, emp_moments=None):
     return sim_moments
 
 
-def smm_obj_func(params, agent, emp_moments):
+def msm_criterion(params, agent=None, emp_moments=None):
     """The objective function for the SMM estimation.  Given values of discount factor
     adjuster DiscFac, coeffecient of relative risk aversion CRRA, a base consumer
     agent type, empirical data, and calibrated parameters, this function calculates
@@ -422,7 +412,7 @@ def calculate_se_bootstrap(
 
         # Estimate the model with the bootstrap data and add to list of estimates
         this_estimate = em.minimize(
-            smm_obj_func,
+            msm_criterion,
             initial_estimate,
             criterion_kwargs={"agent": agent, "emp_moments": bootstrap_moments},
             **minimize_options,
@@ -450,7 +440,13 @@ def calculate_se_bootstrap(
 
 
 def do_estimate_model(
-    agent, emp_moments, initial_guess, minimize_options=None, tables_dir=None
+    agent,
+    initial_guess,
+    estimate_method="min",
+    emp_moments=None,
+    moments_cov=None,
+    minimize_options=None,
+    save_dir=None,
 ):
     fmt_init_guess = [f"{key} = {value:.3f}" for key, value in initial_guess.items()]
     multistart_text = " with multistart" if minimize_options.get("multistart") else ""
@@ -468,58 +464,51 @@ def do_estimate_model(
     print(statement2)
     print(dash_line)
 
-    t_start_estimate = time()
-    res = em.minimize(
-        smm_obj_func,
-        initial_guess,
-        criterion_kwargs={"agent": agent, "emp_moments": emp_moments},
-        upper_bounds={
-            key: value
-            for key, value in init_params_options["upper_bounds"].items()
-            if key in initial_guess
-        },
-        lower_bounds={
-            key: value
-            for key, value in init_params_options["lower_bounds"].items()
-            if key in initial_guess
-        },
-        **minimize_options,
-    )
-    t_end_estimate = time()
-    time_to_estimate = t_end_estimate - t_start_estimate
+    upper_bounds = {
+        key: value
+        for key, value in init_params_options["upper_bounds"].items()
+        if key in initial_guess
+    }
 
-    keys_to_save = [
-        key
-        for key in vars(res)
-        if key
-        not in ["history", "convergence_report", "multistart_info", "algorithm_output"]
-    ]
+    lower_bounds = {
+        key: value
+        for key, value in init_params_options["lower_bounds"].items()
+        if key in initial_guess
+    }
 
-    model_estimate = save_results(
-        res,
-        agent.name,
-        time_to_estimate,
-        tables_dir,
-        params_key="params",
-        keys_to_save=keys_to_save,
-    )
+    estimagic_options = {"upper_bounds": upper_bounds, "lower_bounds": lower_bounds}
 
-    return model_estimate, time_to_estimate
+    if estimate_method == "min":
+        res, time_to_estimate = estimate_min(
+            agent,
+            msm_criterion,
+            initial_guess,
+            emp_moments,
+            minimize_options,
+            estimagic_options=estimagic_options,
+        )
 
+        model_estimate = res.params
 
-def save_results(
-    res,
-    agent_name,
-    time_to_estimate,
-    dir,
-    params_key=None,
-    keys_to_save=None,
-):
-    model_estimate = getattr(res, params_key)
+    elif estimate_method == "msm":
+        res, time_to_estimate = estimate_msm(
+            agent,
+            simulate_moments,
+            emp_moments,
+            moments_cov,
+            initial_guess,
+            minimize_options,
+            estimagic_options=estimagic_options,
+        )
+
+        model_estimate = res._params
+
+    else:
+        raise ValueError(f"Invalid estimate_method: {estimate_method}")
 
     # Calculate minutes and remaining seconds
     minutes, seconds = divmod(time_to_estimate, 60)
-    statement1 = f"Estimated model: {agent_name}"
+    statement1 = f"Estimated model: {agent.name}"
     statement2 = f"Time to estimate: {int(minutes)} min, {int(seconds)} sec."
     estimates = [f"{key} = {value:.3f}" for key, value in model_estimate.items()]
     statement3 = "Estimated values: " + ", ".join(estimates)
@@ -530,7 +519,14 @@ def save_results(
     print("-" * dash_len)
 
     # Create the simple estimate table
-    estimate_results_file = dir + agent_name + "_estimate_results.csv"
+    estimate_results_file = save_dir / (agent.name + "_estimate_results.csv")
+
+    keys_to_save = [
+        key
+        for key in vars(res)
+        if key
+        not in ["history", "convergence_report", "multistart_info", "algorithm_output"]
+    ]
 
     with open(estimate_results_file, "w") as f:
         writer = csv.writer(f)
@@ -544,7 +540,7 @@ def save_results(
             for key in keys_to_save:
                 writer.writerow([key, getattr(res, key)])
 
-    return model_estimate
+    return model_estimate, res, time_to_estimate
 
 
 def do_compute_se_boostrap(
@@ -553,7 +549,7 @@ def do_compute_se_boostrap(
     time_to_estimate,
     bootstrap_size=50,
     seed=0,
-    tables_dir=None,
+    save_dir=None,
 ):
     # Estimate the model:
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
@@ -584,7 +580,7 @@ def do_compute_se_boostrap(
     print(f"Standard errors: DiscFac--> {std_errors[0]}, CRRA--> {std_errors[1]}")
 
     # Create the simple bootstrap table
-    bootstrap_results_file = tables_dir + agent.name + "_bootstrap_results.csv"
+    bootstrap_results_file = save_dir + agent.name + "_bootstrap_results.csv"
 
     with open(bootstrap_results_file, "w") as f:
         writer = csv.writer(f)
@@ -601,7 +597,7 @@ def do_compute_se_boostrap(
         )
 
 
-def do_compute_sensitivity(agent, model_estimate, emp_moments, figures_dir=None):
+def do_compute_sensitivity(agent, model_estimate, emp_moments, save_dir=None):
     print("``````````````````````````````````````````````````````````````````````")
     print("Computing sensitivity measure.")
     print("``````````````````````````````````````````````````````````````````````")
@@ -640,14 +636,14 @@ def do_compute_sensitivity(agent, model_estimate, emp_moments, figures_dir=None)
     axs[1].set_ylabel("Sensitivity")
     axs[1].set_xlabel("Median W/Y Ratio")
 
-    plt.savefig(figures_dir + agent.name + "Sensitivity.pdf")
-    plt.savefig(figures_dir + agent.name + "Sensitivity.png")
-    plt.savefig(figures_dir + agent.name + "Sensitivity.svg")
+    plt.savefig(save_dir + agent.name + "Sensitivity.pdf")
+    plt.savefig(save_dir + agent.name + "Sensitivity.png")
+    plt.savefig(save_dir + agent.name + "Sensitivity.svg")
 
     plt.show()
 
 
-def do_make_contour_plot(agent, model_estimate, emp_moments, figures_dir=None):
+def do_make_contour_plot(agent, model_estimate, emp_moments, save_dir=None):
     print("``````````````````````````````````````````````````````````````````````")
     print("Creating the contour plot.")
     print("``````````````````````````````````````````````````````````````````````")
@@ -667,7 +663,7 @@ def do_make_contour_plot(agent, model_estimate, emp_moments, figures_dir=None):
         DiscFac = DiscFac_list[j]
         for k in range(grid_density):
             CRRA = CRRA_list[k]
-            smm_obj_levels[j, k] = smm_obj_func(
+            smm_obj_levels[j, k] = msm_criterion(
                 np.array([DiscFac, CRRA]),
                 agent=agent,
                 emp_moments=emp_moments,
@@ -684,7 +680,201 @@ def do_make_contour_plot(agent, model_estimate, emp_moments, figures_dir=None):
     plt.plot(model_estimate[1], model_estimate[0], "*r", ms=15)
     plt.xlabel(r"coefficient of relative risk aversion $\rho$", fontsize=14)
     plt.ylabel(r"discount factor adjustment $\beth$", fontsize=14)
-    plt.savefig(figures_dir + agent.name + "SMMcontour.pdf")
-    plt.savefig(figures_dir + agent.name + "SMMcontour.png")
-    plt.savefig(figures_dir + agent.name + "SMMcontour.svg")
+    plt.savefig(save_dir + agent.name + "SMMcontour.pdf")
+    plt.savefig(save_dir + agent.name + "SMMcontour.png")
+    plt.savefig(save_dir + agent.name + "SMMcontour.svg")
     plt.show()
+
+
+def estimate_msm(
+    agent,
+    simulate_moments=None,
+    emp_moments=None,
+    moments_cov=None,
+    initial_params=None,
+    minimize_options=None,
+    simulate_moments_kwargs=None,
+    estimagic_options=None,
+):
+    t0 = time()
+
+    simulate_moments_kwargs = simulate_moments_kwargs or {}
+    simulate_moments_kwargs.setdefault("agent", agent)
+    simulate_moments_kwargs.setdefault("emp_moments", emp_moments)
+
+    res = em.estimate_msm(
+        simulate_moments,
+        emp_moments,
+        moments_cov,
+        initial_params,
+        optimize_options=minimize_options,
+        simulate_moments_kwargs=simulate_moments_kwargs,
+        **estimagic_options,
+    )
+
+    run_time = time() - t0
+
+    return res, run_time
+
+
+def estimate_min(
+    agent,
+    criterion=None,
+    initial_params=None,
+    emp_moments=None,
+    minimize_options={},
+    criterion_kwargs=None,
+    estimagic_options=None,
+):
+    t0 = time()
+
+    criterion_kwargs = criterion_kwargs or {}
+    criterion_kwargs.setdefault("agent", agent)
+    criterion_kwargs.setdefault("emp_moments", emp_moments)
+
+    res = em.minimize(
+        criterion,
+        initial_params,
+        criterion_kwargs=criterion_kwargs,
+        **minimize_options,
+        **estimagic_options,
+    )
+
+    run_time = time() - t0
+
+    return res, run_time
+
+
+def estimate(
+    agent_name,
+    params_to_estimate,
+    estimate_model=True,
+    estimate_method="min",
+    compute_se_bootstrap=False,
+    compute_sensitivity=False,
+    make_contour_plot=False,
+    save_dir=None,
+    emp_moments=None,
+    moments_cov=None,
+):
+    """Run the main estimation procedure for EstimatingMicroDSOPs.
+
+    Parameters
+    ----------
+    estimate_model : bool
+        Whether to estimate the model using Nelder-Mead. When True, this is a low-time, low-memory operation.
+
+    compute_standard_errors : bool
+        Whether to compute standard errors on the estiamtion of the model.
+
+    make_contour_plot : bool
+        Whether to make the contour plot associate with the estiamte.
+
+    Returns
+    -------
+    None
+
+    """
+    save_dir = Path(save_dir).resolve() if save_dir is not None else Path.cwd()
+
+    ############################################################
+    # Make agent
+    ############################################################
+
+    agent = make_agent(agent_name)
+
+    ############################################################
+    # Get initial guess
+    ############################################################
+
+    initial_guess = get_initial_guess(
+        agent_name,
+        params_to_estimate,
+        save_dir,
+    )
+
+    ############################################################
+    # Get empirical moments
+    ############################################################
+
+    if emp_moments is None:
+        emp_moments = get_empirical_moments(agent_name)
+
+        print("Calculated empirical moments.")
+
+    ############################################################
+    # Get moments covariance matrix
+    ############################################################
+
+    if moments_cov is None and estimate_method == "msm":
+        moments_cov = get_moments_cov(agent_name, emp_moments)
+
+        print("Calculated moments covariance matrix.")
+
+    ############################################################
+    # Estimate model
+    ############################################################
+
+    if estimate_model:
+        model_estimate, res, time_to_estimate = do_estimate_model(
+            agent,
+            initial_guess,
+            estimate_method=estimate_method,
+            emp_moments=emp_moments,
+            moments_cov=moments_cov,
+            minimize_options=minimize_options,
+            save_dir=save_dir,
+        )
+
+    # Compute standard errors by bootstrap
+    if compute_se_bootstrap:
+        do_compute_se_boostrap(
+            agent,
+            model_estimate,
+            time_to_estimate,
+            save_dir=save_dir,
+            **bootstrap_options,
+        )
+
+    # Compute sensitivity measure
+    if compute_sensitivity:
+        do_compute_sensitivity(
+            agent,
+            model_estimate,
+            initial_guess,
+            save_dir=save_dir,
+        )
+
+    # Make a contour plot of the objective function
+    if make_contour_plot:
+        do_make_contour_plot(
+            agent,
+            model_estimate,
+            emp_moments,
+            save_dir=save_dir,
+        )
+
+
+if __name__ == "__main__":
+    # Set booleans to determine which tasks should be done
+    # Which agent type to estimate ("IndShock" or "Portfolio")
+    local_agent_name = "IndShock"
+    local_params_to_estimate = ["CRRA", "DiscFac"]
+    local_estimate_model = True  # Whether to estimate the model
+    # Whether to get standard errors via bootstrap
+    local_compute_se_bootstrap = False
+    # Whether to compute a measure of estimates' sensitivity to moments
+    local_compute_sensitivity = False
+    # Whether to make a contour map of the objective function
+    local_make_contour_plot = False
+    local_save_dir = "content/tables/min"
+
+    estimate(
+        agent_name=local_agent_name,
+        params_to_estimate=local_params_to_estimate,
+        estimate_model=local_estimate_model,
+        compute_se_bootstrap=local_compute_se_bootstrap,
+        compute_sensitivity=local_compute_sensitivity,
+        make_contour_plot=local_make_contour_plot,
+        save_dir=local_save_dir,
+    )

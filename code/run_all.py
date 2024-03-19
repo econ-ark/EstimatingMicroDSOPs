@@ -1,12 +1,17 @@
+import itertools
+
 import dask
 from dask.distributed import Client
-from estimark.min import estimate_min
-from estimark.options import (
-    all_replications,
-    high_resource,
-    low_resource,
-    medium_resource,
-)
+from estimark.estimation import estimate
+from estimark.options import low_resource
+
+agent_names = [
+    "IndShock",
+    "Portfolio",
+    "WarmGlow",
+    "WarmGlowPortfolio",
+    "WealthPortfolio",
+]
 
 
 # Ask the user which replication to run, and run it:
@@ -15,62 +20,24 @@ def run_replication():
 
     lazy_results = []
 
-    for i in range(1, 6):
-        which_model = str(i)
-        which_replication = "1"
-        for k in range(1, 5):
-            subjective_markets = str(k)
+    for agent_name in agent_names:
+        for sub_stock, sub_labor in itertools.product(range(2), repeat=2):
+            temp_agent_name = agent_name
+            if sub_stock or sub_labor:
+                temp_agent_name += "Sub"
+                if sub_stock:
+                    temp_agent_name += "(Stock)"
+                if sub_labor:
+                    temp_agent_name += "(Labor)"
+                temp_agent_name += "Market"
 
-            replication_specs = {}
+            replication_specs = low_resource.copy()
+            replication_specs["agent_name"] = temp_agent_name
+            replication_specs["save_dir"] = "content/tables/min"
 
-            if which_model == "1" or which_model == "":
-                replication_specs["init_agent_name"] = "IndShock"
-            elif which_model == "2":
-                replication_specs["init_agent_name"] = "Portfolio"
-            elif which_model == "3":
-                replication_specs["init_agent_name"] = "WarmGlow"
-            elif which_model == "4":
-                replication_specs["init_agent_name"] = "WarmGlowPortfolio"
-            elif which_model == "5":
-                replication_specs["init_agent_name"] = "WealthPortfolio"
-            else:
-                print("Invalid model choice.")
-                return
+            print("Model: ", replication_specs["agent_name"])
 
-            print("Model: ", replication_specs["init_agent_name"])
-
-            if which_replication == "q":
-                return
-
-            elif which_replication == "1" or which_replication == "":
-                print("Running low-resource replication...")
-                replication_specs.update(**low_resource)
-
-            elif which_replication == "2":
-                print("Running medium-resource replication...")
-                replication_specs.update(**medium_resource)
-
-            elif which_replication == "3":
-                print("Running high-resource replication...")
-                replication_specs.update(**high_resource)
-
-            elif which_replication == "4":
-                print("Running all replications...")
-                replication_specs.update(**all_replications)
-
-            else:
-                print("Invalid replication choice.")
-                return
-
-            if subjective_markets == "2" or subjective_markets == "4":
-                replication_specs["subjective_stock"] = True
-                print("Adding subjective stock market beliefs...")
-
-            if subjective_markets == "3" or subjective_markets == "4":
-                replication_specs["subjective_labor"] = True
-                print("Adding subjective labor market beliefs...")
-
-            lazy_result = dask.delayed(estimate_min)(**replication_specs)
+            lazy_result = dask.delayed(estimate)(**replication_specs)
             lazy_results.append(lazy_result)
 
     dask.compute(*lazy_results)

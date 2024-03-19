@@ -40,7 +40,7 @@ education = "College"  # Education level for income process
 
 # Population age parameters
 final_age = 120  # Age at which the problem ends (die with certainty)
-retirement_age = 125  # Age at which the consumer retires
+retirement_age = 65  # Age at which the consumer retires
 initial_age = 25  # Age at which the consumer enters the model
 final_age_data = 95  # Age at which the data ends
 age_interval = 5  # Interval between age groups
@@ -55,20 +55,20 @@ num_agents = 10000  # Number of agents to simulate
 bootstrap_size = 50  # Number of re-estimations to do during bootstrap
 seed = 1132023  # Just an integer to seed the estimation
 
-
 params_to_estimate = ["CRRA", "DiscFac"]
+
 # Initial guess of the coefficient of relative risk aversion during estimation (rho)
 init_CRRA = 5.0
+# Bounds for rho; if violated, objective function returns "penalty value"
+bounds_CRRA = [1.1, 20.0]
+
 # Initial guess of the adjustment to the discount factor during estimation (beth)
 init_DiscFac = 1.0
 # Bounds for beth; if violated, objective function returns "penalty value"
 bounds_DiscFac = [0.5, 1.1]
-# Bounds for rho; if violated, objective function returns "penalty value"
-bounds_CRRA = [1.1, 20.0]
 
 init_WealthShare = 0.5  # Initial guess of the wealth share parameter
 bounds_WealthShare = [0.0, 1.0]  # Bounds for the wealth share parameter
-
 
 ######################################################################
 # Constructed parameters
@@ -114,7 +114,6 @@ remove_ages_from_snp = np.arange(
     retirement_age + age_interval + 1,
 )  # only match ages 71 and older
 
-
 init_params_options = {
     "init_guess": {
         "CRRA": init_CRRA,
@@ -132,7 +131,6 @@ init_params_options = {
         "WealthShare": bounds_WealthShare[0],
     },
 }
-
 
 # Survival probabilities over the lifecycle
 liv_prb = parse_ssa_life_table(
@@ -155,13 +153,13 @@ bootstrap_options = {
 
 minimize_options = {
     "algorithm": "scipy_neldermead",
-    "multistart": False,
+    "multistart": True,
     "error_handling": "continue",
     "algo_options": {
         "convergence.absolute_params_tolerance": 1e-3,
         "convergence.absolute_criterion_tolerance": 1e-3,
-        "stopping.max_iterations": 100,
-        "stopping.max_criterion_evaluations": 200,
+        "stopping.max_iterations": 50,
+        "stopping.max_criterion_evaluations": 100,
         # "n_cores": 12,
     },
     # "numdiff_options": {"n_cores": 12},
@@ -203,8 +201,6 @@ init_calibration = {
     "CubicBool": CubicBool,
     "aNrmInit": aNrmInit,
 }
-
-print(init_calibration["DiscFac"])
 
 # from Mateo's JMP for College Educated
 ElnR = 0.020
