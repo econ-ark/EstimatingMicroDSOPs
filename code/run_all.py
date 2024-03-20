@@ -1,7 +1,5 @@
 import itertools
 
-import dask
-from dask.distributed import Client
 from estimark.estimation import estimate
 from estimark.options import low_resource
 
@@ -16,10 +14,6 @@ agent_names = [
 
 # Ask the user which replication to run, and run it:
 def run_replication():
-    client = Client(threads_per_worker=10, n_workers=20)
-
-    lazy_results = []
-
     for agent_name in agent_names:
         for sub_stock, sub_labor in itertools.product(range(2), repeat=2):
             temp_agent_name = agent_name
@@ -37,12 +31,7 @@ def run_replication():
 
             print("Model: ", replication_specs["agent_name"])
 
-            lazy_result = dask.delayed(estimate)(**replication_specs)
-            lazy_results.append(lazy_result)
-
-    dask.compute(*lazy_results)
-
-    client.close()
+            estimate(**replication_specs)
 
     print("All replications complete.")
 

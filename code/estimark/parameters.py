@@ -32,7 +32,7 @@ PermShkCount = 7
 # Number of points in discrete approximation to transitory income shocks
 TranShkCount = 7
 UnempPrb = 0.05  # Probability of unemployment while working
-UnempPrbRet = 0.005  # Probability of "unemployment" while retired # maybe one more zero
+UnempPrbRet = 0.005  # Probability of "unemployment" while retired
 IncUnemp = 0.3  # Unemployment benefits replacement rate
 IncUnempRet = 0.0  # "Unemployment" benefits when retired
 ss_variances = True  # Use the Sabelhaus-Song variance profiles
@@ -63,7 +63,7 @@ init_CRRA = 5.0
 bounds_CRRA = [1.1, 20.0]
 
 # Initial guess of the adjustment to the discount factor during estimation (beth)
-init_DiscFac = 1.0
+init_DiscFac = 0.95
 # Bounds for beth; if violated, objective function returns "penalty value"
 bounds_DiscFac = [0.5, 1.1]
 
@@ -152,7 +152,7 @@ bootstrap_options = {
 }
 
 minimize_options = {
-    "algorithm": "scipy_neldermead",
+    "algorithm": "tranquilo_ls",
     "multistart": True,
     "error_handling": "continue",
     "algo_options": {
@@ -160,9 +160,10 @@ minimize_options = {
         "convergence.absolute_criterion_tolerance": 1e-3,
         "stopping.max_iterations": 50,
         "stopping.max_criterion_evaluations": 100,
-        # "n_cores": 12,
+        "trustregion_initial_radius": 0.01,
+        "n_cores": 12,
     },
-    # "numdiff_options": {"n_cores": 12},
+    "numdiff_options": {"n_cores": 12},
 }
 
 # -----------------------------------------------------------------------------
@@ -219,6 +220,6 @@ init_subjective_stock = {
 
 # from Tao's JMP
 init_subjective_labor = {
-    "TranShkStd": [0.03] * len(inc_calib["TranShkStd"]),
-    "PermShkStd": [0.03] * len(inc_calib["PermShkStd"]),
+    "TranShkStd": [0.03] * (retirement_t + 1) + [0.0] * (terminal_t - retirement_t - 1),
+    "PermShkStd": [0.03] * (retirement_t + 1) + [0.0] * (terminal_t - retirement_t - 1),
 }

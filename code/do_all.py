@@ -45,7 +45,7 @@ Python PATH with the locations of the MicroDSOP directory structure so it can
 still run.
 """
 
-from estimark.min import estimate_min
+from estimark.estimation import estimate
 from estimark.options import (
     all_replications,
     high_resource,
@@ -99,15 +99,15 @@ def run_replication():
     replication_specs = {}
 
     if which_model == "1" or which_model == "":
-        replication_specs["agent_name"] = "IndShock"
+        agent_name = "IndShock"
     elif which_model == "2":
-        replication_specs["agent_name"] = "Portfolio"
+        agent_name = "Portfolio"
     elif which_model == "3":
-        replication_specs["agent_name"] = "WarmGlow"
+        agent_name = "WarmGlow"
     elif which_model == "4":
-        replication_specs["agent_name"] = "WarmGlowPortfolio"
+        agent_name = "WarmGlowPortfolio"
     elif which_model == "5":
-        replication_specs["agent_name"] = "WealthPortfolio"
+        agent_name = "WealthPortfolio"
     else:
         print("Invalid model choice.")
         return
@@ -135,15 +135,23 @@ def run_replication():
         print("Invalid replication choice.")
         return
 
-    if subjective_markets == "2" or subjective_markets == "4":
-        replication_specs["subjective_stock"] = True
-        print("Adding subjective stock market beliefs...")
+    if int(subjective_markets) > 1:
+        agent_name += "Sub"
 
-    if subjective_markets == "3" or subjective_markets == "4":
-        replication_specs["subjective_labor"] = True
-        print("Adding subjective labor market beliefs...")
+        if subjective_markets == "2" or subjective_markets == "4":
+            agent_name += "(Stock)"
+            print("Adding subjective stock market beliefs...")
 
-    estimate_min(**replication_specs)
+        if subjective_markets == "3" or subjective_markets == "4":
+            agent_name += "(Labor)"
+            print("Adding subjective labor market beliefs...")
+
+        agent_name += "Market"
+
+    replication_specs["agent_name"] = agent_name
+    replication_specs["save_dir"] = "content/tables/min"
+
+    estimate(**replication_specs)
 
 
 if __name__ == "__main__":

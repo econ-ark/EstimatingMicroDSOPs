@@ -322,6 +322,7 @@ def msm_criterion(params, agent=None, emp_moments=None):
         median wealth-to-permanent-income ratio in the simulation.
 
     """
+    emp_moments = emp_moments.copy()
     sim_moments = simulate_moments(params, agent, emp_moments)
 
     # normalize wealth moments by the maximum value in the empirical moments
@@ -521,12 +522,7 @@ def do_estimate_model(
     # Create the simple estimate table
     estimate_results_file = save_dir / (agent.name + "_estimate_results.csv")
 
-    keys_to_save = [
-        key
-        for key in vars(res)
-        if key
-        not in ["history", "convergence_report", "multistart_info", "algorithm_output"]
-    ]
+    keys_to_save = vars(res)
 
     with open(estimate_results_file, "w") as f:
         writer = csv.writer(f)
@@ -858,7 +854,7 @@ def estimate(
 if __name__ == "__main__":
     # Set booleans to determine which tasks should be done
     # Which agent type to estimate ("IndShock" or "Portfolio")
-    local_agent_name = "IndShock"
+    local_agent_name = "IndShockSub(Labor)Market"
     local_params_to_estimate = ["CRRA", "DiscFac"]
     local_estimate_model = True  # Whether to estimate the model
     # Whether to get standard errors via bootstrap
