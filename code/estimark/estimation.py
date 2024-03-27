@@ -221,6 +221,9 @@ def simulate_moments(params, agent=None, emp_moments=None):
 
     agent.assign_parameters(**params)
 
+    if hasattr(agent, "BeqCRRA"):
+        agent.BeqCRRA = agent.CRRA
+
     # ensure subjective beliefs are used for solution
     if "(Stock)" in agent.name and "Portfolio" in agent.name:
         agent.RiskyAvg = init_subjective_stock["RiskyAvg"]
@@ -772,6 +775,7 @@ def estimate(
 
     """
     save_dir = Path(save_dir).resolve() if save_dir is not None else Path.cwd()
+    save_dir.mkdir(parents=True, exist_ok=True)
 
     ############################################################
     # Make agent
@@ -855,7 +859,7 @@ if __name__ == "__main__":
     # Set booleans to determine which tasks should be done
     # Which agent type to estimate ("IndShock" or "Portfolio")
     local_agent_name = "IndShockSub(Labor)Market"
-    local_params_to_estimate = ["CRRA", "DiscFac"]
+    local_params_to_estimate = ["CRRA"]
     local_estimate_model = True  # Whether to estimate the model
     # Whether to get standard errors via bootstrap
     local_compute_se_bootstrap = False

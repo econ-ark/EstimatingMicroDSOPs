@@ -27,7 +27,7 @@ def run_replication():
 
             replication_specs = low_resource.copy()
             replication_specs["agent_name"] = temp_agent_name
-            replication_specs["save_dir"] = "content/tables/min"
+            replication_specs["save_dir"] = "content/tables/TRP"
 
             print("Model: ", replication_specs["agent_name"])
 

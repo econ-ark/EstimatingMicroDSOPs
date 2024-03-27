@@ -2,6 +2,10 @@
 model.  The empirical data is stored in a separate csv file and is loaded in setup_scf_data.
 """
 
+# Discount Factor of 1.0 always
+# income uncertainty doubles at retirement
+# only estimate CRRA
+
 import numpy as np
 from HARK.Calibration.Income.IncomeTools import CGM_income, parse_income_spec
 from HARK.ConsumptionSaving.ConsIndShockModel import init_lifecycle
@@ -55,15 +59,15 @@ num_agents = 10000  # Number of agents to simulate
 bootstrap_size = 50  # Number of re-estimations to do during bootstrap
 seed = 1132023  # Just an integer to seed the estimation
 
-params_to_estimate = ["CRRA", "DiscFac"]
+params_to_estimate = ["CRRA"]
 
 # Initial guess of the coefficient of relative risk aversion during estimation (rho)
-init_CRRA = 5.0
+init_CRRA = 10.0
 # Bounds for rho; if violated, objective function returns "penalty value"
 bounds_CRRA = [1.1, 20.0]
 
 # Initial guess of the adjustment to the discount factor during estimation (beth)
-init_DiscFac = 0.95
+init_DiscFac = 1.0
 # Bounds for beth; if violated, objective function returns "penalty value"
 bounds_DiscFac = [0.5, 1.1]
 
@@ -179,9 +183,13 @@ init_calibration = {
     "PermGroFac": inc_calib["PermGroFac"],
     "PermGroFacAgg": 1.0,
     "BoroCnstArt": BoroCnstArt,
-    "PermShkStd": inc_calib["PermShkStd"],
+    "PermShkStd": inc_calib["PermShkStd"][: retirement_t + 1]
+    + [np.sqrt(2) * inc_calib["PermShkStd"][retirement_t]]
+    * (terminal_t - retirement_t - 1),
     "PermShkCount": PermShkCount,
-    "TranShkStd": inc_calib["TranShkStd"],
+    "TranShkStd": inc_calib["TranShkStd"][: retirement_t + 1]
+    + [np.sqrt(2) * inc_calib["TranShkStd"][retirement_t]]
+    * (terminal_t - retirement_t - 1),
     "TranShkCount": TranShkCount,
     "T_cycle": terminal_t,
     "UnempPrb": UnempPrb,
@@ -220,6 +228,8 @@ init_subjective_stock = {
 
 # from Tao's JMP
 init_subjective_labor = {
-    "TranShkStd": [0.03] * (retirement_t + 1) + [0.0] * (terminal_t - retirement_t - 1),
-    "PermShkStd": [0.03] * (retirement_t + 1) + [0.0] * (terminal_t - retirement_t - 1),
+    "TranShkStd": [0.03] * (retirement_t + 1)
+    + [0.03 * np.sqrt(2)] * (terminal_t - retirement_t - 1),
+    "PermShkStd": [0.03] * (retirement_t + 1)
+    + [0.03 * np.sqrt(2)] * (terminal_t - retirement_t - 1),
 }
