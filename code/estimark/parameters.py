@@ -4,7 +4,7 @@ model.  The empirical data is stored in a separate csv file and is loaded in set
 
 # Discount Factor of 1.0 always
 # income uncertainty doubles at retirement
-# only estimate CRRA
+# only estimate CRRA, Bequest params
 
 import numpy as np
 from HARK.Calibration.Income.IncomeTools import CGM_income, parse_income_spec
@@ -74,6 +74,12 @@ bounds_DiscFac = [0.5, 1.1]
 init_WealthShare = 0.5  # Initial guess of the wealth share parameter
 bounds_WealthShare = [0.0, 1.0]  # Bounds for the wealth share parameter
 
+init_BeqFac = 20.0  # Initial guess of the bequest factor
+bounds_BeqFac = [20.0, 100.0]  # Bounds for the bequest factor
+
+init_BeqShift = 0.0  # Initial guess of the bequest shift parameter
+bounds_BeqShift = [0.0, 80.0]  # Bounds for the bequest shift parameter
+
 ######################################################################
 # Constructed parameters
 ######################################################################
@@ -123,16 +129,22 @@ init_params_options = {
         "CRRA": init_CRRA,
         "DiscFac": init_DiscFac,
         "WealthShare": init_WealthShare,
+        "BeqFac": init_BeqFac,
+        "BeqShift": init_BeqShift,
     },
     "upper_bounds": {
         "CRRA": bounds_CRRA[1],
         "DiscFac": bounds_DiscFac[1],
         "WealthShare": bounds_WealthShare[1],
+        "BeqFac": bounds_BeqFac[1],
+        "BeqShift": bounds_BeqShift[1],
     },
     "lower_bounds": {
         "CRRA": bounds_CRRA[0],
         "DiscFac": bounds_DiscFac[0],
         "WealthShare": bounds_WealthShare[0],
+        "BeqFac": bounds_BeqFac[0],
+        "BeqShift": bounds_BeqShift[0],
     },
 }
 
@@ -160,11 +172,10 @@ minimize_options = {
     "multistart": True,
     "error_handling": "continue",
     "algo_options": {
-        "convergence.absolute_params_tolerance": 1e-3,
-        "convergence.absolute_criterion_tolerance": 1e-3,
-        "stopping.max_iterations": 50,
-        "stopping.max_criterion_evaluations": 100,
-        "trustregion_initial_radius": 0.01,
+        "convergence.absolute_params_tolerance": 1e-6,
+        "convergence.absolute_criterion_tolerance": 1e-6,
+        "stopping.max_iterations": 100,
+        "stopping.max_criterion_evaluations": 200,
         "n_cores": 12,
     },
     "numdiff_options": {"n_cores": 12},

@@ -64,7 +64,6 @@ def make_agent(agent_name):
     for key, value in agent_types.items():
         if key in agent_name:
             agent_type = value
-            break
 
     calibration = init_calibration.copy()
 
@@ -193,7 +192,16 @@ def get_empirical_moments(agent_name):
     return emp_moments
 
 
-def get_initial_guess(agent_name, params_to_estimate, save_dir):
+def get_initial_guess(agent, params_to_estimate, save_dir):
+    agent_name = agent.name
+
+    agent_params = []
+    for key in params_to_estimate:
+        if hasattr(agent, key):
+            agent_params.append(key)
+        else:
+            print(f"Agent {agent_name} does not have parameter: {key}")
+
     # start from previous estimation results if available
     csv_file_path = save_dir / (agent_name + "_estimate_results.csv")
 
@@ -205,7 +213,7 @@ def get_initial_guess(agent_name, params_to_estimate, save_dir):
 
     initial_guess = {
         key: float(temp_dict.get(key, init_params_options["init_guess"][key]))
-        for key in params_to_estimate
+        for key in agent_params
     }
 
     return initial_guess
@@ -787,11 +795,7 @@ def estimate(
     # Get initial guess
     ############################################################
 
-    initial_guess = get_initial_guess(
-        agent_name,
-        params_to_estimate,
-        save_dir,
-    )
+    initial_guess = get_initial_guess(agent, params_to_estimate, save_dir)
 
     ############################################################
     # Get empirical moments
@@ -859,7 +863,7 @@ if __name__ == "__main__":
     # Set booleans to determine which tasks should be done
     # Which agent type to estimate ("IndShock" or "Portfolio")
     local_agent_name = "IndShockSub(Labor)Market"
-    local_params_to_estimate = ["CRRA"]
+    local_params_to_estimate = ["CRRA", "potato"]
     local_estimate_model = True  # Whether to estimate the model
     # Whether to get standard errors via bootstrap
     local_compute_se_bootstrap = False
