@@ -5,14 +5,15 @@ dependencies:
   - python=3.10
   - jupyter
   - jupyterlab
-  - black 
-  - ruff 
+  - black
+  - ruff
   - nbqa
-  - dask 
+  - dask
   - estimagic
   - openpyxl
   - pip
   - pip:
+      - DFO-LS
       - git+https://github.com/econ-ark/HARK@SimplifySolvers
       - black[jupyter]
       - -e ./code/
