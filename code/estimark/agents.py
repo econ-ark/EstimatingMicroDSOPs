@@ -49,6 +49,9 @@ class TempConsumerType(AgentType):
         self.t_age[which_agents] = 0
         # Which period of the cycle each agents is currently in
         self.t_cycle[which_agents] = 0
+        
+### Overwrite sim_one_period to not have death or look up of agent ages
+
 
 
 class IndShkLifeCycleConsumerType(TempConsumerType, IndShockConsumerType):

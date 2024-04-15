@@ -4,10 +4,10 @@ from estimark.estimation import estimate
 from estimark.options import low_resource
 
 agent_names = [
-    "IndShock",
-    "Portfolio",
-    "WarmGlow",
-    "WarmGlowPortfolio",
+    # "IndShock",
+    # "Portfolio",
+    # "WarmGlow",
+    # "WarmGlowPortfolio",
     "WealthPortfolio",
 ]
 

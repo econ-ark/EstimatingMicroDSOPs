@@ -170,6 +170,7 @@ bootstrap_options = {
 minimize_options = {
     "algorithm": "tranquilo_ls",
     "multistart": True,
+    
     "error_handling": "continue",
     "algo_options": {
         "convergence.absolute_params_tolerance": 1e-6,
