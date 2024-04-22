@@ -1,7 +1,7 @@
 # Define settings for "main()" function in StructuralEstiamtion.py based on
 # resource requirements:
 
-params_to_estimate = ["CRRA", "BeqShift", "BeqFac", "WealthShare"]
+params_to_estimate = ["CRRA", "BeqShift", "BeqFac", "WealthShare", "WealthShift"]
 
 low_resource = {
     "estimate_model": True,

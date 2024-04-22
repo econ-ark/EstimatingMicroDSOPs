@@ -62,7 +62,7 @@ seed = 1132023  # Just an integer to seed the estimation
 params_to_estimate = ["CRRA"]
 
 # Initial guess of the coefficient of relative risk aversion during estimation (rho)
-init_CRRA = 10.0
+init_CRRA = 2.0
 # Bounds for rho; if violated, objective function returns "penalty value"
 bounds_CRRA = [1.1, 20.0]
 
@@ -71,14 +71,17 @@ init_DiscFac = 1.0
 # Bounds for beth; if violated, objective function returns "penalty value"
 bounds_DiscFac = [0.5, 1.1]
 
-init_WealthShare = 0.5  # Initial guess of the wealth share parameter
-bounds_WealthShare = [0.0, 1.0]  # Bounds for the wealth share parameter
+init_WealthShare = 0.05  # Initial guess of the wealth share parameter
+bounds_WealthShare = [0.0, 0.5]  # Bounds for the wealth share parameter
+
+init_WealthShift = 0.0  # Initial guess of the wealth shift parameter
+bounds_WealthShift = [0.0, 100.0]  # Bounds for the wealth shift parameter
 
 init_BeqFac = 20.0  # Initial guess of the bequest factor
-bounds_BeqFac = [20.0, 100.0]  # Bounds for the bequest factor
+bounds_BeqFac = [20.0, 70.0]  # Bounds for the bequest factor
 
-init_BeqShift = 0.0  # Initial guess of the bequest shift parameter
-bounds_BeqShift = [0.0, 80.0]  # Bounds for the bequest shift parameter
+init_BeqShift = 1.0  # Initial guess of the bequest shift parameter
+bounds_BeqShift = [0.0, 70.0]  # Bounds for the bequest shift parameter
 
 ######################################################################
 # Constructed parameters
@@ -129,6 +132,7 @@ init_params_options = {
         "CRRA": init_CRRA,
         "DiscFac": init_DiscFac,
         "WealthShare": init_WealthShare,
+        "WealthShift": init_WealthShift,
         "BeqFac": init_BeqFac,
         "BeqShift": init_BeqShift,
     },
@@ -136,6 +140,7 @@ init_params_options = {
         "CRRA": bounds_CRRA[1],
         "DiscFac": bounds_DiscFac[1],
         "WealthShare": bounds_WealthShare[1],
+        "WealthShift": bounds_WealthShift[1],
         "BeqFac": bounds_BeqFac[1],
         "BeqShift": bounds_BeqShift[1],
     },
@@ -143,6 +148,7 @@ init_params_options = {
         "CRRA": bounds_CRRA[0],
         "DiscFac": bounds_DiscFac[0],
         "WealthShare": bounds_WealthShare[0],
+        "WealthShift": bounds_WealthShift[0],
         "BeqFac": bounds_BeqFac[0],
         "BeqShift": bounds_BeqShift[0],
     },
@@ -170,7 +176,6 @@ bootstrap_options = {
 minimize_options = {
     "algorithm": "tranquilo_ls",
     "multistart": True,
-    
     "error_handling": "continue",
     "algo_options": {
         "convergence.absolute_params_tolerance": 1e-6,
@@ -223,6 +228,12 @@ init_calibration = {
     "aNrmInit": aNrmInit,
 }
 
+Eq_prem = 0.035
+RiskyStd = 0.20
+
+init_calibration["RiskyAvg"] = Rfree + Eq_prem
+init_calibration["RiskyStd"] = RiskyStd
+
 # from Mateo's JMP for College Educated
 ElnR = 0.020
 VlnR = 0.424**2
@@ -230,8 +241,10 @@ VlnR = 0.424**2
 TrueElnR = 0.085
 TrueVlnR = 0.170**2
 
+logRfree = 0.043
+
 init_subjective_stock = {
-    "Rfree": 1.019,  # from Mateo's JMP
+    "Rfree": np.exp(logRfree),  # from Mateo's JMP
     "RiskyAvg": np.exp(ElnR + 0.5 * VlnR),
     "RiskyStd": np.sqrt(np.exp(2 * ElnR + VlnR) * (np.exp(VlnR) - 1)),
     "RiskyAvgTrue": np.exp(TrueElnR + 0.5 * TrueVlnR),

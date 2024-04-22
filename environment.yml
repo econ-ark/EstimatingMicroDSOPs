@@ -14,6 +14,6 @@ dependencies:
   - pip
   - pip:
       - DFO-LS
-      - git+https://github.com/econ-ark/HARK@SimplifySolvers
+      - git+https://github.com/alanlujan91/HARK@wealth_portfolio_solver
       - black[jupyter]
       - -e ./code/
