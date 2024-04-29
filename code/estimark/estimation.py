@@ -258,6 +258,8 @@ def simulate_moments(params, agent=None, emp_moments=None):
         agent.PermShkStd = init_subjective_labor["PermShkStd"]
         agent.update_income_process()
 
+    agent.LivPrb = [1.0] * agent.T_cycle
+
     max_sim_age = agent.T_cycle + 1
     # Initialize the simulation by clearing histories, resetting initial values
     agent.initialize_sim()

@@ -228,7 +228,7 @@ init_calibration = {
     "aNrmInit": aNrmInit,
 }
 
-Eq_prem = 0.035
+Eq_prem = 0.03
 RiskyStd = 0.20
 
 init_calibration["RiskyAvg"] = Rfree + Eq_prem
