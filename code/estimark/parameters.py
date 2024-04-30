@@ -226,6 +226,8 @@ init_calibration = {
     "vFuncBool": vFuncBool,
     "CubicBool": CubicBool,
     "aNrmInit": aNrmInit,
+    "neutral_measure": True,  # Harmemberg
+    "sim_common_Rrisky": False,  # idiosyncratic risky return
 }
 
 Eq_prem = 0.03
@@ -235,20 +237,28 @@ init_calibration["RiskyAvg"] = Rfree + Eq_prem
 init_calibration["RiskyStd"] = RiskyStd
 
 # from Mateo's JMP for College Educated
-ElnR = 0.020
+ElnR_nom = 0.020
 VlnR = 0.424**2
 
-TrueElnR = 0.085
+TrueElnR_nom = 0.085
 TrueVlnR = 0.170**2
 
-logRfree = 0.043
+logInflation = 0.024
+logRfree_nom = 0.043
+Rfree_real = np.exp(logRfree_nom - logInflation)  # 1.019
+
+ElnR_real = ElnR_nom - logInflation
+TrueElnR_real = TrueElnR_nom - logInflation
+
 
 init_subjective_stock = {
-    "Rfree": np.exp(logRfree),  # from Mateo's JMP
-    "RiskyAvg": np.exp(ElnR + 0.5 * VlnR),
-    "RiskyStd": np.sqrt(np.exp(2 * ElnR + VlnR) * (np.exp(VlnR) - 1)),
-    "RiskyAvgTrue": np.exp(TrueElnR + 0.5 * TrueVlnR),
-    "RiskyStdTrue": np.sqrt(np.exp(2 * TrueElnR + TrueVlnR) * (np.exp(TrueVlnR) - 1)),
+    "Rfree": Rfree_real,  # from Mateo's JMP
+    "RiskyAvg": np.exp(ElnR_real + 0.5 * VlnR),
+    "RiskyStd": np.sqrt(np.exp(2 * ElnR_real + VlnR) * (np.exp(VlnR) - 1)),
+    "RiskyAvgTrue": np.exp(TrueElnR_real + 0.5 * TrueVlnR),
+    "RiskyStdTrue": np.sqrt(
+        np.exp(2 * TrueElnR_real + TrueVlnR) * (np.exp(TrueVlnR) - 1)
+    ),
 }
 
 # from Tao's JMP

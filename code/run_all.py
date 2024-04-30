@@ -1,7 +1,11 @@
 from estimark.estimation import estimate
 from estimark.options import low_resource
 
-agent_names = ["Portfolio", "WarmGlowPortfolio", "WealthPortfolio"]
+agent_names = [
+    "Portfolio",
+    "WarmGlowPortfolio",
+    "WealthPortfolio",
+]
 
 
 # Ask the user which replication to run, and run it:
