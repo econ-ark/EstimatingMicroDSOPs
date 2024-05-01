@@ -64,17 +64,17 @@ params_to_estimate = ["CRRA"]
 # Initial guess of the coefficient of relative risk aversion during estimation (rho)
 init_CRRA = 2.0
 # Bounds for rho; if violated, objective function returns "penalty value"
-bounds_CRRA = [1.1, 20.0]
+bounds_CRRA = [2.0, 20.0]
 
 # Initial guess of the adjustment to the discount factor during estimation (beth)
 init_DiscFac = 1.0
 # Bounds for beth; if violated, objective function returns "penalty value"
 bounds_DiscFac = [0.5, 1.1]
 
-init_WealthShare = 0.05  # Initial guess of the wealth share parameter
-bounds_WealthShare = [0.0, 0.5]  # Bounds for the wealth share parameter
+init_WealthShare = 0.1  # Initial guess of the wealth share parameter
+bounds_WealthShare = [0.1, 0.5]  # Bounds for the wealth share parameter
 
-init_WealthShift = 0.0  # Initial guess of the wealth shift parameter
+init_WealthShift = 50.0  # Initial guess of the wealth shift parameter
 bounds_WealthShift = [0.0, 100.0]  # Bounds for the wealth shift parameter
 
 init_BeqFac = 20.0  # Initial guess of the bequest factor
