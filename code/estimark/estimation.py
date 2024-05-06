@@ -20,6 +20,7 @@ import pandas as pd
 # Estimation methods
 from estimagic.inference import get_bootstrap_samples
 from scipy.optimize import approx_fprime
+from statsmodels.stats.weightstats import DescrStatsW
 
 # Import modules from core HARK libraries:
 # The consumption-saving micro model
@@ -91,14 +92,8 @@ def make_agent(agent_name):
 
 
 def weighted_median(values, weights):
-    inds = np.argsort(values)
-    values = values[inds]
-    weights = weights[inds]
-
-    wsum = np.cumsum(inds)
-    ind = np.where(wsum > wsum[-1] / 2)[0][0]
-
-    return values[ind]
+    stats = DescrStatsW(values, weights=weights)
+    return stats.quantile(0.5, return_pandas=False)
 
 
 def get_weighted_moments(
