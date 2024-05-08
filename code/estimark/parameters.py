@@ -75,9 +75,9 @@ init_DiscFac = 1.0
 bounds_DiscFac = [0.5, 1.1]
 
 init_WealthShare = 0.3  # Initial guess of the wealth share parameter
-bounds_WealthShare = [0.0, 0.5]  # Bounds for the wealth share parameter
+bounds_WealthShare = [0.0, 0.7]  # Bounds for the wealth share parameter
 
-init_WealthShift = 50.0  # Initial guess of the wealth shift parameter
+init_WealthShift = 0.0  # Initial guess of the wealth shift parameter
 bounds_WealthShift = [0.0, 100.0]  # Bounds for the wealth shift parameter
 
 init_BeqFac = 20.0  # Initial guess of the bequest factor
@@ -233,6 +233,7 @@ init_calibration = {
     "aNrmInit": aNrmInit,
     "neutral_measure": True,  # Harmemberg
     "sim_common_Rrisky": False,  # idiosyncratic risky return
+    "WealthShift": init_WealthShift,
 }
 
 Eq_prem = 0.03

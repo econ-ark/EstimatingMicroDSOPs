@@ -283,7 +283,26 @@ def simulate_moments(params, agent=None, emp_moments=None):
     return sim_moments
 
 
-def msm_criterion(params, agent=None, emp_moments=None):
+def calculate_weights(emp_moments):
+    max_w_stat = 1.0  # maximum value of wealth statistic
+    n_port_stats = 0  # number of portfolio statistics
+    for k, v in emp_moments.items():
+        if "_port" not in k:
+            max_w_stat = max(max_w_stat, v)
+        else:
+            n_port_stats += 1
+
+    port_fac = len(emp_moments) / n_port_stats if n_port_stats != 0 else 1.0
+
+    # Using dictionary comprehension to create weights
+    weights = {
+        k: (1 / max_w_stat if "_port" not in k else port_fac) for k in emp_moments
+    }
+
+    return weights
+
+
+def msm_criterion(params, agent=None, emp_moments=None, weights=None):
     """The objective function for the SMM estimation.  Given values of discount factor
     adjuster DiscFac, coeffecient of relative risk aversion CRRA, a base consumer
     agent type, empirical data, and calibrated parameters, this function calculates
@@ -333,28 +352,13 @@ def msm_criterion(params, agent=None, emp_moments=None):
     emp_moments = emp_moments.copy()
     sim_moments = simulate_moments(params, agent, emp_moments)
 
-    # normalize wealth moments by the maximum value in the empirical moments
-    modify = sum("_port" in key for key in emp_moments)
-
-    if modify:
-        max_fac = max(
-            (v for k, v in emp_moments.items() if "_port" not in k),
-            default=1.0,
-        )
-
-        for key in emp_moments:
-            if "_port" not in key:
-                sim_moments[key] /= max_fac
-                emp_moments[key] /= max_fac
-            else:
-                factor = len(emp_moments) / modify
-                sim_moments[key] *= factor
-                emp_moments[key] *= factor
-
     # TODO: make sure all keys in moments have a corresponding
     # key in sim_moments, raise an error if not
     errors = np.array(
-        [sim_moments[key] - emp_moments[key] for key in emp_moments],
+        [
+            float(weights[key] * (sim_moments[key] - emp_moments[key]))
+            for key in emp_moments
+        ]
     )
 
     squared_errors = np.square(errors)
@@ -455,6 +459,7 @@ def do_estimate_model(
     emp_moments=None,
     moments_cov=None,
     minimize_options=None,
+    criterion_kwargs=None,
     save_dir=None,
 ):
     fmt_init_guess = [f"{key} = {value:.3f}" for key, value in initial_guess.items()]
@@ -494,6 +499,7 @@ def do_estimate_model(
             initial_guess,
             emp_moments,
             minimize_options,
+            criterion_kwargs=criterion_kwargs,
             estimagic_options=estimagic_options,
         )
 
@@ -803,6 +809,8 @@ def estimate(
 
         print("Calculated empirical moments.")
 
+    weights = calculate_weights(emp_moments)
+
     ############################################################
     # Get moments covariance matrix
     ############################################################
@@ -824,6 +832,7 @@ def estimate(
             emp_moments=emp_moments,
             moments_cov=moments_cov,
             minimize_options=minimize_options,
+            criterion_kwargs={"weights": weights},
             save_dir=save_dir,
         )
 
