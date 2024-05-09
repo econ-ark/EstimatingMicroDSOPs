@@ -20,6 +20,7 @@ import pandas as pd
 # Estimation methods
 from estimagic.inference import get_bootstrap_samples
 from scipy.optimize import approx_fprime
+from statsmodels.stats.weightstats import DescrStatsW
 
 # Import modules from core HARK libraries:
 # The consumption-saving micro model
@@ -64,7 +65,6 @@ def make_agent(agent_name):
     for key, value in agent_types.items():
         if key in agent_name:
             agent_type = value
-            break
 
     calibration = init_calibration.copy()
 
@@ -92,14 +92,8 @@ def make_agent(agent_name):
 
 
 def weighted_median(values, weights):
-    inds = np.argsort(values)
-    values = values[inds]
-    weights = weights[inds]
-
-    wsum = np.cumsum(inds)
-    ind = np.where(wsum > wsum[-1] / 2)[0][0]
-
-    return values[ind]
+    stats = DescrStatsW(values, weights=weights)
+    return stats.quantile(0.5, return_pandas=False)
 
 
 def get_weighted_moments(
@@ -193,7 +187,16 @@ def get_empirical_moments(agent_name):
     return emp_moments
 
 
-def get_initial_guess(agent_name, params_to_estimate, save_dir):
+def get_initial_guess(agent, params_to_estimate, save_dir):
+    agent_name = agent.name
+
+    agent_params = []
+    for key in params_to_estimate:
+        if hasattr(agent, key):
+            agent_params.append(key)
+        else:
+            print(f"Agent {agent_name} does not have parameter: {key}")
+
     # start from previous estimation results if available
     csv_file_path = save_dir / (agent_name + "_estimate_results.csv")
 
@@ -205,7 +208,7 @@ def get_initial_guess(agent_name, params_to_estimate, save_dir):
 
     initial_guess = {
         key: float(temp_dict.get(key, init_params_options["init_guess"][key]))
-        for key in params_to_estimate
+        for key in agent_params
     }
 
     return initial_guess
@@ -220,6 +223,9 @@ def simulate_moments(params, agent=None, emp_moments=None):
     # Update the agent with a new path of DiscFac based on this DiscFac (and a new CRRA)
 
     agent.assign_parameters(**params)
+
+    if hasattr(agent, "BeqCRRA"):
+        agent.BeqCRRA = agent.CRRA
 
     # ensure subjective beliefs are used for solution
     if "(Stock)" in agent.name and "Portfolio" in agent.name:
@@ -246,6 +252,8 @@ def simulate_moments(params, agent=None, emp_moments=None):
         agent.TranShkStd = init_subjective_labor["TranShkStd"]
         agent.PermShkStd = init_subjective_labor["PermShkStd"]
         agent.update_income_process()
+
+    agent.LivPrb = [1.0] * agent.T_cycle
 
     max_sim_age = agent.T_cycle + 1
     # Initialize the simulation by clearing histories, resetting initial values
@@ -275,7 +283,26 @@ def simulate_moments(params, agent=None, emp_moments=None):
     return sim_moments
 
 
-def msm_criterion(params, agent=None, emp_moments=None):
+def calculate_weights(emp_moments):
+    max_w_stat = 1.0  # maximum value of wealth statistic
+    n_port_stats = 0  # number of portfolio statistics
+    for k, v in emp_moments.items():
+        if "_port" not in k:
+            max_w_stat = max(max_w_stat, v)
+        else:
+            n_port_stats += 1
+
+    port_fac = len(emp_moments) / n_port_stats if n_port_stats != 0 else 1.0
+
+    # Using dictionary comprehension to create weights
+    weights = {
+        k: (1 / max_w_stat if "_port" not in k else port_fac) for k in emp_moments
+    }
+
+    return weights
+
+
+def msm_criterion(params, agent=None, emp_moments=None, weights=None):
     """The objective function for the SMM estimation.  Given values of discount factor
     adjuster DiscFac, coeffecient of relative risk aversion CRRA, a base consumer
     agent type, empirical data, and calibrated parameters, this function calculates
@@ -325,28 +352,13 @@ def msm_criterion(params, agent=None, emp_moments=None):
     emp_moments = emp_moments.copy()
     sim_moments = simulate_moments(params, agent, emp_moments)
 
-    # normalize wealth moments by the maximum value in the empirical moments
-    modify = sum("_port" in key for key in emp_moments)
-
-    if modify:
-        max_fac = max(
-            (v for k, v in emp_moments.items() if "_port" not in k),
-            default=1.0,
-        )
-
-        for key in emp_moments:
-            if "_port" not in key:
-                sim_moments[key] /= max_fac
-                emp_moments[key] /= max_fac
-            else:
-                factor = len(emp_moments) / modify
-                sim_moments[key] *= factor
-                emp_moments[key] *= factor
-
     # TODO: make sure all keys in moments have a corresponding
     # key in sim_moments, raise an error if not
     errors = np.array(
-        [sim_moments[key] - emp_moments[key] for key in emp_moments],
+        [
+            float(weights[key] * (sim_moments[key] - emp_moments[key]))
+            for key in emp_moments
+        ]
     )
 
     squared_errors = np.square(errors)
@@ -447,6 +459,7 @@ def do_estimate_model(
     emp_moments=None,
     moments_cov=None,
     minimize_options=None,
+    criterion_kwargs=None,
     save_dir=None,
 ):
     fmt_init_guess = [f"{key} = {value:.3f}" for key, value in initial_guess.items()]
@@ -486,6 +499,7 @@ def do_estimate_model(
             initial_guess,
             emp_moments,
             minimize_options,
+            criterion_kwargs=criterion_kwargs,
             estimagic_options=estimagic_options,
         )
 
@@ -772,6 +786,7 @@ def estimate(
 
     """
     save_dir = Path(save_dir).resolve() if save_dir is not None else Path.cwd()
+    save_dir.mkdir(parents=True, exist_ok=True)
 
     ############################################################
     # Make agent
@@ -783,11 +798,7 @@ def estimate(
     # Get initial guess
     ############################################################
 
-    initial_guess = get_initial_guess(
-        agent_name,
-        params_to_estimate,
-        save_dir,
-    )
+    initial_guess = get_initial_guess(agent, params_to_estimate, save_dir)
 
     ############################################################
     # Get empirical moments
@@ -797,6 +808,8 @@ def estimate(
         emp_moments = get_empirical_moments(agent_name)
 
         print("Calculated empirical moments.")
+
+    weights = calculate_weights(emp_moments)
 
     ############################################################
     # Get moments covariance matrix
@@ -819,6 +832,7 @@ def estimate(
             emp_moments=emp_moments,
             moments_cov=moments_cov,
             minimize_options=minimize_options,
+            criterion_kwargs={"weights": weights},
             save_dir=save_dir,
         )
 
@@ -854,8 +868,8 @@ def estimate(
 if __name__ == "__main__":
     # Set booleans to determine which tasks should be done
     # Which agent type to estimate ("IndShock" or "Portfolio")
-    local_agent_name = "IndShockSub(Labor)Market"
-    local_params_to_estimate = ["CRRA", "DiscFac"]
+    local_agent_name = "WarmGlowPortfolio"
+    local_params_to_estimate = ["CRRA", "BeqFac", "BeqShift"]
     local_estimate_model = True  # Whether to estimate the model
     # Whether to get standard errors via bootstrap
     local_compute_se_bootstrap = False

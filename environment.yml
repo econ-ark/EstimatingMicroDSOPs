@@ -2,17 +2,19 @@ name: estimatingmicrodsops
 channels:
   - conda-forge
 dependencies:
-  - python=3.10
+  - python=3.12
   - jupyter
   - jupyterlab
-  - black 
-  - ruff 
+  - black
+  - ruff
   - nbqa
-  - dask 
-  - estimagic
+  - dask
   - openpyxl
   - pip
   - pip:
-      - git+https://github.com/econ-ark/HARK@SimplifySolvers
+      - DFO-LS
+      - tranquilo
+      - git+https://github.com/alanlujan91/HARK@wealth_portfolio_solver
+      - git+https://github.com/OpenSourceEconomics/estimagic
       - black[jupyter]
       - -e ./code/

@@ -2,8 +2,19 @@
 model.  The empirical data is stored in a separate csv file and is loaded in setup_scf_data.
 """
 
+# Discount Factor of 1.0 always
+# income uncertainty doubles at retirement
+# only estimate CRRA, Bequest params
+
+import warnings
+
+warnings.simplefilter(action="ignore", category=FutureWarning)
+
 import numpy as np
-from HARK.Calibration.Income.IncomeTools import CGM_income, parse_income_spec
+from HARK.Calibration.Income.IncomeTools import (
+    Cagetti_income,
+    parse_income_spec,
+)
 from HARK.ConsumptionSaving.ConsIndShockModel import init_lifecycle
 from HARK.datasets.life_tables.us_ssa.SSATools import parse_ssa_life_table
 from HARK.distribution import DiscreteDistribution
@@ -35,7 +46,7 @@ UnempPrb = 0.05  # Probability of unemployment while working
 UnempPrbRet = 0.005  # Probability of "unemployment" while retired
 IncUnemp = 0.3  # Unemployment benefits replacement rate
 IncUnempRet = 0.0  # "Unemployment" benefits when retired
-ss_variances = True  # Use the Sabelhaus-Song variance profiles
+ss_variances = False  # Use the Sabelhaus-Song variance profiles
 education = "College"  # Education level for income process
 
 # Population age parameters
@@ -55,20 +66,29 @@ num_agents = 10000  # Number of agents to simulate
 bootstrap_size = 50  # Number of re-estimations to do during bootstrap
 seed = 1132023  # Just an integer to seed the estimation
 
-params_to_estimate = ["CRRA", "DiscFac"]
+params_to_estimate = ["CRRA"]
 
 # Initial guess of the coefficient of relative risk aversion during estimation (rho)
-init_CRRA = 5.0
+init_CRRA = 2.0
 # Bounds for rho; if violated, objective function returns "penalty value"
-bounds_CRRA = [1.1, 20.0]
+bounds_CRRA = [2.0, 20.0]
 
 # Initial guess of the adjustment to the discount factor during estimation (beth)
-init_DiscFac = 0.95
+init_DiscFac = 1.0
 # Bounds for beth; if violated, objective function returns "penalty value"
 bounds_DiscFac = [0.5, 1.1]
 
-init_WealthShare = 0.5  # Initial guess of the wealth share parameter
-bounds_WealthShare = [0.0, 1.0]  # Bounds for the wealth share parameter
+init_WealthShare = 0.3  # Initial guess of the wealth share parameter
+bounds_WealthShare = [0.0, 0.7]  # Bounds for the wealth share parameter
+
+init_WealthShift = 0.0  # Initial guess of the wealth shift parameter
+bounds_WealthShift = [0.0, 100.0]  # Bounds for the wealth shift parameter
+
+init_BeqFac = 20.0  # Initial guess of the bequest factor
+bounds_BeqFac = [20.0, 70.0]  # Bounds for the bequest factor
+
+init_BeqShift = 1.0  # Initial guess of the bequest shift parameter
+bounds_BeqShift = [0.0, 70.0]  # Bounds for the bequest shift parameter
 
 ######################################################################
 # Constructed parameters
@@ -79,7 +99,7 @@ terminal_t = final_age - initial_age
 retirement_t = retirement_age - initial_age - 1
 
 # Income
-income_spec = CGM_income[education]
+income_spec = Cagetti_income[education]
 # Replace retirement age
 income_spec["age_ret"] = retirement_age
 inc_calib = parse_income_spec(
@@ -88,6 +108,10 @@ inc_calib = parse_income_spec(
     **income_spec,
     SabelhausSong=ss_variances,
 )
+
+inc_calib["PermGroFac"][retirement_age - initial_age] = 0.9389
+
+# use permgrofac = 0.9389 at retirement
 
 # Age groups for the estimation: calculate average wealth-to-permanent income ratio
 # for consumers within each of these age groups, compare actual to simulated data
@@ -119,16 +143,25 @@ init_params_options = {
         "CRRA": init_CRRA,
         "DiscFac": init_DiscFac,
         "WealthShare": init_WealthShare,
+        "WealthShift": init_WealthShift,
+        "BeqFac": init_BeqFac,
+        "BeqShift": init_BeqShift,
     },
     "upper_bounds": {
         "CRRA": bounds_CRRA[1],
         "DiscFac": bounds_DiscFac[1],
         "WealthShare": bounds_WealthShare[1],
+        "WealthShift": bounds_WealthShift[1],
+        "BeqFac": bounds_BeqFac[1],
+        "BeqShift": bounds_BeqShift[1],
     },
     "lower_bounds": {
         "CRRA": bounds_CRRA[0],
         "DiscFac": bounds_DiscFac[0],
         "WealthShare": bounds_WealthShare[0],
+        "WealthShift": bounds_WealthShift[0],
+        "BeqFac": bounds_BeqFac[0],
+        "BeqShift": bounds_BeqShift[0],
     },
 }
 
@@ -156,11 +189,10 @@ minimize_options = {
     "multistart": True,
     "error_handling": "continue",
     "algo_options": {
-        "convergence.absolute_params_tolerance": 1e-3,
-        "convergence.absolute_criterion_tolerance": 1e-3,
-        "stopping.max_iterations": 50,
-        "stopping.max_criterion_evaluations": 100,
-        "trustregion_initial_radius": 0.01,
+        "convergence.absolute_params_tolerance": 1e-6,
+        "convergence.absolute_criterion_tolerance": 1e-6,
+        "stopping.max_iterations": 100,
+        "stopping.max_criterion_evaluations": 200,
         "n_cores": 12,
     },
     "numdiff_options": {"n_cores": 12},
@@ -179,9 +211,11 @@ init_calibration = {
     "PermGroFac": inc_calib["PermGroFac"],
     "PermGroFacAgg": 1.0,
     "BoroCnstArt": BoroCnstArt,
-    "PermShkStd": inc_calib["PermShkStd"],
+    "PermShkStd": inc_calib["PermShkStd"][: retirement_t + 1]
+    + [inc_calib["PermShkStd"][retirement_t]] * (terminal_t - retirement_t - 1),
     "PermShkCount": PermShkCount,
-    "TranShkStd": inc_calib["TranShkStd"],
+    "TranShkStd": inc_calib["TranShkStd"][: retirement_t + 1]
+    + [inc_calib["TranShkStd"][retirement_t]] * (terminal_t - retirement_t - 1),
     "TranShkCount": TranShkCount,
     "T_cycle": terminal_t,
     "UnempPrb": UnempPrb,
@@ -201,25 +235,46 @@ init_calibration = {
     "vFuncBool": vFuncBool,
     "CubicBool": CubicBool,
     "aNrmInit": aNrmInit,
+    "neutral_measure": True,  # Harmemberg
+    "sim_common_Rrisky": False,  # idiosyncratic risky return
+    "WealthShift": init_WealthShift,
 }
 
+Eq_prem = 0.03
+RiskyStd = 0.20
+
+init_calibration["RiskyAvg"] = Rfree + Eq_prem
+init_calibration["RiskyStd"] = RiskyStd
+
 # from Mateo's JMP for College Educated
-ElnR = 0.020
+ElnR_nom = 0.020
 VlnR = 0.424**2
 
-TrueElnR = 0.085
+TrueElnR_nom = 0.085
 TrueVlnR = 0.170**2
 
+logInflation = 0.024
+logRfree_nom = 0.043
+Rfree_real = np.exp(logRfree_nom - logInflation)  # 1.019
+
+ElnR_real = ElnR_nom - logInflation
+TrueElnR_real = TrueElnR_nom - logInflation
+
+
 init_subjective_stock = {
-    "Rfree": 1.019,  # from Mateo's JMP
-    "RiskyAvg": np.exp(ElnR + 0.5 * VlnR),
-    "RiskyStd": np.sqrt(np.exp(2 * ElnR + VlnR) * (np.exp(VlnR) - 1)),
-    "RiskyAvgTrue": np.exp(TrueElnR + 0.5 * TrueVlnR),
-    "RiskyStdTrue": np.sqrt(np.exp(2 * TrueElnR + TrueVlnR) * (np.exp(TrueVlnR) - 1)),
+    "Rfree": Rfree_real,  # from Mateo's JMP
+    "RiskyAvg": np.exp(ElnR_real + 0.5 * VlnR),
+    "RiskyStd": np.sqrt(np.exp(2 * ElnR_real + VlnR) * (np.exp(VlnR) - 1)),
+    "RiskyAvgTrue": np.exp(TrueElnR_real + 0.5 * TrueVlnR),
+    "RiskyStdTrue": np.sqrt(
+        np.exp(2 * TrueElnR_real + TrueVlnR) * (np.exp(TrueVlnR) - 1),
+    ),
 }
 
 # from Tao's JMP
 init_subjective_labor = {
-    "TranShkStd": [0.03] * (retirement_t + 1) + [0.0] * (terminal_t - retirement_t - 1),
-    "PermShkStd": [0.03] * (retirement_t + 1) + [0.0] * (terminal_t - retirement_t - 1),
+    "TranShkStd": [0.03] * (retirement_t + 1)
+    + [0.03 * np.sqrt(2)] * (terminal_t - retirement_t - 1),
+    "PermShkStd": [0.03] * (retirement_t + 1)
+    + [0.03 * np.sqrt(2)] * (terminal_t - retirement_t - 1),
 }

@@ -33,6 +33,7 @@ snp_data = snp_data.assign(
     age_group=pd.cut(snp_data["age"], bins=bins, labels=labels, right=False),
 )
 
+snp_data_full = snp_data.copy()
 # Remove ages
 snp_data = snp_data.loc[
     ~snp_data.age.isin(remove_ages_from_snp),
