@@ -6,6 +6,10 @@ model.  The empirical data is stored in a separate csv file and is loaded in set
 # income uncertainty doubles at retirement
 # only estimate CRRA, Bequest params
 
+import warnings
+
+warnings.simplefilter(action="ignore", category=FutureWarning)
+
 import numpy as np
 from HARK.Calibration.Income.IncomeTools import (
     Cagetti_income,
