@@ -84,8 +84,8 @@ bounds_WealthShare = [0.0, 0.7]  # Bounds for the wealth share parameter
 init_WealthShift = 0.0  # Initial guess of the wealth shift parameter
 bounds_WealthShift = [0.0, 100.0]  # Bounds for the wealth shift parameter
 
-init_BeqFac = 20.0  # Initial guess of the bequest factor
-bounds_BeqFac = [20.0, 70.0]  # Bounds for the bequest factor
+init_BeqFac = 1.0  # Initial guess of the bequest factor
+bounds_BeqFac = [0.0, 70.0]  # Bounds for the bequest factor
 
 init_BeqShift = 1.0  # Initial guess of the bequest shift parameter
 bounds_BeqShift = [0.0, 70.0]  # Bounds for the bequest shift parameter

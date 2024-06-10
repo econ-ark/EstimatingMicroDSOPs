@@ -96,6 +96,15 @@ def weighted_median(values, weights):
     return stats.quantile(0.5, return_pandas=False)
 
 
+def winsored_mean(values, weights, limits):
+    stats = DescrStatsW(values, weights=weights)
+    qs = stats.quantile(limits, return_pandas=False)
+
+    # discard values outside qs
+    mask = (values >= qs[0]) & (values <= qs[1])
+    return np.average(values[mask], weights=weights[mask])
+
+
 def get_weighted_moments(
     data,
     variable=None,
@@ -238,6 +247,10 @@ def simulate_moments(params, agent=None, emp_moments=None):
         agent.PermShkStd = init_subjective_labor["PermShkStd"]
         agent.update_income_process()
 
+    agent.LivPrb = init_calibration["LivPrb"]
+
+    agent.update()
+
     # Solve the model for these parameters, then simulate wealth data
     agent.solve()  # Solve the microeconomic model
 
@@ -254,6 +267,8 @@ def simulate_moments(params, agent=None, emp_moments=None):
         agent.update_income_process()
 
     agent.LivPrb = [1.0] * agent.T_cycle
+
+    agent.update()
 
     max_sim_age = agent.T_cycle + 1
     # Initialize the simulation by clearing histories, resetting initial values
@@ -284,19 +299,19 @@ def simulate_moments(params, agent=None, emp_moments=None):
 
 
 def calculate_weights(emp_moments):
-    max_w_stat = 1.0  # maximum value of wealth statistic
-    n_port_stats = 0  # number of portfolio statistics
-    for k, v in emp_moments.items():
-        if "_port" not in k:
-            max_w_stat = max(max_w_stat, v)
-        else:
-            n_port_stats += 1
+    n_port_stats = sum(1 for k in emp_moments if "_port" in k)
+    max_w_stat = max(emp_moments.values())
 
-    port_fac = len(emp_moments) / n_port_stats if n_port_stats != 0 else 1.0
+    port_fac = (
+        (len(emp_moments) - n_port_stats) / n_port_stats if n_port_stats != 0 else 1.0
+    )
+
+    port_fac = 1.0
 
     # Using dictionary comprehension to create weights
     weights = {
-        k: (1 / max_w_stat if "_port" not in k else port_fac) for k in emp_moments
+        k: (1 / max_w_stat if "_port" not in k else port_fac)
+        for k, v in emp_moments.items()
     }
 
     return weights
