@@ -1,17 +1,23 @@
 ---
 title: "Structural Estimation of Life Cycle Models "
-subtitle: "with Welth in the Utility Function"
-author: "Alan E. Lujan Solis"
+subtitle: "with Wealth in the Utility Function"
+author: "Alan Lujan"
 institute: "Johns Hopkins University <br> Econ-ARK"
-date: "July 7, 2023"
-output:
-  xaringan::moon_reader:
-    css: [default, metropolis, metropolis-fonts]
-    lib_dir: libs
-    nature:
-      highlightStyle: github
-      highlightLines: true
-      countIncrementalSlides: false
+date: "CEF 2024 NTU Singapore <br> June 20, 2024"
+format: revealjs
+---
+
+# Why do people save?
+
+Insert data from SCF, for education levels, for different stages of life
+
+---
+
+# Life Cycle savings profiles
+
+Insert graphs from SCF
+normalized and unnormalized
+
 ---
 
 # Motivation and Research Quesitions
@@ -19,14 +25,17 @@ output:
 ## Motivation
 
 - Wealth accumulation
-- Life Cycle Models
-- HANK
-  
+- Inequality
+- Life Cycle / Retirement
+
+--
+
 ## Research Questions
 
+- What are these models missing?
 - How do we better fit the distribution of wealth at the top?
 - How much does wealth in the utility function matter?
-- What do we gain from Life Cycle models?
+- How imporant are life cycle properties?
 
 $$
 \newcommand{\DiscFac}{\beta}
@@ -65,9 +74,10 @@ $$
 
 ---
 
-# Literature Review
+# Some Literature
 
-- Carroll [1998]
+- Why do the rich save so much? - Carroll [1998]
+
   - the rich have higher lifetime savings rates
   - models of consumption smoothing and precautionary savings can not explain this
   - propose a model where wealth is in the utility function
@@ -76,10 +86,7 @@ $$
 
 --
 
-- HANK: Kaplan et al. [2018], Auclert et al. [2020]
-  - modern workhorse models for analyzing monetary and fiscal policy
-  - can not match distribution of wealth 
-  - infinitely lived agents with no life cycle considerations
+- Do the rich save more? - Dyan Skinner Zeldes [2004]
 
 ---
 
@@ -169,11 +176,21 @@ $$\begin{equation}
 
 --
 
-#### Non-separable Utility
+#### Non-separable Utility (as in T.R.P.)
 
 $$\begin{equation}
 \uFunc(\cNrm_{t}, \aNrm_{t}) = \frac{(\cNrm_{t}^{1-\wealthShare} (\aNrm_{t} - \underline\aNrm)^\wealthShare)^{1-\CRRA}}{(1-\CRRA)}
 \end{equation}$$
+
+---
+
+# More Literature
+
+- A monetary equilibrium model with transactions costs - Rotemberg [1984]
+
+- Money in the Utility Function: An Empirical Implementation - Poterba Rotemberg [1986]
+
+- A Novel Model to Measure Utility from Consumption and Wealth - Tzitzouris [2024]
 
 ---
 

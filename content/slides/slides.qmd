@@ -1,0 +1,535 @@
+---
+title: "Structural Estimation of Life Cycle Models with Wealth in the Utility Function"
+subtitle: "CEF 2024 -- NTU, Singapore" 
+format: 
+  clean-revealjs:
+    footer: "Powered by [Econ-ARK](https://econ-ark.org)"
+    logo: econ-ark-logo.png
+html-math-method:
+  method: mathjax
+  url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+author:
+  - name: "Alan Lujan"
+    orcid: 0000-0000-0000-0000
+    email: alujan@jhu.edu
+    affiliations: "Johns Hopkins University <br> Econ-ARK"
+date: "June 20, 2024"
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+## Why do people save? {.smaller}
+
+::: {.panel-tabset}
+
+### By Education
+
+{{< include tables/table1.tex >}}
+
+### Among Retirees ^[Older than 70 years old.]
+
+{{< include tables/table2.tex >}}
+
+### Details ^[https://www.federalreserve.gov/econres/files/bulletin.macro.txt]
+
+{{< include tables/savres.tex >}}
+
+:::
+
+::: aside
+Source: Survey of Consumer Finances
+:::
+
+## How do people save?
+
+::: {.panel-tabset}
+
+### Net Worth by Age
+
+::: {#fig-age}
+
+![](figures/median_net_worth_by_age.svg)
+
+Median Net Worth by Age
+:::
+
+### By Education
+
+::: {#fig-educ}
+
+![](figures/median_net_worth_by_educ.svg)
+
+Median Net Worth by Education
+:::
+
+### Normalized by Income
+
+::: {#fig-norminc}
+
+![](figures/median_norm_net_worth_by_age.svg)
+
+Median Normalized Net Worth
+:::
+
+### Model
+
+![](figures/lcim_results.svg)
+
+:::
+
+## Motivation and Research Quesitions
+
+### Motivation
+
+-   Savings and wealth accumulation
+-   Patterns of inequality
+-   Life cycle / Retirement / Bequests
+
+### Research Questions
+
+-   What are our models missing?
+-   How do we fit the distribution of wealth for the rich and/or the old?
+-   How important are life cycle properties?
+-   How much does wealth in the utility function matter?
+
+
+$$
+\newcommand{\DiscFac}{\beta}
+\newcommand{\cFunc}{\mathrm{c}}
+\newcommand{\uFunc}{\mathrm{u}}
+\newcommand{\vFunc}{\mathrm{v}}
+\newcommand{\Alive}{\mathcal{L}}
+\newcommand{\h}{h}
+\newcommand{\cLvl}{\mathbf{c}}
+\newcommand{\mLvl}{\mathbf{m}}
+\newcommand{\pLvl}{\mathbf{p}}
+\newcommand{\Ex}{\mathbb{E}}
+\newcommand{\CRRA}{\rho}
+\newcommand{\PermGroFac}{\pmb{\Phi}}
+\newcommand{\Rfree}{\mathsf{R}}
+\newcommand{\PermShk}{\mathbf{\Psi}}
+\newcommand{\TranShk}{\pmb{\xi}}
+\newcommand{\aNrm}{a}
+\newcommand{\cNrm}{c}
+\newcommand{\RNrm}{\mathcal{R}}
+\newcommand{\TranShkEmp}{\pmb{\theta}}
+\newcommand{\mNrm}{m}
+\newcommand{\pZero}{\wp}
+\newcommand{\aFunc}{\mathrm{a}}
+\newcommand{\kapShare}{\alpha}
+\newcommand{\wealth}{o}
+\newcommand{\kap}{k}
+\newcommand{\wealthShare}{\delta}
+\newcommand{\wFunc}{\mathrm{w}}
+\newcommand{\aRat}{a}
+\newcommand{\mRat}{m}
+\newcommand{\aMat}{[\mathrm{a}]}
+\newcommand{\mMat}{[\mathrm{m}]}
+\newcommand{\weight}{\omega}
+$$
+
+## Some Literature
+
+-   Why do the rich save so much? - Carroll \[1998\]
+
+    -   the rich have higher lifetime savings rates
+    -   models of consumption smoothing and precautionary savings can
+        not explain this
+    -   propose a model where wealth is in the utility function
+    -   households derive utility from wealth itself OR
+    -   wealth provides a flow of services such as political power or
+        social status
+
+-   Do the rich save more? - Dynan Skinner Zeldes \[2004\]
+
+## The baseline Life Cycle Incomplete Markets model
+
+The agent maximizes PDV of utility from consumption over life cycle with
+terminal period $T$:
+
+$$\begin{equation}
+\label{eq:lifecyclemax}
+\vFunc_{t}(\pLvl_{t},\mLvl_{t})  = \max_{\{\cFunc\}_{t}^{T}} ~ \uFunc(\cLvl_{t})+\Ex_{t}\left[\sum_{n=1}^{T-t} \DiscFac^n \Alive_{t}^{t+n} \uFunc(\cLvl_{t+n}) \right]
+\end{equation}$$
+
+where $\pLvl_{t}$ is permanent income level, $\mLvl_{t}$ is total market
+resources, $\cLvl_{t}$ is consumption, and
+
+$$\begin{aligned}
+    \DiscFac & :  \text{time-invariant pure discount factor}
+    \\ \Alive _{t}^{t+n} & :  \text{probability to }\Alive\text{ive until age t+n given alive at age t}
+\end{aligned}$$
+
+## Recursive Bellman Equation {.smaller}
+
+$$\begin{aligned}
+    {\vFunc}_{t}({m}_{t}) & = \max_{\cNrm_{t}} ~ \uFunc(\cNrm_{t})+\DiscFac\Alive_{t+1}
+    \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})]
+    \\ & \text{s.t.} & 
+    \\ \aNrm_{t} & = {m}_{t}-\cNrm_{t} 
+    \\ {m}_{t+1} & = \aNrm_{t}\underbrace{\left(\frac{\Rfree}{\PermShk_{t+1}\PermGroFac_{t+1}}\right)}_{\equiv \RNrm_{t+1}} + \TranShkEmp_{t+1}
+\end{aligned}$$
+
+where $\vFunc(\cdot)$ and $\uFunc(\cdot)$ are now the normalized value
+and utility functions, and
+
+$$\begin{aligned}
+  \CRRA & : \text{constant relative risk aversion parameter} \\
+  \mNrm_{t} & : \text{normalized market resources} \\
+  \cNrm_{t} & : \text{normalized consumption} \\
+  \aNrm_{t} & : \text{normalized liquid assets after consumption} \\
+  \Rfree & : \text{risk free interest rate}
+    \\ \RNrm_{t+1} & :  \text{permanent income growth normalized return factor}
+\end{aligned}$$
+
+## Distribution of Shocks to Income
+
+The transitory and permanent shocks to income are defined as:
+
+$$\begin{aligned}
+  \PermShk_{t+1} & :  \text{mean-one shock to permanent income}
+    \\ \PermGroFac_{t+1} & :  \text{permanent income growth factor}
+    \\ \TranShkEmp_{t+1} & :  \text{mean-one transitory shock to permanent income}
+\end{aligned}$$
+
+where
+
+$$\begin{aligned}
+\TranShkEmp_{s}  = & \begin{cases} 0  & \text{with probability } \pZero>0  \\ 
+\xi_{s}/\pZero & \text{with probability } (1-\pZero)  \end{cases} \\
+\phantom{/\pZero} \\ & \text{with } \log \xi_{s}\thicksim \mathcal{N}(-\sigma_{[\xi, t]}^{2}/2,\sigma_{[\xi, t]}^{2})
+\\ & \text{and }  \log \PermShk_{s}   \thicksim \mathcal{N}(-\sigma_{[\PermShk, t]}^{2}/2,\sigma_{[\PermShk, t]}^{2}).
+\end{aligned}$$
+
+## Wealth in the Utility Literature {.smaller}
+
+### Separable -- Bequest Models
+
+- Wealth inequality and intergenerational links - De Nardi [2004]
+
+
+### Non-separable -- Money in the Utility
+
+-   A monetary equilibrium model with transactions costs - Rotemberg
+    \[1984\]
+
+-   Money in the Utility Function: An Empirical Implementation - Poterba
+    Rotemberg \[1986\]
+
+-   A Novel Model to Measure Utility from Consumption and Wealth -
+    Tzitzouris \[2024\]
+
+## The Wealth in the Utility Function Incomplete Markets model {.smaller}
+
+$$\begin{aligned}
+    {\vFunc}_{t}({m}_{t}) & = \max_{\cNrm_{t}}  \uFunc(\cNrm_{t}, \aNrm_{t})+\DiscFac\Alive_{t+1}
+    \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})]
+    \\ & \text{s.t.} & 
+    \\ \aNrm_{t} & = {m}_{t}-\cNrm_{t} 
+    \\ {m}_{t+1} & = \aNrm_{t}\RNrm_{t+1}+ ~\TranShkEmp_{t+1}
+\end{aligned}$$
+
+#### Separable Utility (as in Carroll \[1998\], De Nardi \[2004\])
+
+$$\begin{equation}
+\uFunc(\cNrm_{t}, \aNrm_{t}) = \frac{\cNrm_{t}^{1-\CRRA}}{1-\CRRA} + \kapShare_{t} \frac{(\aFunc_{t} - \underline\aNrm)^{1-\wealthShare}}{1-\wealthShare}
+\end{equation}$$
+
+#### Non-separable Utility (as in Tzitzouris [2024], Rotemberg Poterba [1986])
+
+$$\begin{equation}
+\uFunc(\cNrm_{t}, \aNrm_{t}) = \frac{(\cNrm_{t}^{1-\wealthShare} (\aNrm_{t} - \underline\aNrm)^\wealthShare)^{1-\CRRA}}{(1-\CRRA)}
+\end{equation}$$
+
+
+
+## Parameterization and Calibration
+
+| Parameter                                   | Description                          | Values                      |
+|------------------------|------------------------|------------------------|
+| $\PermGroFac_{t}$ | Perm. income growth factor | Caggetti [2003] |
+| $\sigma_{[\xi, t]}, \sigma_{[\PermShk, t]}$ | Std. dev. of trans. and perm. shocks | Sabelhaus and Song \[2010\] |
+| $\pZero = 0.005$                            | Probability of zero income           | Carroll \[1992\]            |
+| $\Alive_{t}$             | Survival and discount factors        | Caggetti \[2003\]           |
+| $\Rfree = 1.03$                             | Risk free interest rate              | Caggetti \[2003\]           |
+
+
+## Estimation - Method of Simulated Moments
+
+### Steps of MSM estimation
+
+1. Obtain empirical data
+2. Calculate empirical moments
+3. Calculate covariance matrix 
+4. Define Heterogeneous Agent Model
+5. Given a guess $\theta_0$, simulate model and calculate moments
+6. Estimate model parameters by minimizing criterion function
+
+### Objective function
+
+$$\begin{equation}
+  \min_{\theta \in \Theta} \hat{g}(\theta)' \hat{W} \hat{g}(\theta) \qquad \qquad \hat{g}(\theta) = \hat{s} - s(\theta)
+\end{equation}$$
+
+## Method of Simulated Moments
+
+### 1. Empirical Data
+
+#### Survey of Consumer Finances (SCF)
+
+- every 3 years
+- cross-sectional survey of U.S. households
+- includes balance sheets, pensions, income, demographics
+- pooled data from 1998 to 2022
+
+
+### 2. Calculate Moments
+
+- Bin by age groups of 5 years [25-30), [30-35), ...
+- SCF is weighted survey, calculate weighted median `networth`
+
+### 3. Calculate Covariance Matrix
+
+- Via the bootstrap
+
+## 4. Define Heterogeneous Agent Model
+
+```python
+birth_age = 25
+death_age = 100
+adjust_infl_to = 1992
+income_calib = Cagetti_income
+education = "College"
+
+# Income specification
+income_params = parse_income_spec(
+    age_min=birth_age,
+    age_max=death_age,
+    adjust_infl_to=adjust_infl_to,
+    **income_calib[education],
+    SabelhausSong=True,
+)
+
+# Initial distribution of wealth and permanent income
+dist_params = income_wealth_dists_from_scf(
+    base_year=adjust_infl_to, age=birth_age, education=education, wave=1995
+)
+
+# We need survival probabilities only up to death_age-1, because survival
+# probability at death_age is 0.
+liv_prb = parse_ssa_life_table(
+    female=True, cross_sec=True, year=2004, min_age=birth_age, max_age=death_age - 1
+)
+
+# Parameters related to the number of periods implied by the calibration
+time_params = parse_time_params(age_birth=birth_age, age_death=death_age)
+
+# Update all the new parameters
+params = copy(init_lifecycle)
+params.update(time_params)
+params.update(dist_params)
+params.update(income_params)
+params["LivPrb"] = liv_prb
+params["AgentCount"] = 10_000
+params["T_sim"] = 200
+params["track_vars"] = ["aNrm", "bNrm", "cNrm", "pLvl", "t_age", "mNrm"]
+params["PermGroFacAgg"] = 1.0
+
+LifeCycleAgent = IndShockConsumerType(**params)
+```
+
+## 5. Define a function to calculate simulated moments
+
+```python
+def simulate_moments(params, agent=None):
+    agent.assign_parameters(**params)
+    agent.update()
+
+    agent.solve()
+
+    agent.initialize_sim()
+    history = agent.simulate()
+
+    raw_data = {
+        "age": history["t_age"].flatten() + birth_age - 1,
+        "b_nrm": history["bNrm"].flatten(),
+        "p_lvl": history["pLvl"].flatten(),
+    }
+
+    sim_data = pd.DataFrame(raw_data)
+    sim_data["Wealth"] = sim_data.b_nrm * sim_data.p_lvl
+
+    sim_data["Age_grp"] = pd.cut(
+        sim_data.age, bins=range(birth_age + 1, 97, 5), labels=age_labels, right=False
+    )
+
+    sim_data = sim_data.dropna()
+
+    return sim_data.groupby("Age_grp", observed=False)["Wealth"].median()
+```
+
+## 6. Estimate the Model Parameters
+
+```python
+init_params = {"CRRA": 3.0, "DiscFac": 0.97}
+lower_bounds = {"CRRA": 1.0, "DiscFac": 0.9}
+upper_bounds = {"CRRA": 10.0, "DiscFac": 1.1}
+
+res = estimate_msm(
+    LifeCycleAgent,
+    init_params,
+    empirical_moments,
+    moments_cov,
+    simulate_moments,
+    optimize_options={
+        "algorithm": "scipy_lbfgsb",
+        "error_handling": "continue",
+        "multistart": True,
+        "numdiff_options": {"n_cores": 24},
+    },
+    estimagic_options={
+        "lower_bounds": lower_bounds,
+        "upper_bounds": upper_bounds,
+    },
+)
+```
+
+## Results
+
+::: {#fig-results}
+
+![](figures/cis_results.svg)
+
+Simulated vs. Empirical Moments
+:::
+
+```
+              value  standard_error  ci_lower  ci_upper       p_value  
+CRRA    0  3.038229        0.250762  2.546745  3.529714  8.690398e-34     
+DiscFac 0  0.972242        0.003527  0.965330  0.979155  0.000000e+00  
+```
+
+## Sensitivity
+
+::: {#fig-sensitivity}
+
+![](figures/sensitivity.svg)
+
+Sensitivity
+:::
+
+## More Results
+
+::: {.panel-tabset}
+
+### Terminal Only
+
+![](figures/termbeq_results.svg)
+
+### Warm Glow Only
+
+![](figures/wgbeq_results.svg)
+
+### Full 
+
+![](figures/fullbeq_results.svg)
+
+### Non-Separable T.R.P.
+
+![](figures/trp_results.svg)
+
+:::
+
+## More Results
+
+::: {.panel-tabset}
+
+### Terminal Only
+
+```
+                    value  standard_error   ci_lower   ci_upper       p_value  
+CRRA         0   3.039525        0.193870   2.659547   3.419503  2.133078e-55   
+DiscFac      0   0.972220        0.002772   0.966788   0.977652  0.000000e+00   
+BeqCRRATerm  0   1.125000        0.000000   1.125000   1.125000  0.000000e+00   
+BeqFacTerm   0  67.187500        0.000000  67.187500  67.187500  0.000000e+00   
+BeqShiftTerm 0  17.187500        0.000000  17.187500  17.187500  0.000000e+00
+```
+
+
+### Warm Glow Only
+
+```
+                value  standard_error     ci_lower     ci_upper       p_value  
+CRRA     0   4.233600        0.205016     3.831775     4.635424  9.748335e-95   
+DiscFac  0   0.923009        0.008554     0.906242     0.939775  0.000000e+00   
+BeqCRRA  0   2.427211        2.614537    -2.697187     7.551609  3.532248e-01   
+BeqFac   0  70.763872      698.885867 -1299.027256  1440.555000  9.193501e-01   
+BeqShift 0   1.630113       17.348288   -32.371906    35.632133  9.251378e-01
+```
+
+
+### Full 
+
+```
+                    value  standard_error   ci_lower   ci_upper       p_value  
+CRRA         0   4.507691        0.574552   3.381591   5.633791  4.309510e-15   
+DiscFac      0   0.912999        0.021864   0.870145   0.955852  0.000000e+00   
+BeqCRRA      0   2.516346        0.056806   2.405008   2.627684  0.000000e+00   
+BeqFac       0  90.986219        0.004840  90.976733  90.995704  0.000000e+00   
+BeqShift     0   1.532614        0.129104   1.279575   1.785654  1.671346e-32   
+BeqCRRATerm  0   2.748689        0.000000   2.748689   2.748689  0.000000e+00   
+BeqFacTerm   0  64.515898        0.000000  64.515898  64.515898  0.000000e+00   
+BeqShiftTerm 0  30.746973        0.000000  30.746973  30.746973  0.000000e+00
+```
+
+
+### Non-Separable T.R.P.
+
+
+:::
+
+## More Results
+
+::: {.panel-tabset}
+
+### Terminal Only
+
+![](figures/termbeq_sensitivity.svg)
+
+### Warm Glow Only
+
+![](figures/wgbeq_sensitivity.svg)
+
+### Full 
+
+![](figures/fullbeq_sensitivity.svg)
+
+### Non-Separable T.R.P.
+
+![](figures/trp_sensitivity.svg)
+
+:::
+
+
+## Conclusion and Future Work
+
+#### Conclusion
+
+-   Need wealth in the utility function to better capture distribution
+    of wealth
+-   Need life cycle structure to understand effect of policies on:
+    -   young parents with children and low income
+    -   working middle aged
+    -   retirees with low wealth
+
+#### Future Work
+
+-   Better estimation techniques such as Sequence Space Jacobians
+    (Auclert et al. \[2021\])
+    -   Will also help speed up sensitivity analysis
+-   Implement policy experiments and derive impulse response functions
+    by life cycle
+-   Analyze the effect of policy experiments on different segments of
+    the population
+-   Evaluate optimal policy to minimize differential harm

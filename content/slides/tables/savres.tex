@@ -1,0 +1,65 @@
+```
+*   reasons for saving: 1=cant save, 2=education, 3=family, 4=home,
+    5=purchases, 6=retirement, 7=liquidity/the future, 8=investment,
+    9=no particular reason;
+*   NOTE: multiple saving reasons may be reported: here choosing only
+    first (most important) reason;
+    ARRAY SAVRES {*} SAVRES1-SAVRES9;
+    ARRAY RES {*} X3006 /*X3007*/ ;
+    DO I=1 TO DIM(SAVRES);
+      SAVRES{I}=0;
+    END;
+    DO I=1 TO DIM(RES);
+      IF (RES{I} IN (-2 -1)) THEN SAVRES{1}=1;
+      ELSE IF (RES{I} IN (1 2)) THEN SAVRES{2}=1;
+      ELSE IF (RES{I} IN (3 5 6)) THEN SAVRES{3}=1;
+      ELSE IF (RES{I} EQ 11) THEN SAVRES{4}=1;
+      ELSE IF (RES{I} IN (12 13 14 15 16 27 29 30 9 18 20 41)) THEN
+        SAVRES{5}=1;
+      ELSE IF (RES{I} IN (17 22)) THEN SAVRES{6}=1;
+      ELSE IF (RES{I} IN (23 24 25 32 92 93)) THEN SAVRES{7}=1;
+      ELSE IF (RES{I} IN (21 26 28)) THEN SAVRES{8}=1;
+      ELSE IF (RES{I} IN (31 33 40 90 91 -7)) THEN SAVRES{9}=1;
+      ELSE PUT "UNCLASSIFIED SAVING REASON! " &ID= RES{I}=;
+    END;
+/*
+    1.  Children's education; education of grandchildren
+    2.  Own education; spouse's education; education -- NA for whom
+    3.  "For the children/family"  -- NFS; "to help the kids
+        out"; estate
+    5.  Wedding, Bar Mitzvah, and other ceremonies (except 17)
+    6.  To have children/a family
+    9.  To move (except 11)
+   11.  Buying own house (code summer cottage in 12)
+   12.  Purchase of cottage or second home for own use
+   13.  Buy a car, boat or other vehicle
+   14.  Home improvements/repairs
+   15.  To travel; take vacations; take other time off
+   16.  Buy durable household goods, appliances, home
+        furnishings; hobby and recreational items; for other
+        purchases not codable above or not further specified;
+        "buy things when we need/want them"; moving/special occasions
+   17.  Burial/funeral expenses
+   18.  Charitable or religious contributions
+   20.  "To enjoy life"
+   21.  Buying (investing in) own business/farm; equipment for
+        business/farm
+   22.  Retirement/old age
+   23.  Reserves in case of unemployment
+   24.  In case of illness; medical/dental expenses
+   25.  Emergencies; "rainy days"; other unexpected needs; for
+       "security" and independence
+   26.  Investments reasons (to get interest, to be
+        diversified, to buy other forms of assets)
+   27.  To meet contractual commitments (debt repayment,
+        insurance, taxes, etc.), to pay off house
+   28.  "To get ahead;" to advance standard of living
+   29.  Ordinary living expenses/bills
+   31.  No reason (except 90, 91, 92)
+   32.  "For the future"
+   90.  Had extra income; saved becaused had the money left
+        over -- no other purpose specified
+   91.  Wise/prudent thing to do; good discipline to save; habit
+   92.  Liquidity; to have cash available/on hand
+   -1.  Don't/can't save; "have no money"
+  ```

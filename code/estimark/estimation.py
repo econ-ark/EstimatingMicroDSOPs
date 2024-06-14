@@ -373,7 +373,7 @@ def msm_criterion(params, agent=None, emp_moments=None, weights=None):
         [
             float(weights[key] * (sim_moments[key] - emp_moments[key]))
             for key in emp_moments
-        ]
+        ],
     )
 
     squared_errors = np.square(errors)

@@ -1,0 +1,1760 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="slides_files/libs/clipboard/clipboard.min.js"></script>
+<script src="slides_files/libs/quarto-html/tabby.min.js"></script>
+<script src="slides_files/libs/quarto-html/popper.min.js"></script>
+<script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.5.43">
+
+  <meta name="author" content="Alan Lujan">
+  <meta name="dcterms.date" content="2024-06-20">
+  <title>Structural Estimation of Life Cycle Models with Wealth in the Utility Function</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto.css">
+  <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+
+  .callout {
+    margin-top: 1em;
+    margin-bottom: 1em;  
+    border-radius: .25rem;
+  }
+
+  .callout.callout-style-simple { 
+    padding: 0em 0.5em;
+    border-left: solid #acacac .3rem;
+    border-right: solid 1px silver;
+    border-top: solid 1px silver;
+    border-bottom: solid 1px silver;
+    display: flex;
+  }
+
+  .callout.callout-style-default {
+    border-left: solid #acacac .3rem;
+    border-right: solid 1px silver;
+    border-top: solid 1px silver;
+    border-bottom: solid 1px silver;
+  }
+
+  .callout .callout-body-container {
+    flex-grow: 1;
+  }
+
+  .callout.callout-style-simple .callout-body {
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  .callout.callout-style-default .callout-body {
+    font-size: 0.9rem;
+    font-weight: 400;
+  }
+
+  .callout.callout-titled.callout-style-simple .callout-body {
+    margin-top: 0.2em;
+  }
+
+  .callout:not(.callout-titled) .callout-body {
+      display: flex;
+  }
+
+  .callout:not(.no-icon).callout-titled.callout-style-simple .callout-content {
+    padding-left: 1.6em;
+  }
+
+  .callout.callout-titled .callout-header {
+    padding-top: 0.2em;
+    margin-bottom: -0.2em;
+  }
+
+  .callout.callout-titled .callout-title  p {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+    
+  .callout.callout-titled.callout-style-simple .callout-content  p {
+    margin-top: 0;
+  }
+
+  .callout.callout-titled.callout-style-default .callout-content  p {
+    margin-top: 0.7em;
+  }
+
+  .callout.callout-style-simple div.callout-title {
+    border-bottom: none;
+    font-size: .9rem;
+    font-weight: 600;
+    opacity: 75%;
+  }
+
+  .callout.callout-style-default  div.callout-title {
+    border-bottom: none;
+    font-weight: 600;
+    opacity: 85%;
+    font-size: 0.9rem;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  .callout.callout-style-default div.callout-content {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  .callout.callout-style-simple .callout-icon::before {
+    height: 1rem;
+    width: 1rem;
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 1rem 1rem;
+  }
+
+  .callout.callout-style-default .callout-icon::before {
+    height: 0.9rem;
+    width: 0.9rem;
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 0.9rem 0.9rem;
+  }
+
+  .callout-title {
+    display: flex
+  }
+    
+  .callout-icon::before {
+    margin-top: 1rem;
+    padding-right: .5rem;
+  }
+
+  .callout.no-icon::before {
+    display: none !important;
+  }
+
+  .callout.callout-titled .callout-body > .callout-content > :last-child {
+    padding-bottom: 0.5rem;
+    margin-bottom: 0;
+  }
+
+  .callout.callout-titled .callout-icon::before {
+    margin-top: .5rem;
+    padding-right: .5rem;
+  }
+
+  .callout:not(.callout-titled) .callout-icon::before {
+    margin-top: 1rem;
+    padding-right: .5rem;
+  }
+
+  /* Callout Types */
+
+  div.callout-note {
+    border-left-color: #4582ec !important;
+  }
+
+  div.callout-note .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEU0lEQVRYCcVXTWhcVRQ+586kSUMMxkyaElstCto2SIhitS5Ek8xUKV2poatCcVHtUlFQk8mbaaziwpWgglJwVaquitBOfhQXFlqlzSJpFSpIYyXNjBNiTCck7x2/8/LeNDOZxDuEkgOXe++553zfefee+/OYLOXFk3+1LLrRdiO81yNqZ6K9cG0P3MeFaMIQjXssE8Z1JzLO9ls20MBZX7oG8w9GxB0goaPrW5aNMp1yOZIa7Wv6o2ykpLtmAPs/vrG14Z+6d4jpbSKuhdcSyq9wGMPXjonwmESXrriLzFGOdDBLB8Y6MNYBu0dRokSygMA/mrun8MGFN3behm6VVAwg4WR3i6FvYK1T7MHo9BK7ydH+1uurECoouk5MPRyVSBrBHMYwVobG2aOXM07sWrn5qgB60rc6mcwIDJtQrnrEr44kmy+UO9r0u9O5/YbkS9juQckLed3DyW2XV/qWBBB3ptvI8EUY3I9p/67OW+g967TNr3Sotn3IuVlfMLVnsBwH4fsnebJvyGm5GeIUA3jljERmrv49SizPYuq+z7c2H/jlGC+Ghhupn/hcapqmcudB9jwJ/3jvnvu6vu5lVzF1fXyZuZZ7U8nRmVzytvT+H3kilYvH09mLWrQdwFSsFEsxFVs5fK7A0g8gMZjbif4ACpKbjv7gNGaD8bUrlk8x+KRflttr22JEMRUbTUwwDQScyzPgedQHZT0xnx7ujw2jfVfExwYHwOsDTjLdJ2ebmeQIlJ7neo41s/DrsL3kl+W2lWvAga0tR3zueGr6GL78M3ifH0rGXrBC2aAR8uYcIA5gwV8zIE8onoh8u0Fca/ciF7j1uOzEnqcIm59sEXoGc0+z6+H45V1CvAvHcD7THztu669cnp+L0okAeIc6zjbM/24LgGM1gZk7jnRu1aQWoU9sfUOuhrmtaPIO3YY1KLLWZaEO5TKUbMY5zx8W9UJ6elpLwKXbsaZ4EFl7B4bMtDv0iRipKoDQT2sNQI9b1utXFdYisi+wzZ/ri/1m7QfDgEuvgUUEIJPq3DhX/5DWNqIXDOweC2wvIR90Oq3lDpdMIgD2r0dXvGdsEW5H6x6HLRJYU7C69VefO1x8Gde1ZFSJLfWS1jbCnhtOPxmpfv2LXOA2Xk2tvnwKKPFuZ/oRmwBwqRQDcKNeVQkYcOjtWVBuM/JuYw5b6isojIkYxyYAFn5K7ZBF10fea52y8QltAg6jnMqNHFBmGkQ1j+U43HMi2xMar1Nv0zGsf1s8nUsmUtPOOrbFIR8bHFDMB5zL13Gmr/kGlCkUzedTzzmzsaJXhYawnA3UmARpiYj5ooJZiUoxFRtK3X6pgNPv+IZVPcnwbOl6f+aBaO1CNvPW9n9LmCp01nuSaTRF2YxHqZ8DYQT6WsXT+RD6eUztwYLZ8rM+rcPxamv1VQzFUkzFXvkiVrySGQgJNvXHJAxiU3/NwiC03rSf05VBaPtu/Z7/B8Yn/w7eguloAAAAAElFTkSuQmCC');
+  }
+
+  div.callout-note.callout-style-default .callout-title {
+    background-color: #dae6fb
+  }
+
+  div.callout-important {
+    border-left-color: #d9534f !important;
+  }
+
+  div.callout-important .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEKklEQVRYCcVXTWhcVRS+575MJym48A+hSRFr00ySRQhURRfd2HYjk2SSTokuBCkU2o0LoSKKraKIBTcuFCoidGFD08nkBzdREbpQ1EDNIv8qSGMFUboImMSZd4/f9zJv8ibJMC8xJQfO3HPPPef7zrvvvnvviIkpC9nsw0UttFunbUhpFzFtarSd6WJkStVMw5xyVqYTvkwfzuf/5FgtkVoB0729j1rjXwThS7Vio+Mo6DNnvLfahoZ+i/o32lULuJ3NNiz7q6+pyAUkJaFF6JwaM2lUJlV0MlnQn5aTRbEu0SEqHUa0A4AdiGuB1kFXRfVyg5d87+Dg4DL6m2TLAub60ilj7A1Ec4odSAc8X95sHh7+ZRPCFo6Fnp7HfU/fBng/hi10CjCnWnJjsxvDNxWw0NfV6Rv5GgP3I3jGWXumdTD/3cbEOP2ZbOZp69yniG3FQ9z1jD7bnBu9Fc2tKGC2q+uAJOQHBDRiZX1x36o7fWBs7J9ownbtO+n0/qWkvW7UPIfc37WgT6ZGR++EOJyeQDSb9UB+DZ1G6DdLDzyS+b/kBCYGsYgJbSQHuThGKRcw5xdeQf8YdNHsc6ePXrlSYMBuSIAFTGAtQo+VuALo4BX83N190NWZWbynBjhOHsmNfFWLeL6v+ynsA58zDvvAC8j5PkbOcXCMg2PZFk3q8MjI7WAG/Dp9AwP7jdGBOOQkAvlFUB+irtm16I1Zw9YBcpGTGXYmk3kQIC/Cds55l+iMI3jqhjAuaoe+am2Jw5GT3Nbz3CkE12NavmzN5+erJW7046n/CH1RO/RVa8lBLozXk9uqykkGAyRXLWlLv5jyp4RFsG5vGVzpDLnIjTWgnRy2Rr+tDKvRc7Y8AyZq10jj8DqXdnIRNtFZb+t/ZRtXcDiVnzpqx8mPcDWxgARUqx0W1QB9MeUZiNrV4qP+Ehc+BpNgATsTX8ozYKL2NtFYAHc84fG7ndxUPr+AR/iQSns7uSUufAymwDOb2+NjK27lEFocm/EE2WpyIy/Hi66MWuMKJn8RvxIcj87IM5Vh9663ziW36kR0HNenXuxmfaD8JC7tfKbrhFr7LiZCrMjrzTeGx+PmkosrkNzW94ObzwocJ7A1HokLolY+AvkTiD/q1H0cN48c5EL8Crkttsa/AXQVDmutfyku0E7jShx49XqV3MFK8IryDhYVbj7Sj2P2eBxwcXoe8T8idsKKPRcnZw1b+slFTubwUwhktrfnAt7J++jwQtLZcm3sr9LQrjRzz6cfMv9aLvgmnAGvpoaGLxM4mAEaLV7iAzQ3oU0IvD5x9ix3yF2RAAuYAOO2f7PEFWCXZ4C9Pb2UsgDeVnFSpbFK7/IWu7TPTvBqzbGdCHOJQSxiEjt6IyZmxQyEJHv6xyQsYk//moVFsN2zP6fRImjfq7/n/wFDguUQFNEwugAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-important.callout-style-default .callout-title {
+    background-color: #f7dddc
+  }
+
+  div.callout-warning {
+    border-left-color: #f0ad4e !important;
+  }
+
+  div.callout-warning .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAETklEQVRYCeVWW2gcVRg+58yaTUnizqbipZeX4uWhBEniBaoUX1Ioze52t7sRq6APio9V9MEaoWlVsFasRq0gltaAPuxms8lu0gcviE/FFOstVbSIxgcv6SU7EZqmdc7v9+9mJtNks51NTUH84ed889/PP+cmxP+d5FIbMJmNbpREu4WUkiTtCicKny0l1pIKmBzovF2S+hIJHX8iEu3hZJ5lNZGqyRrGSIQpq15AzF28jgpeY6yk6GVdrfFqdrD6Iw+QlB8g0YS2g7dyQmXM/IDhBhT0UCiRf59lfqmmDvzRt6kByV/m4JjtzuaujMUM2c5Z2d6JdKrRb3K2q6mA+oYVz8JnDdKPmmNthzkAk/lN63sYPgevrguc72aZX/L9C6x09GYyxBgCX4NlvyGUHOKELlm5rXeR1kchuChJt4SSwyddZRXgvwMGvYo4QSlk3/zkHD8UHxwVJA6zjZZqP8v8kK8OWLnIZtLyCAJagYC4rTGW/9Pqj92N/c+LUaAj27movwbi19tk/whRCIE7Q9vyI6yvRpftAKVTdUjOW40X3h5OXsKCdmFcx0xlLJoSuQngnrJe7Kcjm4OMq9FlC7CMmScQANuNvjfP3PjGXDBaUQmbp296S5L4DrpbrHN1T87ZVEZVCzg1FF0Ft+dKrlLukI+/c9ENo+TvlTDbYFvuKPtQ9+l052rXrgKoWkDAFnvh0wTOmYn8R5f4k/jN/fZiCM1tQx9jQQ4ANhqG4hiL0qIFTGViG9DKB7GYzgubnpofgYRwO+DFjh0Zin2m4b/97EDkXkc+f6xYAPX0KK2I/7fUQuwzuwo/L3AkcjugPNixC8cHf0FyPjWlItmLxWw4Ou9YsQCr5fijMGoD/zpdRy95HRysyXA74MWOnscpO4j2y3HAVisw85hX5+AFBRSHt4ShfLFkIMXTqyKFc46xdzQM6XbAi702a7sy04J0+feReMFKp5q9esYLCqAZYw/k14E/xcLLsFElaornTuJB0svMuJINy8xkIYuL+xPAlWRceH6+HX7THJ0djLUom46zREu7tTkxwmf/FdOZ/sh6Q8qvEAiHpm4PJ4a/doJe0gH1t+aHRgCzOvBvJedEK5OFE5jpm4AGP2a8Dxe3gGJ/pAutug9Gp6he92CsSsWBaEcxGx0FHytmIpuqGkOpldqNYQK8cSoXvd+xLxXADw0kf6UkJNFtdo5MOgaLjiQOQHcn+A6h5NuL2s0qsC2LOM75PcF3yr5STuBSAcGG+meA14K/CI21HcS4LBT6tv0QAh8Dr5l93AhZzG5ZJ4VxAqdZUEl9z7WJ4aN+svMvwHHL21UKTd1mqvChH7/Za5xzXBBKrUcB0TQ+Ulgkfbi/H/YT5EptrGzsEK7tR1B7ln9BBwckYfMiuSqklSznIuoIIOM42MQO+QnduCoFCI0bpkzjCjddHPN/F+2Yu+sd9bKNpVwHhbS3LluK/0zgfwD0xYI5dXuzlQAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-warning.callout-style-default .callout-title {
+    background-color: #fcefdc
+  }
+
+  div.callout-tip {
+    border-left-color: #02b875 !important;
+  }
+
+  div.callout-tip .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAADr0lEQVRYCe1XTWgTQRj9ZjZV8a9SPIkKgj8I1bMHsUWrqYLVg4Ue6v9BwZOxSYsIerFao7UiUryIqJcqgtpimhbBXoSCVxUFe9CTiogUrUp2Pt+3aUI2u5vdNh4dmMzOzHvvezuz8xNFM0mjnbXaNu1MvFWRXkXEyE6aYOYJpdW4IXuA4r0fo8qqSMDBU0v1HJUgVieAXxzCsdE/YJTdFcVIZQNMyhruOMJKXYFoLfIfIvVIMWdsrd+Rpd86ZmyzzjJmLStqRn0v8lzkb4rVIXvnpScOJuAn2ACC65FkPzEdEy4TPWRLJ2h7z4cArXzzaOdKlbOvKKX25Wl00jSnrwVxAg3o4dRxhO13RBSdNvH0xSARv3adTXbBdTf64IWO2vH0LT+cv4GR1DJt+DUItaQogeBX/chhbTBxEiZ6gftlDNXTrvT7co4ub5A6gp9HIcHvzTa46OS5fBeP87Qm0fQkr4FsYgVQ7Qg+ZayaDg9jhg1GkWj8RG6lkeSacrrHgDaxdoBiZPg+NXV/KifMuB6//JmYH4CntVEHy/keA6x4h4CU5oFy8GzrBS18cLJMXcljAKB6INjWsRcuZBWVaS3GDrqB7rdapVIeA+isQ57Eev9eCqzqOa81CY05VLd6SamW2wA2H3SiTbnbSxmzfp7WtKZkqy4mdyAlGx7ennghYf8voqp9cLSgKdqNfa6RdRsAAkPwRuJZNbpByn+RrJi1RXTwdi8RQF6ymDwGMAtZ6TVE+4uoKh+MYkcLsT0Hk8eAienbiGdjJHZTpmNjlbFJNKDVAp2fJlYju6IreQxQ08UJDNYdoLSl6AadO+fFuCQqVMB1NJwPm69T04Wv5WhfcWyfXQB+wXRs1pt+nCknRa0LVzSA/2B+a9+zQJadb7IyyV24YAxKp2Jqs3emZTuNnKxsah+uabKbMk7CbTgJx/zIgQYErIeTKRQ9yD9wxVof5YolPHqaWo7TD6tJlh7jQnK5z2n3+fGdggIOx2kaa2YI9QWarc5Ce1ipNWMKeSG4DysFF52KBmTNMmn5HqCFkwy34rDg05gDwgH3bBi+sgFhN/e8QvRn8kbamCOhgrZ9GJhFDgfcMHzFb6BAtjKpFhzTjwv1KCVuxHvCbsSiEz4CANnj84cwHdFXAbAOJ4LTSAawGWFn5tDhLMYz6nWeU2wJfIhmIJBefcd/A5FWQWGgrWzyORZ3Q6HuV+Jf0Bj+BTX69fm1zWgK7By1YTXchFDORywnfQ7GpzOo6S+qECrsx2ifVQAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-tip.callout-style-default .callout-title {
+    background-color: #ccf1e3
+  }
+
+  div.callout-caution {
+    border-left-color: #fd7e14 !important;
+  }
+
+  div.callout-caution .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAACV0lEQVRYCdVWzWoUQRCuqp2ICBLJXgITZL1EfQDBW/bkzUMUD7klD+ATSHBEfAIfQO+iXsWDxJsHL96EHAwhgzlkg8nBg25XWb0zIb0zs9muYYWkoKeru+vn664fBqElyZNuyh167NXJ8Ut8McjbmEraKHkd7uAnAFku+VWdb3reSmRV8PKSLfZ0Gjn3a6Xlcq9YGb6tADjn+lUfTXtVmaZ1KwBIvFI11rRXlWlatwIAAv2asaa9mlB9wwygiDX26qaw1yYPzFXg2N1GgG0FMF8Oj+VIx7E/03lHx8UhvYyNZLN7BwSPgekXXLribw7w5/c8EF+DBK5idvDVYtEEwMeYefjjLAdEyQ3M9nfOkgnPTEkYU+sxMq0BxNR6jExrAI31H1rzvLEfRIdgcv1XEdj6QTQAS2wtstEALLG1yEZ3QhH6oDX7ExBSFEkFINXH98NTrme5IOaaA7kIfiu2L8A3qhH9zRbukdCqdsA98TdElyeMe5BI8Rs2xHRIsoTSSVFfCFCWGPn9XHb4cdobRIWABNf0add9jakDjQJpJ1bTXOJXnnRXHRf+dNL1ZV1MBRCXhMbaHqGI1JkKIL7+i8uffuP6wVQAzO7+qVEbF6NbS0LJureYcWXUUhH66nLR5rYmva+2tjRFtojkM2aD76HEGAD3tPtKM309FJg5j/K682ywcWJ3PASCcycH/22u+Bh7Aa0ehM2Fu4z0SAE81HF9RkB21c5bEn4Dzw+/qNOyXr3DCTQDMBOdhi4nAgiFDGCinIa2owCEChUwD8qzd03PG+qdW/4fDzjUMcE1ZpIAAAAASUVORK5CYII=');
+  }
+
+  div.callout-caution.callout-style-default .callout-title {
+    background-color: #ffe5d0
+  }
+
+  </style>
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Structural Estimation of Life Cycle Models with Wealth in the Utility Function</h1>
+  <p class="subtitle">CEF 2024 – NTU, Singapore</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Alan Lujan <a href="https://orcid.org/0000-0000-0000-0000" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a>
+</div>
+<div class="quarto-title-author-email">
+<a href="mailto:alujan@jhu.edu">alujan@jhu.edu</a>
+</div>
+        <p class="quarto-title-affiliation">
+            Johns Hopkins University <br> Econ-ARK
+          </p>
+    </div>
+</div>
+
+  <p class="date">June 20, 2024</p>
+</section>
+<section id="why-do-people-save" class="slide level2 smaller">
+<h2>Why do people save?</h2>
+<div class="panel-tabset">
+<ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-1-1">By Education</a></li><li><a href="#tabset-1-2">Among Retirees </a><sup>1</sup></li><li><a href="#tabset-1-3">Details </a><sup>2</sup></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1">
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th>
+Reasons for Saving
+</th>
+<th>
+Can’t save
+</th>
+<th>
+Education
+</th>
+<th>
+Family
+</th>
+<th>
+Home
+</th>
+<th>
+Investment
+</th>
+<th>
+Liquidity/the future
+</th>
+<th>
+No particular reason
+</th>
+<th>
+Purchases
+</th>
+<th>
+Retirement
+</th>
+</tr>
+<tr>
+<th>
+edcl_lbl
+</th>
+<th>
+</th>
+<th>
+</th>
+<th>
+</th>
+<th>
+</th>
+<th>
+</th>
+<th>
+</th>
+<th>
+</th>
+<th>
+</th>
+<th>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>
+Bachelors degree or higher
+</th>
+<td>
+2%
+</td>
+<td>
+9%
+</td>
+<td>
+4%
+</td>
+<td>
+4%
+</td>
+<td>
+2%
+</td>
+<td>
+34%
+</td>
+<td>
+1%
+</td>
+<td>
+7%
+</td>
+<td>
+38%
+</td>
+</tr>
+<tr>
+<th>
+high school diploma or GED
+</th>
+<td>
+5%
+</td>
+<td>
+8%
+</td>
+<td>
+6%
+</td>
+<td>
+5%
+</td>
+<td>
+3%
+</td>
+<td>
+35%
+</td>
+<td>
+1%
+</td>
+<td>
+12%
+</td>
+<td>
+26%
+</td>
+</tr>
+<tr>
+<th>
+no high school diploma/GED
+</th>
+<td>
+11%
+</td>
+<td>
+7%
+</td>
+<td>
+7%
+</td>
+<td>
+4%
+</td>
+<td>
+3%
+</td>
+<td>
+34%
+</td>
+<td>
+1%
+</td>
+<td>
+15%
+</td>
+<td>
+18%
+</td>
+</tr>
+<tr>
+<th>
+some college or Assoc. degree
+</th>
+<td>
+4%
+</td>
+<td>
+9%
+</td>
+<td>
+5%
+</td>
+<td>
+5%
+</td>
+<td>
+3%
+</td>
+<td>
+36%
+</td>
+<td>
+1%
+</td>
+<td>
+11%
+</td>
+<td>
+28%
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="tabset-1-2">
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th>
+Reasons for Saving
+</th>
+<th>
+Can’t save
+</th>
+<th>
+Education
+</th>
+<th>
+Family
+</th>
+<th>
+Home
+</th>
+<th>
+Investment
+</th>
+<th>
+Liquidity/the future
+</th>
+<th>
+No particular reason
+</th>
+<th>
+Purchases
+</th>
+<th>
+Retirement
+</th>
+</tr>
+<tr>
+<th>
+edcl_lbl
+</th>
+<th>
+</th>
+<th>
+</th>
+<th>
+</th>
+<th>
+</th>
+<th>
+</th>
+<th>
+</th>
+<th>
+</th>
+<th>
+</th>
+<th>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>
+Bachelors degree or higher
+</th>
+<td>
+5%
+</td>
+<td>
+2%
+</td>
+<td>
+6%
+</td>
+<td>
+1%
+</td>
+<td>
+2%
+</td>
+<td>
+42%
+</td>
+<td>
+3%
+</td>
+<td>
+13%
+</td>
+<td>
+27%
+</td>
+</tr>
+<tr>
+<th>
+high school diploma or GED
+</th>
+<td>
+7%
+</td>
+<td>
+1%
+</td>
+<td>
+8%
+</td>
+<td>
+0%
+</td>
+<td>
+2%
+</td>
+<td>
+42%
+</td>
+<td>
+3%
+</td>
+<td>
+14%
+</td>
+<td>
+22%
+</td>
+</tr>
+<tr>
+<th>
+no high school diploma/GED
+</th>
+<td>
+14%
+</td>
+<td>
+1%
+</td>
+<td>
+5%
+</td>
+<td>
+1%
+</td>
+<td>
+2%
+</td>
+<td>
+40%
+</td>
+<td>
+2%
+</td>
+<td>
+17%
+</td>
+<td>
+19%
+</td>
+</tr>
+<tr>
+<th>
+some college or Assoc. degree
+</th>
+<td>
+7%
+</td>
+<td>
+1%
+</td>
+<td>
+7%
+</td>
+<td>
+0%
+</td>
+<td>
+2%
+</td>
+<td>
+43%
+</td>
+<td>
+3%
+</td>
+<td>
+15%
+</td>
+<td>
+21%
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="tabset-1-3">
+<pre><code>*   reasons for saving: 1=cant save, 2=education, 3=family, 4=home,
+    5=purchases, 6=retirement, 7=liquidity/the future, 8=investment,
+    9=no particular reason;
+*   NOTE: multiple saving reasons may be reported: here choosing only
+    first (most important) reason;
+    ARRAY SAVRES {*} SAVRES1-SAVRES9;
+    ARRAY RES {*} X3006 /*X3007*/ ;
+    DO I=1 TO DIM(SAVRES);
+      SAVRES{I}=0;
+    END;
+    DO I=1 TO DIM(RES);
+      IF (RES{I} IN (-2 -1)) THEN SAVRES{1}=1;
+      ELSE IF (RES{I} IN (1 2)) THEN SAVRES{2}=1;
+      ELSE IF (RES{I} IN (3 5 6)) THEN SAVRES{3}=1;
+      ELSE IF (RES{I} EQ 11) THEN SAVRES{4}=1;
+      ELSE IF (RES{I} IN (12 13 14 15 16 27 29 30 9 18 20 41)) THEN
+        SAVRES{5}=1;
+      ELSE IF (RES{I} IN (17 22)) THEN SAVRES{6}=1;
+      ELSE IF (RES{I} IN (23 24 25 32 92 93)) THEN SAVRES{7}=1;
+      ELSE IF (RES{I} IN (21 26 28)) THEN SAVRES{8}=1;
+      ELSE IF (RES{I} IN (31 33 40 90 91 -7)) THEN SAVRES{9}=1;
+      ELSE PUT "UNCLASSIFIED SAVING REASON! " &amp;ID= RES{I}=;
+    END;
+/*
+    1.  Children's education; education of grandchildren
+    2.  Own education; spouse's education; education -- NA for whom
+    3.  "For the children/family"  -- NFS; "to help the kids
+        out"; estate
+    5.  Wedding, Bar Mitzvah, and other ceremonies (except 17)
+    6.  To have children/a family
+    9.  To move (except 11)
+   11.  Buying own house (code summer cottage in 12)
+   12.  Purchase of cottage or second home for own use
+   13.  Buy a car, boat or other vehicle
+   14.  Home improvements/repairs
+   15.  To travel; take vacations; take other time off
+   16.  Buy durable household goods, appliances, home
+        furnishings; hobby and recreational items; for other
+        purchases not codable above or not further specified;
+        "buy things when we need/want them"; moving/special occasions
+   17.  Burial/funeral expenses
+   18.  Charitable or religious contributions
+   20.  "To enjoy life"
+   21.  Buying (investing in) own business/farm; equipment for
+        business/farm
+   22.  Retirement/old age
+   23.  Reserves in case of unemployment
+   24.  In case of illness; medical/dental expenses
+   25.  Emergencies; "rainy days"; other unexpected needs; for
+       "security" and independence
+   26.  Investments reasons (to get interest, to be
+        diversified, to buy other forms of assets)
+   27.  To meet contractual commitments (debt repayment,
+        insurance, taxes, etc.), to pay off house
+   28.  "To get ahead;" to advance standard of living
+   29.  Ordinary living expenses/bills
+   31.  No reason (except 90, 91, 92)
+   32.  "For the future"
+   90.  Had extra income; saved becaused had the money left
+        over -- no other purpose specified
+   91.  Wise/prudent thing to do; good discipline to save; habit
+   92.  Liquidity; to have cash available/on hand
+   -1.  Don't/can't save; "have no money"</code></pre>
+</div>
+</div>
+</div>
+
+<aside><div>
+<p>Source: Survey of Consumer Finances</p>
+</div><ol class="aside-footnotes"><li id="fn1"><p>Older than 70 years old.</p></li><li id="fn2"><p>https://www.federalreserve.gov/econres/files/bulletin.macro.txt</p></li></ol></aside></section>
+<section id="how-do-people-save" class="slide level2">
+<h2>How do people save?</h2>
+<div class="panel-tabset">
+<ul id="tabset-2" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-2-1">Net Worth by Age</a></li><li><a href="#tabset-2-2">By Education</a></li><li><a href="#tabset-2-3">Normalized by Income</a></li><li><a href="#tabset-2-4">Model</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1">
+<div id="fig-age" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-age-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img data-src="figures/median_net_worth_by_age.svg">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-age-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Median Net Worth by Age
+</figcaption>
+</figure>
+</div>
+</div>
+<div id="tabset-2-2">
+<div id="fig-educ" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-educ-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img data-src="figures/median_net_worth_by_educ.svg">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-educ-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Median Net Worth by Education
+</figcaption>
+</figure>
+</div>
+</div>
+<div id="tabset-2-3">
+<div id="fig-norminc" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-norminc-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img data-src="figures/median_norm_net_worth_by_age.svg">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-norminc-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Median Normalized Net Worth
+</figcaption>
+</figure>
+</div>
+</div>
+<div id="tabset-2-4">
+<p><img data-src="figures/lcim_results.svg"></p>
+</div>
+</div>
+</div>
+</section>
+<section id="motivation-and-research-quesitions" class="slide level2">
+<h2>Motivation and Research Quesitions</h2>
+<h3 id="motivation">Motivation</h3>
+<ul>
+<li>Savings and wealth accumulation</li>
+<li>Patterns of inequality</li>
+<li>Life cycle / Retirement / Bequests</li>
+</ul>
+<h3 id="research-questions">Research Questions</h3>
+<ul>
+<li>What are our models missing?</li>
+<li>How do we fit the distribution of wealth for the rich and/or the old?</li>
+<li>How important are life cycle properties?</li>
+<li>How much does wealth in the utility function matter?</li>
+</ul>
+<p><span class="math display">\[
+\newcommand{\DiscFac}{\beta}
+\newcommand{\cFunc}{\mathrm{c}}
+\newcommand{\uFunc}{\mathrm{u}}
+\newcommand{\vFunc}{\mathrm{v}}
+\newcommand{\Alive}{\mathcal{L}}
+\newcommand{\h}{h}
+\newcommand{\cLvl}{\mathbf{c}}
+\newcommand{\mLvl}{\mathbf{m}}
+\newcommand{\pLvl}{\mathbf{p}}
+\newcommand{\Ex}{\mathbb{E}}
+\newcommand{\CRRA}{\rho}
+\newcommand{\PermGroFac}{\pmb{\Phi}}
+\newcommand{\Rfree}{\mathsf{R}}
+\newcommand{\PermShk}{\mathbf{\Psi}}
+\newcommand{\TranShk}{\pmb{\xi}}
+\newcommand{\aNrm}{a}
+\newcommand{\cNrm}{c}
+\newcommand{\RNrm}{\mathcal{R}}
+\newcommand{\TranShkEmp}{\pmb{\theta}}
+\newcommand{\mNrm}{m}
+\newcommand{\pZero}{\wp}
+\newcommand{\aFunc}{\mathrm{a}}
+\newcommand{\kapShare}{\alpha}
+\newcommand{\wealth}{o}
+\newcommand{\kap}{k}
+\newcommand{\wealthShare}{\delta}
+\newcommand{\wFunc}{\mathrm{w}}
+\newcommand{\aRat}{a}
+\newcommand{\mRat}{m}
+\newcommand{\aMat}{[\mathrm{a}]}
+\newcommand{\mMat}{[\mathrm{m}]}
+\newcommand{\weight}{\omega}
+\]</span></p>
+</section>
+<section id="some-literature" class="slide level2">
+<h2>Some Literature</h2>
+<ul>
+<li><p>Why do the rich save so much? - Carroll [1998]</p>
+<ul>
+<li>the rich have higher lifetime savings rates</li>
+<li>models of consumption smoothing and precautionary savings can not explain this</li>
+<li>propose a model where wealth is in the utility function</li>
+<li>households derive utility from wealth itself OR</li>
+<li>wealth provides a flow of services such as political power or social status</li>
+</ul></li>
+<li><p>Do the rich save more? - Dynan Skinner Zeldes [2004]</p></li>
+</ul>
+</section>
+<section id="the-baseline-life-cycle-incomplete-markets-model" class="slide level2">
+<h2>The baseline Life Cycle Incomplete Markets model</h2>
+<p>The agent maximizes PDV of utility from consumption over life cycle with terminal period <span class="math inline">\(T\)</span>:</p>
+<p><span class="math display">\[\begin{equation}
+\label{eq:lifecyclemax}
+\vFunc_{t}(\pLvl_{t},\mLvl_{t})  = \max_{\{\cFunc\}_{t}^{T}} ~ \uFunc(\cLvl_{t})+\Ex_{t}\left[\sum_{n=1}^{T-t} \DiscFac^n \Alive_{t}^{t+n} \uFunc(\cLvl_{t+n}) \right]
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\pLvl_{t}\)</span> is permanent income level, <span class="math inline">\(\mLvl_{t}\)</span> is total market resources, <span class="math inline">\(\cLvl_{t}\)</span> is consumption, and</p>
+<p><span class="math display">\[\begin{aligned}
+    \DiscFac &amp; :  \text{time-invariant pure discount factor}
+    \\ \Alive _{t}^{t+n} &amp; :  \text{probability to }\Alive\text{ive until age t+n given alive at age t}
+\end{aligned}\]</span></p>
+</section>
+<section id="recursive-bellman-equation" class="slide level2 smaller">
+<h2>Recursive Bellman Equation</h2>
+<p><span class="math display">\[\begin{aligned}
+    {\vFunc}_{t}({m}_{t}) &amp; = \max_{\cNrm_{t}} ~ \uFunc(\cNrm_{t})+\DiscFac\Alive_{t+1}
+    \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})]
+    \\ &amp; \text{s.t.} &amp;
+    \\ \aNrm_{t} &amp; = {m}_{t}-\cNrm_{t}
+    \\ {m}_{t+1} &amp; = \aNrm_{t}\underbrace{\left(\frac{\Rfree}{\PermShk_{t+1}\PermGroFac_{t+1}}\right)}_{\equiv \RNrm_{t+1}} + \TranShkEmp_{t+1}
+\end{aligned}\]</span></p>
+<p>where <span class="math inline">\(\vFunc(\cdot)\)</span> and <span class="math inline">\(\uFunc(\cdot)\)</span> are now the normalized value and utility functions, and</p>
+<p><span class="math display">\[\begin{aligned}
+  \CRRA &amp; : \text{constant relative risk aversion parameter} \\
+  \mNrm_{t} &amp; : \text{normalized market resources} \\
+  \cNrm_{t} &amp; : \text{normalized consumption} \\
+  \aNrm_{t} &amp; : \text{normalized liquid assets after consumption} \\
+  \Rfree &amp; : \text{risk free interest rate}
+    \\ \RNrm_{t+1} &amp; :  \text{permanent income growth normalized return factor}
+\end{aligned}\]</span></p>
+</section>
+<section id="distribution-of-shocks-to-income" class="slide level2">
+<h2>Distribution of Shocks to Income</h2>
+<p>The transitory and permanent shocks to income are defined as:</p>
+<p><span class="math display">\[\begin{aligned}
+  \PermShk_{t+1} &amp; :  \text{mean-one shock to permanent income}
+    \\ \PermGroFac_{t+1} &amp; :  \text{permanent income growth factor}
+    \\ \TranShkEmp_{t+1} &amp; :  \text{mean-one transitory shock to permanent income}
+\end{aligned}\]</span></p>
+<p>where</p>
+<p><span class="math display">\[\begin{aligned}
+\TranShkEmp_{s}  = &amp; \begin{cases} 0  &amp; \text{with probability } \pZero&gt;0  \\
+\xi_{s}/\pZero &amp; \text{with probability } (1-\pZero)  \end{cases} \\
+\phantom{/\pZero} \\ &amp; \text{with } \log \xi_{s}\thicksim \mathcal{N}(-\sigma_{[\xi, t]}^{2}/2,\sigma_{[\xi, t]}^{2})
+\\ &amp; \text{and }  \log \PermShk_{s}   \thicksim \mathcal{N}(-\sigma_{[\PermShk, t]}^{2}/2,\sigma_{[\PermShk, t]}^{2}).
+\end{aligned}\]</span></p>
+</section>
+<section id="wealth-in-the-utility-literature" class="slide level2 smaller">
+<h2>Wealth in the Utility Literature</h2>
+<h3 id="separable-bequest-models">Separable – Bequest Models</h3>
+<ul>
+<li>Wealth inequality and intergenerational links - De Nardi [2004]</li>
+</ul>
+<h3 id="non-separable-money-in-the-utility">Non-separable – Money in the Utility</h3>
+<ul>
+<li><p>A monetary equilibrium model with transactions costs - Rotemberg [1984]</p></li>
+<li><p>Money in the Utility Function: An Empirical Implementation - Poterba Rotemberg [1986]</p></li>
+<li><p>A Novel Model to Measure Utility from Consumption and Wealth - Tzitzouris [2024]</p></li>
+</ul>
+</section>
+<section id="the-wealth-in-the-utility-function-incomplete-markets-model" class="slide level2 smaller">
+<h2>The Wealth in the Utility Function Incomplete Markets model</h2>
+<p><span class="math display">\[\begin{aligned}
+    {\vFunc}_{t}({m}_{t}) &amp; = \max_{\cNrm_{t}}  \uFunc(\cNrm_{t}, \aNrm_{t})+\DiscFac\Alive_{t+1}
+    \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})]
+    \\ &amp; \text{s.t.} &amp;
+    \\ \aNrm_{t} &amp; = {m}_{t}-\cNrm_{t}
+    \\ {m}_{t+1} &amp; = \aNrm_{t}\RNrm_{t+1}+ ~\TranShkEmp_{t+1}
+\end{aligned}\]</span></p>
+<h4 id="separable-utility-as-in-carroll-1998-de-nardi-2004">Separable Utility (as in Carroll [1998], De Nardi [2004])</h4>
+<p><span class="math display">\[\begin{equation}
+\uFunc(\cNrm_{t}, \aNrm_{t}) = \frac{\cNrm_{t}^{1-\CRRA}}{1-\CRRA} + \kapShare_{t} \frac{(\aFunc_{t} - \underline\aNrm)^{1-\wealthShare}}{1-\wealthShare}
+\end{equation}\]</span></p>
+<h4 id="non-separable-utility-as-in-tzitzouris-2024-rotemberg-poterba-1986">Non-separable Utility (as in Tzitzouris [2024], Rotemberg Poterba [1986])</h4>
+<p><span class="math display">\[\begin{equation}
+\uFunc(\cNrm_{t}, \aNrm_{t}) = \frac{(\cNrm_{t}^{1-\wealthShare} (\aNrm_{t} - \underline\aNrm)^\wealthShare)^{1-\CRRA}}{(1-\CRRA)}
+\end{equation}\]</span></p>
+</section>
+<section id="parameterization-and-calibration" class="slide level2">
+<h2>Parameterization and Calibration</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Description</th>
+<th>Values</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\PermGroFac_{t}\)</span></td>
+<td>Perm. income growth factor</td>
+<td>Caggetti [2003]</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\sigma_{[\xi, t]}, \sigma_{[\PermShk, t]}\)</span></td>
+<td>Std. dev. of trans. and perm. shocks</td>
+<td>Sabelhaus and Song [2010]</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\pZero = 0.005\)</span></td>
+<td>Probability of zero income</td>
+<td>Carroll [1992]</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\Alive_{t}\)</span></td>
+<td>Survival and discount factors</td>
+<td>Caggetti [2003]</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\Rfree = 1.03\)</span></td>
+<td>Risk free interest rate</td>
+<td>Caggetti [2003]</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="estimation---method-of-simulated-moments" class="slide level2">
+<h2>Estimation - Method of Simulated Moments</h2>
+<h3 id="steps-of-msm-estimation">Steps of MSM estimation</h3>
+<ol type="1">
+<li>Obtain empirical data</li>
+<li>Calculate empirical moments</li>
+<li>Calculate covariance matrix</li>
+<li>Define Heterogeneous Agent Model</li>
+<li>Given a guess <span class="math inline">\(\theta_0\)</span>, simulate model and calculate moments</li>
+<li>Estimate model parameters by minimizing criterion function</li>
+</ol>
+<h3 id="objective-function">Objective function</h3>
+<p><span class="math display">\[\begin{equation}
+  \min_{\theta \in \Theta} \hat{g}(\theta)' \hat{W} \hat{g}(\theta) \qquad \qquad \hat{g}(\theta) = \hat{s} - s(\theta)
+\end{equation}\]</span></p>
+</section>
+<section id="method-of-simulated-moments" class="slide level2">
+<h2>Method of Simulated Moments</h2>
+<h3 id="empirical-data">1. Empirical Data</h3>
+<h4 id="survey-of-consumer-finances-scf">Survey of Consumer Finances (SCF)</h4>
+<ul>
+<li>every 3 years</li>
+<li>cross-sectional survey of U.S. households</li>
+<li>includes balance sheets, pensions, income, demographics</li>
+<li>pooled data from 1998 to 2022</li>
+</ul>
+<h3 id="calculate-moments">2. Calculate Moments</h3>
+<ul>
+<li>Bin by age groups of 5 years [25-30), [30-35), …</li>
+<li>SCF is weighted survey, calculate weighted median <code>networth</code></li>
+</ul>
+<h3 id="calculate-covariance-matrix">3. Calculate Covariance Matrix</h3>
+<ul>
+<li>Via the bootstrap</li>
+</ul>
+</section>
+<section id="define-heterogeneous-agent-model" class="slide level2">
+<h2>4. Define Heterogeneous Agent Model</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a>birth_age <span class="op">=</span> <span class="dv">25</span></span>
+<span id="cb2-2"><a href=""></a>death_age <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb2-3"><a href=""></a>adjust_infl_to <span class="op">=</span> <span class="dv">1992</span></span>
+<span id="cb2-4"><a href=""></a>income_calib <span class="op">=</span> Cagetti_income</span>
+<span id="cb2-5"><a href=""></a>education <span class="op">=</span> <span class="st">"College"</span></span>
+<span id="cb2-6"><a href=""></a></span>
+<span id="cb2-7"><a href=""></a><span class="co"># Income specification</span></span>
+<span id="cb2-8"><a href=""></a>income_params <span class="op">=</span> parse_income_spec(</span>
+<span id="cb2-9"><a href=""></a>    age_min<span class="op">=</span>birth_age,</span>
+<span id="cb2-10"><a href=""></a>    age_max<span class="op">=</span>death_age,</span>
+<span id="cb2-11"><a href=""></a>    adjust_infl_to<span class="op">=</span>adjust_infl_to,</span>
+<span id="cb2-12"><a href=""></a>    <span class="op">**</span>income_calib[education],</span>
+<span id="cb2-13"><a href=""></a>    SabelhausSong<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb2-14"><a href=""></a>)</span>
+<span id="cb2-15"><a href=""></a></span>
+<span id="cb2-16"><a href=""></a><span class="co"># Initial distribution of wealth and permanent income</span></span>
+<span id="cb2-17"><a href=""></a>dist_params <span class="op">=</span> income_wealth_dists_from_scf(</span>
+<span id="cb2-18"><a href=""></a>    base_year<span class="op">=</span>adjust_infl_to, age<span class="op">=</span>birth_age, education<span class="op">=</span>education, wave<span class="op">=</span><span class="dv">1995</span></span>
+<span id="cb2-19"><a href=""></a>)</span>
+<span id="cb2-20"><a href=""></a></span>
+<span id="cb2-21"><a href=""></a><span class="co"># We need survival probabilities only up to death_age-1, because survival</span></span>
+<span id="cb2-22"><a href=""></a><span class="co"># probability at death_age is 0.</span></span>
+<span id="cb2-23"><a href=""></a>liv_prb <span class="op">=</span> parse_ssa_life_table(</span>
+<span id="cb2-24"><a href=""></a>    female<span class="op">=</span><span class="va">True</span>, cross_sec<span class="op">=</span><span class="va">True</span>, year<span class="op">=</span><span class="dv">2004</span>, min_age<span class="op">=</span>birth_age, max_age<span class="op">=</span>death_age <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb2-25"><a href=""></a>)</span>
+<span id="cb2-26"><a href=""></a></span>
+<span id="cb2-27"><a href=""></a><span class="co"># Parameters related to the number of periods implied by the calibration</span></span>
+<span id="cb2-28"><a href=""></a>time_params <span class="op">=</span> parse_time_params(age_birth<span class="op">=</span>birth_age, age_death<span class="op">=</span>death_age)</span>
+<span id="cb2-29"><a href=""></a></span>
+<span id="cb2-30"><a href=""></a><span class="co"># Update all the new parameters</span></span>
+<span id="cb2-31"><a href=""></a>params <span class="op">=</span> copy(init_lifecycle)</span>
+<span id="cb2-32"><a href=""></a>params.update(time_params)</span>
+<span id="cb2-33"><a href=""></a>params.update(dist_params)</span>
+<span id="cb2-34"><a href=""></a>params.update(income_params)</span>
+<span id="cb2-35"><a href=""></a>params[<span class="st">"LivPrb"</span>] <span class="op">=</span> liv_prb</span>
+<span id="cb2-36"><a href=""></a>params[<span class="st">"AgentCount"</span>] <span class="op">=</span> <span class="dv">10_000</span></span>
+<span id="cb2-37"><a href=""></a>params[<span class="st">"T_sim"</span>] <span class="op">=</span> <span class="dv">200</span></span>
+<span id="cb2-38"><a href=""></a>params[<span class="st">"track_vars"</span>] <span class="op">=</span> [<span class="st">"aNrm"</span>, <span class="st">"bNrm"</span>, <span class="st">"cNrm"</span>, <span class="st">"pLvl"</span>, <span class="st">"t_age"</span>, <span class="st">"mNrm"</span>]</span>
+<span id="cb2-39"><a href=""></a>params[<span class="st">"PermGroFacAgg"</span>] <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb2-40"><a href=""></a></span>
+<span id="cb2-41"><a href=""></a>LifeCycleAgent <span class="op">=</span> IndShockConsumerType(<span class="op">**</span>params)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="define-a-function-to-calculate-simulated-moments" class="slide level2">
+<h2>5. Define a function to calculate simulated moments</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href=""></a><span class="kw">def</span> simulate_moments(params, agent<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb3-2"><a href=""></a>    agent.assign_parameters(<span class="op">**</span>params)</span>
+<span id="cb3-3"><a href=""></a>    agent.update()</span>
+<span id="cb3-4"><a href=""></a></span>
+<span id="cb3-5"><a href=""></a>    agent.solve()</span>
+<span id="cb3-6"><a href=""></a></span>
+<span id="cb3-7"><a href=""></a>    agent.initialize_sim()</span>
+<span id="cb3-8"><a href=""></a>    history <span class="op">=</span> agent.simulate()</span>
+<span id="cb3-9"><a href=""></a></span>
+<span id="cb3-10"><a href=""></a>    raw_data <span class="op">=</span> {</span>
+<span id="cb3-11"><a href=""></a>        <span class="st">"age"</span>: history[<span class="st">"t_age"</span>].flatten() <span class="op">+</span> birth_age <span class="op">-</span> <span class="dv">1</span>,</span>
+<span id="cb3-12"><a href=""></a>        <span class="st">"b_nrm"</span>: history[<span class="st">"bNrm"</span>].flatten(),</span>
+<span id="cb3-13"><a href=""></a>        <span class="st">"p_lvl"</span>: history[<span class="st">"pLvl"</span>].flatten(),</span>
+<span id="cb3-14"><a href=""></a>    }</span>
+<span id="cb3-15"><a href=""></a></span>
+<span id="cb3-16"><a href=""></a>    sim_data <span class="op">=</span> pd.DataFrame(raw_data)</span>
+<span id="cb3-17"><a href=""></a>    sim_data[<span class="st">"Wealth"</span>] <span class="op">=</span> sim_data.b_nrm <span class="op">*</span> sim_data.p_lvl</span>
+<span id="cb3-18"><a href=""></a></span>
+<span id="cb3-19"><a href=""></a>    sim_data[<span class="st">"Age_grp"</span>] <span class="op">=</span> pd.cut(</span>
+<span id="cb3-20"><a href=""></a>        sim_data.age, bins<span class="op">=</span><span class="bu">range</span>(birth_age <span class="op">+</span> <span class="dv">1</span>, <span class="dv">97</span>, <span class="dv">5</span>), labels<span class="op">=</span>age_labels, right<span class="op">=</span><span class="va">False</span></span>
+<span id="cb3-21"><a href=""></a>    )</span>
+<span id="cb3-22"><a href=""></a></span>
+<span id="cb3-23"><a href=""></a>    sim_data <span class="op">=</span> sim_data.dropna()</span>
+<span id="cb3-24"><a href=""></a></span>
+<span id="cb3-25"><a href=""></a>    <span class="cf">return</span> sim_data.groupby(<span class="st">"Age_grp"</span>, observed<span class="op">=</span><span class="va">False</span>)[<span class="st">"Wealth"</span>].median()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="estimate-the-model-parameters" class="slide level2">
+<h2>6. Estimate the Model Parameters</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href=""></a>init_params <span class="op">=</span> {<span class="st">"CRRA"</span>: <span class="fl">3.0</span>, <span class="st">"DiscFac"</span>: <span class="fl">0.97</span>}</span>
+<span id="cb4-2"><a href=""></a>lower_bounds <span class="op">=</span> {<span class="st">"CRRA"</span>: <span class="fl">1.0</span>, <span class="st">"DiscFac"</span>: <span class="fl">0.9</span>}</span>
+<span id="cb4-3"><a href=""></a>upper_bounds <span class="op">=</span> {<span class="st">"CRRA"</span>: <span class="fl">10.0</span>, <span class="st">"DiscFac"</span>: <span class="fl">1.1</span>}</span>
+<span id="cb4-4"><a href=""></a></span>
+<span id="cb4-5"><a href=""></a>res <span class="op">=</span> estimate_msm(</span>
+<span id="cb4-6"><a href=""></a>    LifeCycleAgent,</span>
+<span id="cb4-7"><a href=""></a>    init_params,</span>
+<span id="cb4-8"><a href=""></a>    empirical_moments,</span>
+<span id="cb4-9"><a href=""></a>    moments_cov,</span>
+<span id="cb4-10"><a href=""></a>    simulate_moments,</span>
+<span id="cb4-11"><a href=""></a>    optimize_options<span class="op">=</span>{</span>
+<span id="cb4-12"><a href=""></a>        <span class="st">"algorithm"</span>: <span class="st">"scipy_lbfgsb"</span>,</span>
+<span id="cb4-13"><a href=""></a>        <span class="st">"error_handling"</span>: <span class="st">"continue"</span>,</span>
+<span id="cb4-14"><a href=""></a>        <span class="st">"multistart"</span>: <span class="va">True</span>,</span>
+<span id="cb4-15"><a href=""></a>        <span class="st">"numdiff_options"</span>: {<span class="st">"n_cores"</span>: <span class="dv">24</span>},</span>
+<span id="cb4-16"><a href=""></a>    },</span>
+<span id="cb4-17"><a href=""></a>    estimagic_options<span class="op">=</span>{</span>
+<span id="cb4-18"><a href=""></a>        <span class="st">"lower_bounds"</span>: lower_bounds,</span>
+<span id="cb4-19"><a href=""></a>        <span class="st">"upper_bounds"</span>: upper_bounds,</span>
+<span id="cb4-20"><a href=""></a>    },</span>
+<span id="cb4-21"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="results" class="slide level2">
+<h2>Results</h2>
+
+<img data-src="figures/cis_results.svg" class="r-stretch quarto-figure-center"><p class="caption">
+Figure&nbsp;4: Simulated vs.&nbsp;Empirical Moments
+</p><pre><code>              value  standard_error  ci_lower  ci_upper       p_value  
+CRRA    0  3.038229        0.250762  2.546745  3.529714  8.690398e-34     
+DiscFac 0  0.972242        0.003527  0.965330  0.979155  0.000000e+00  </code></pre>
+</section>
+<section id="sensitivity" class="slide level2">
+<h2>Sensitivity</h2>
+
+<img data-src="figures/sensitivity.svg" class="r-stretch quarto-figure-center"><p class="caption">
+Figure&nbsp;5: Sensitivity
+</p></section>
+<section id="more-results" class="slide level2">
+<h2>More Results</h2>
+<div class="panel-tabset">
+<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">Terminal Only</a></li><li><a href="#tabset-3-2">Warm Glow Only</a></li><li><a href="#tabset-3-3">Full</a></li><li><a href="#tabset-3-4">Non-Separable T.R.P.</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1">
+<p><img data-src="figures/termbeq_results.svg"></p>
+</div>
+<div id="tabset-3-2">
+<p><img data-src="figures/wgbeq_results.svg"></p>
+</div>
+<div id="tabset-3-3">
+<p><img data-src="figures/fullbeq_results.svg"></p>
+</div>
+<div id="tabset-3-4">
+<p><img data-src="figures/trp_results.svg"></p>
+</div>
+</div>
+</div>
+</section>
+<section id="more-results-1" class="slide level2">
+<h2>More Results</h2>
+<div class="panel-tabset">
+<ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">Terminal Only</a></li><li><a href="#tabset-4-2">Warm Glow Only</a></li><li><a href="#tabset-4-3">Full</a></li><li><a href="#tabset-4-4">Non-Separable T.R.P.</a></li></ul>
+<div class="tab-content">
+<div id="tabset-4-1">
+<pre><code>                    value  standard_error   ci_lower   ci_upper       p_value  
+CRRA         0   3.039525        0.193870   2.659547   3.419503  2.133078e-55   
+DiscFac      0   0.972220        0.002772   0.966788   0.977652  0.000000e+00   
+BeqCRRATerm  0   1.125000        0.000000   1.125000   1.125000  0.000000e+00   
+BeqFacTerm   0  67.187500        0.000000  67.187500  67.187500  0.000000e+00   
+BeqShiftTerm 0  17.187500        0.000000  17.187500  17.187500  0.000000e+00</code></pre>
+</div>
+<div id="tabset-4-2">
+<pre><code>                value  standard_error     ci_lower     ci_upper       p_value  
+CRRA     0   4.233600        0.205016     3.831775     4.635424  9.748335e-95   
+DiscFac  0   0.923009        0.008554     0.906242     0.939775  0.000000e+00   
+BeqCRRA  0   2.427211        2.614537    -2.697187     7.551609  3.532248e-01   
+BeqFac   0  70.763872      698.885867 -1299.027256  1440.555000  9.193501e-01   
+BeqShift 0   1.630113       17.348288   -32.371906    35.632133  9.251378e-01</code></pre>
+</div>
+<div id="tabset-4-3">
+<pre><code>                    value  standard_error   ci_lower   ci_upper       p_value  
+CRRA         0   4.507691        0.574552   3.381591   5.633791  4.309510e-15   
+DiscFac      0   0.912999        0.021864   0.870145   0.955852  0.000000e+00   
+BeqCRRA      0   2.516346        0.056806   2.405008   2.627684  0.000000e+00   
+BeqFac       0  90.986219        0.004840  90.976733  90.995704  0.000000e+00   
+BeqShift     0   1.532614        0.129104   1.279575   1.785654  1.671346e-32   
+BeqCRRATerm  0   2.748689        0.000000   2.748689   2.748689  0.000000e+00   
+BeqFacTerm   0  64.515898        0.000000  64.515898  64.515898  0.000000e+00   
+BeqShiftTerm 0  30.746973        0.000000  30.746973  30.746973  0.000000e+00</code></pre>
+</div>
+<div id="tabset-4-4">
+
+</div>
+</div>
+</div>
+</section>
+<section id="more-results-2" class="slide level2">
+<h2>More Results</h2>
+<div class="panel-tabset">
+<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1">Terminal Only</a></li><li><a href="#tabset-5-2">Warm Glow Only</a></li><li><a href="#tabset-5-3">Full</a></li><li><a href="#tabset-5-4">Non-Separable T.R.P.</a></li></ul>
+<div class="tab-content">
+<div id="tabset-5-1">
+<p><img data-src="figures/termbeq_sensitivity.svg"></p>
+</div>
+<div id="tabset-5-2">
+<p><img data-src="figures/wgbeq_sensitivity.svg"></p>
+</div>
+<div id="tabset-5-3">
+<p><img data-src="figures/fullbeq_sensitivity.svg"></p>
+</div>
+<div id="tabset-5-4">
+<p><img data-src="figures/trp_sensitivity.svg"></p>
+</div>
+</div>
+</div>
+</section>
+<section id="conclusion-and-future-work" class="slide level2">
+<h2>Conclusion and Future Work</h2>
+<h4 id="conclusion">Conclusion</h4>
+<ul>
+<li>Need wealth in the utility function to better capture distribution of wealth</li>
+<li>Need life cycle structure to understand effect of policies on:
+<ul>
+<li>young parents with children and low income</li>
+<li>working middle aged</li>
+<li>retirees with low wealth</li>
+</ul></li>
+</ul>
+<h4 id="future-work">Future Work</h4>
+<ul>
+<li>Better estimation techniques such as Sequence Space Jacobians (Auclert et al.&nbsp;[2021])
+<ul>
+<li>Will also help speed up sensitivity analysis</li>
+</ul></li>
+<li>Implement policy experiments and derive impulse response functions by life cycle</li>
+<li>Analyze the effect of policy experiments on different segments of the population</li>
+<li>Evaluate optimal policy to minimize differential harm</li>
+</ul>
+<div class="quarto-auto-generated-content">
+<p><img src="econ-ark-logo.png" class="slide-logo"></p>
+<div class="footer footer-default">
+<p>Powered by <a href="https://econ-ark.org">Econ-ARK</a></p>
+</div>
+</div>
+</section>
+
+    </div>
+  </div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="slides_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="slides_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+    window.document.addEventListener("DOMContentLoaded", function (event) {
+      const toggleBodyColorMode = (bsSheetEl) => {
+        const mode = bsSheetEl.getAttribute("data-mode");
+        const bodyEl = window.document.querySelector("body");
+        if (mode === "dark") {
+          bodyEl.classList.add("quarto-dark");
+          bodyEl.classList.remove("quarto-light");
+        } else {
+          bodyEl.classList.add("quarto-light");
+          bodyEl.classList.remove("quarto-dark");
+        }
+      }
+      const toggleBodyColorPrimary = () => {
+        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+        if (bsSheetEl) {
+          toggleBodyColorMode(bsSheetEl);
+        }
+      }
+      toggleBodyColorPrimary();  
+      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+      tabsets.forEach(function(tabset) {
+        const tabby = new Tabby('#' + tabset.id);
+      });
+      const isCodeAnnotation = (el) => {
+        for (const clz of el.classList) {
+          if (clz.startsWith('code-annotation-')) {                     
+            return true;
+          }
+        }
+        return false;
+      }
+      const onCopySuccess = function(e) {
+        // button target
+        const button = e.trigger;
+        // don't keep focus
+        button.blur();
+        // flash "checked"
+        button.classList.add('code-copy-button-checked');
+        var currentTitle = button.getAttribute("title");
+        button.setAttribute("title", "Copied!");
+        let tooltip;
+        if (window.bootstrap) {
+          button.setAttribute("data-bs-toggle", "tooltip");
+          button.setAttribute("data-bs-placement", "left");
+          button.setAttribute("data-bs-title", "Copied!");
+          tooltip = new bootstrap.Tooltip(button, 
+            { trigger: "manual", 
+              customClass: "code-copy-button-tooltip",
+              offset: [0, -8]});
+          tooltip.show();    
+        }
+        setTimeout(function() {
+          if (tooltip) {
+            tooltip.hide();
+            button.removeAttribute("data-bs-title");
+            button.removeAttribute("data-bs-toggle");
+            button.removeAttribute("data-bs-placement");
+          }
+          button.setAttribute("title", currentTitle);
+          button.classList.remove('code-copy-button-checked');
+        }, 1000);
+        // clear code selection
+        e.clearSelection();
+      }
+      const getTextToCopy = function(trigger) {
+          const codeEl = trigger.previousElementSibling.cloneNode(true);
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+      }
+      const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+        text: getTextToCopy
+      });
+      clipboard.on('success', onCopySuccess);
+      if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+        // For code content inside modals, clipBoardJS needs to be initialized with a container option
+        // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+        const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+          text: getTextToCopy,
+          container: window.document.getElementById('quarto-embedded-source-code-modal')
+        });
+        clipboardModal.on('success', onCopySuccess);
+      }
+        var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+        var mailtoRegex = new RegExp(/^mailto:/);
+          var filterRegex = new RegExp('/' + window.location.host + '/');
+        var isInternal = (href) => {
+            return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+        }
+        // Inspect non-navigation links and adorn them if external
+     	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+        for (var i=0; i<links.length; i++) {
+          const link = links[i];
+          if (!isInternal(link.href)) {
+            // undo the damage that might have been done by quarto-nav.js in the case of
+            // links that we want to consider external
+            if (link.dataset.originalHref !== undefined) {
+              link.href = link.dataset.originalHref;
+            }
+          }
+        }
+      function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+        const config = {
+          allowHTML: true,
+          maxWidth: 500,
+          delay: 100,
+          arrow: false,
+          appendTo: function(el) {
+              return el.closest('section.slide') || el.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start',
+        };
+        if (contentFn) {
+          config.content = contentFn;
+        }
+        if (onTriggerFn) {
+          config.onTrigger = onTriggerFn;
+        }
+        if (onUntriggerFn) {
+          config.onUntrigger = onUntriggerFn;
+        }
+          config['offset'] = [0,0];
+          config['maxWidth'] = 700;
+        window.tippy(el, config); 
+      }
+      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+      for (var i=0; i<noterefs.length; i++) {
+        const ref = noterefs[i];
+        tippyHover(ref, function() {
+          // use id or data attribute instead here
+          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+          try { href = new URL(href).hash; } catch {}
+          const id = href.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note) {
+            return note.innerHTML;
+          } else {
+            return "";
+          }
+        });
+      }
+      const findCites = (el) => {
+        const parentEl = el.parentElement;
+        if (parentEl) {
+          const cites = parentEl.dataset.cites;
+          if (cites) {
+            return {
+              el,
+              cites: cites.split(' ')
+            };
+          } else {
+            return findCites(el.parentElement)
+          }
+        } else {
+          return undefined;
+        }
+      };
+      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+      for (var i=0; i<bibliorefs.length; i++) {
+        const ref = bibliorefs[i];
+        const citeInfo = findCites(ref);
+        if (citeInfo) {
+          tippyHover(citeInfo.el, function() {
+            var popup = window.document.createElement('div');
+            citeInfo.cites.forEach(function(cite) {
+              var citeDiv = window.document.createElement('div');
+              citeDiv.classList.add('hanging-indent');
+              citeDiv.classList.add('csl-entry');
+              var biblioDiv = window.document.getElementById('ref-' + cite);
+              if (biblioDiv) {
+                citeDiv.innerHTML = biblioDiv.innerHTML;
+              }
+              popup.appendChild(citeDiv);
+            });
+            return popup.innerHTML;
+          });
+        }
+      }
+    });
+    </script>
+    
+
+</body></html>

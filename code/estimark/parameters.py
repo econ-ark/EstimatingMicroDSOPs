@@ -15,8 +15,8 @@ from HARK.Calibration.Income.IncomeTools import (
     Cagetti_income,
     parse_income_spec,
 )
+from HARK.Calibration.life_tables.us_ssa.SSATools import parse_ssa_life_table
 from HARK.ConsumptionSaving.ConsIndShockModel import init_lifecycle
-from HARK.datasets.life_tables.us_ssa.SSATools import parse_ssa_life_table
 from HARK.distribution import DiscreteDistribution
 
 # ---------------------------------------------------------------------------------
