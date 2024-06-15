@@ -30,71 +30,6 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
-    /* CSS for syntax highlighting */
-    pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
-    pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
-    code.sourceCode > span { color: inherit; text-decoration: inherit; }
-    div.sourceCode { margin: 1em 0; }
-    pre.sourceCode { margin: 0; }
-    @media screen {
-    div.sourceCode { overflow: auto; }
-    }
-    @media print {
-    pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-    }
-    pre.numberSource code
-      { counter-reset: source-line 0; }
-    pre.numberSource code > span
-      { position: relative; left: -4em; counter-increment: source-line; }
-    pre.numberSource code > span > a:first-child::before
-      { content: counter(source-line);
-        position: relative; left: -1em; text-align: right; vertical-align: baseline;
-        border: none; display: inline-block;
-        -webkit-touch-callout: none; -webkit-user-select: none;
-        -khtml-user-select: none; -moz-user-select: none;
-        -ms-user-select: none; user-select: none;
-        padding: 0 4px; width: 4em;
-        color: #aaaaaa;
-      }
-    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-    div.sourceCode
-      { color: #003b4f; background-color: #f1f3f5; }
-    @media screen {
-    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-    }
-    code span { color: #003b4f; } /* Normal */
-    code span.al { color: #ad0000; } /* Alert */
-    code span.an { color: #5e5e5e; } /* Annotation */
-    code span.at { color: #657422; } /* Attribute */
-    code span.bn { color: #ad0000; } /* BaseN */
-    code span.bu { } /* BuiltIn */
-    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
-    code span.ch { color: #20794d; } /* Char */
-    code span.cn { color: #8f5902; } /* Constant */
-    code span.co { color: #5e5e5e; } /* Comment */
-    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
-    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
-    code span.dt { color: #ad0000; } /* DataType */
-    code span.dv { color: #ad0000; } /* DecVal */
-    code span.er { color: #ad0000; } /* Error */
-    code span.ex { } /* Extension */
-    code span.fl { color: #ad0000; } /* Float */
-    code span.fu { color: #4758ab; } /* Function */
-    code span.im { color: #00769e; } /* Import */
-    code span.in { color: #5e5e5e; } /* Information */
-    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
-    code span.op { color: #5e5e5e; } /* Operator */
-    code span.ot { color: #003b4f; } /* Other */
-    code span.pp { color: #ad0000; } /* Preprocessor */
-    code span.sc { color: #5e5e5e; } /* SpecialChar */
-    code span.ss { color: #20794d; } /* SpecialString */
-    code span.st { color: #20794d; } /* String */
-    code span.va { color: #111111; } /* Variable */
-    code span.vs { color: #20794d; } /* VerbatimString */
-    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
@@ -1063,9 +998,9 @@ Figure&nbsp;3: Median Normalized Net Worth
 <h2>Parameterization and Calibration</h2>
 <table class="caption-top">
 <colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
+<col style="width: 38%">
+<col style="width: 34%">
+<col style="width: 26%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -1114,14 +1049,10 @@ Figure&nbsp;3: Median Normalized Net Worth
 <li>Given a guess <span class="math inline">\(\theta_0\)</span>, simulate model and calculate moments</li>
 <li>Estimate model parameters by minimizing criterion function</li>
 </ol>
-<h3 id="objective-function">Objective function</h3>
-<p><span class="math display">\[\begin{equation}
-  \min_{\theta \in \Theta} \hat{g}(\theta)' \hat{W} \hat{g}(\theta) \qquad \qquad \hat{g}(\theta) = \hat{s} - s(\theta)
-\end{equation}\]</span></p>
 </section>
 <section id="method-of-simulated-moments" class="slide level2">
 <h2>Method of Simulated Moments</h2>
-<h3 id="empirical-data">1. Empirical Data</h3>
+<h3 id="empirical-data">1. Empirical data</h3>
 <h4 id="survey-of-consumer-finances-scf">Survey of Consumer Finances (SCF)</h4>
 <ul>
 <li>every 3 years</li>
@@ -1129,143 +1060,165 @@ Figure&nbsp;3: Median Normalized Net Worth
 <li>includes balance sheets, pensions, income, demographics</li>
 <li>pooled data from 1998 to 2022</li>
 </ul>
-<h3 id="calculate-moments">2. Calculate Moments</h3>
+<h3 id="calculate-empirical-moments">2. Calculate empirical moments</h3>
 <ul>
 <li>Bin by age groups of 5 years [25-30), [30-35), …</li>
 <li>SCF is weighted survey, calculate weighted median <code>networth</code></li>
+<li>Remove households with no income</li>
 </ul>
-<h3 id="calculate-covariance-matrix">3. Calculate Covariance Matrix</h3>
+</section>
+<section id="method-of-simulated-moments-1" class="slide level2">
+<h2>Method of Simulated Moments</h2>
+<h3 id="calculate-covariance-matrix">3. Calculate covariance matrix</h3>
 <ul>
 <li>Via the bootstrap</li>
 </ul>
+<h3 id="define-heterogeneous-agent-model">4. Define Heterogeneous Agent model</h3>
+<ol type="a">
+<li>Life cycle Incomplete Markets model</li>
+<li>Warm Glow Homothetic Separable Utility model</li>
+<li>Warm Glow Non-Homothetic Separable Utility model</li>
+<li>T.R.P. Non-Separable Utility model</li>
+</ol>
 </section>
-<section id="define-heterogeneous-agent-model" class="slide level2">
-<h2>4. Define Heterogeneous Agent Model</h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a>birth_age <span class="op">=</span> <span class="dv">25</span></span>
-<span id="cb2-2"><a href=""></a>death_age <span class="op">=</span> <span class="dv">100</span></span>
-<span id="cb2-3"><a href=""></a>adjust_infl_to <span class="op">=</span> <span class="dv">1992</span></span>
-<span id="cb2-4"><a href=""></a>income_calib <span class="op">=</span> Cagetti_income</span>
-<span id="cb2-5"><a href=""></a>education <span class="op">=</span> <span class="st">"College"</span></span>
-<span id="cb2-6"><a href=""></a></span>
-<span id="cb2-7"><a href=""></a><span class="co"># Income specification</span></span>
-<span id="cb2-8"><a href=""></a>income_params <span class="op">=</span> parse_income_spec(</span>
-<span id="cb2-9"><a href=""></a>    age_min<span class="op">=</span>birth_age,</span>
-<span id="cb2-10"><a href=""></a>    age_max<span class="op">=</span>death_age,</span>
-<span id="cb2-11"><a href=""></a>    adjust_infl_to<span class="op">=</span>adjust_infl_to,</span>
-<span id="cb2-12"><a href=""></a>    <span class="op">**</span>income_calib[education],</span>
-<span id="cb2-13"><a href=""></a>    SabelhausSong<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb2-14"><a href=""></a>)</span>
-<span id="cb2-15"><a href=""></a></span>
-<span id="cb2-16"><a href=""></a><span class="co"># Initial distribution of wealth and permanent income</span></span>
-<span id="cb2-17"><a href=""></a>dist_params <span class="op">=</span> income_wealth_dists_from_scf(</span>
-<span id="cb2-18"><a href=""></a>    base_year<span class="op">=</span>adjust_infl_to, age<span class="op">=</span>birth_age, education<span class="op">=</span>education, wave<span class="op">=</span><span class="dv">1995</span></span>
-<span id="cb2-19"><a href=""></a>)</span>
-<span id="cb2-20"><a href=""></a></span>
-<span id="cb2-21"><a href=""></a><span class="co"># We need survival probabilities only up to death_age-1, because survival</span></span>
-<span id="cb2-22"><a href=""></a><span class="co"># probability at death_age is 0.</span></span>
-<span id="cb2-23"><a href=""></a>liv_prb <span class="op">=</span> parse_ssa_life_table(</span>
-<span id="cb2-24"><a href=""></a>    female<span class="op">=</span><span class="va">True</span>, cross_sec<span class="op">=</span><span class="va">True</span>, year<span class="op">=</span><span class="dv">2004</span>, min_age<span class="op">=</span>birth_age, max_age<span class="op">=</span>death_age <span class="op">-</span> <span class="dv">1</span></span>
-<span id="cb2-25"><a href=""></a>)</span>
-<span id="cb2-26"><a href=""></a></span>
-<span id="cb2-27"><a href=""></a><span class="co"># Parameters related to the number of periods implied by the calibration</span></span>
-<span id="cb2-28"><a href=""></a>time_params <span class="op">=</span> parse_time_params(age_birth<span class="op">=</span>birth_age, age_death<span class="op">=</span>death_age)</span>
-<span id="cb2-29"><a href=""></a></span>
-<span id="cb2-30"><a href=""></a><span class="co"># Update all the new parameters</span></span>
-<span id="cb2-31"><a href=""></a>params <span class="op">=</span> copy(init_lifecycle)</span>
-<span id="cb2-32"><a href=""></a>params.update(time_params)</span>
-<span id="cb2-33"><a href=""></a>params.update(dist_params)</span>
-<span id="cb2-34"><a href=""></a>params.update(income_params)</span>
-<span id="cb2-35"><a href=""></a>params[<span class="st">"LivPrb"</span>] <span class="op">=</span> liv_prb</span>
-<span id="cb2-36"><a href=""></a>params[<span class="st">"AgentCount"</span>] <span class="op">=</span> <span class="dv">10_000</span></span>
-<span id="cb2-37"><a href=""></a>params[<span class="st">"T_sim"</span>] <span class="op">=</span> <span class="dv">200</span></span>
-<span id="cb2-38"><a href=""></a>params[<span class="st">"track_vars"</span>] <span class="op">=</span> [<span class="st">"aNrm"</span>, <span class="st">"bNrm"</span>, <span class="st">"cNrm"</span>, <span class="st">"pLvl"</span>, <span class="st">"t_age"</span>, <span class="st">"mNrm"</span>]</span>
-<span id="cb2-39"><a href=""></a>params[<span class="st">"PermGroFacAgg"</span>] <span class="op">=</span> <span class="fl">1.0</span></span>
-<span id="cb2-40"><a href=""></a></span>
-<span id="cb2-41"><a href=""></a>LifeCycleAgent <span class="op">=</span> IndShockConsumerType(<span class="op">**</span>params)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="define-a-function-to-calculate-simulated-moments" class="slide level2">
-<h2>5. Define a function to calculate simulated moments</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href=""></a><span class="kw">def</span> simulate_moments(params, agent<span class="op">=</span><span class="va">None</span>):</span>
-<span id="cb3-2"><a href=""></a>    agent.assign_parameters(<span class="op">**</span>params)</span>
-<span id="cb3-3"><a href=""></a>    agent.update()</span>
-<span id="cb3-4"><a href=""></a></span>
-<span id="cb3-5"><a href=""></a>    agent.solve()</span>
-<span id="cb3-6"><a href=""></a></span>
-<span id="cb3-7"><a href=""></a>    agent.initialize_sim()</span>
-<span id="cb3-8"><a href=""></a>    history <span class="op">=</span> agent.simulate()</span>
-<span id="cb3-9"><a href=""></a></span>
-<span id="cb3-10"><a href=""></a>    raw_data <span class="op">=</span> {</span>
-<span id="cb3-11"><a href=""></a>        <span class="st">"age"</span>: history[<span class="st">"t_age"</span>].flatten() <span class="op">+</span> birth_age <span class="op">-</span> <span class="dv">1</span>,</span>
-<span id="cb3-12"><a href=""></a>        <span class="st">"b_nrm"</span>: history[<span class="st">"bNrm"</span>].flatten(),</span>
-<span id="cb3-13"><a href=""></a>        <span class="st">"p_lvl"</span>: history[<span class="st">"pLvl"</span>].flatten(),</span>
-<span id="cb3-14"><a href=""></a>    }</span>
-<span id="cb3-15"><a href=""></a></span>
-<span id="cb3-16"><a href=""></a>    sim_data <span class="op">=</span> pd.DataFrame(raw_data)</span>
-<span id="cb3-17"><a href=""></a>    sim_data[<span class="st">"Wealth"</span>] <span class="op">=</span> sim_data.b_nrm <span class="op">*</span> sim_data.p_lvl</span>
-<span id="cb3-18"><a href=""></a></span>
-<span id="cb3-19"><a href=""></a>    sim_data[<span class="st">"Age_grp"</span>] <span class="op">=</span> pd.cut(</span>
-<span id="cb3-20"><a href=""></a>        sim_data.age, bins<span class="op">=</span><span class="bu">range</span>(birth_age <span class="op">+</span> <span class="dv">1</span>, <span class="dv">97</span>, <span class="dv">5</span>), labels<span class="op">=</span>age_labels, right<span class="op">=</span><span class="va">False</span></span>
-<span id="cb3-21"><a href=""></a>    )</span>
-<span id="cb3-22"><a href=""></a></span>
-<span id="cb3-23"><a href=""></a>    sim_data <span class="op">=</span> sim_data.dropna()</span>
-<span id="cb3-24"><a href=""></a></span>
-<span id="cb3-25"><a href=""></a>    <span class="cf">return</span> sim_data.groupby(<span class="st">"Age_grp"</span>, observed<span class="op">=</span><span class="va">False</span>)[<span class="st">"Wealth"</span>].median()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="estimate-the-model-parameters" class="slide level2">
-<h2>6. Estimate the Model Parameters</h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href=""></a>init_params <span class="op">=</span> {<span class="st">"CRRA"</span>: <span class="fl">3.0</span>, <span class="st">"DiscFac"</span>: <span class="fl">0.97</span>}</span>
-<span id="cb4-2"><a href=""></a>lower_bounds <span class="op">=</span> {<span class="st">"CRRA"</span>: <span class="fl">1.0</span>, <span class="st">"DiscFac"</span>: <span class="fl">0.9</span>}</span>
-<span id="cb4-3"><a href=""></a>upper_bounds <span class="op">=</span> {<span class="st">"CRRA"</span>: <span class="fl">10.0</span>, <span class="st">"DiscFac"</span>: <span class="fl">1.1</span>}</span>
-<span id="cb4-4"><a href=""></a></span>
-<span id="cb4-5"><a href=""></a>res <span class="op">=</span> estimate_msm(</span>
-<span id="cb4-6"><a href=""></a>    LifeCycleAgent,</span>
-<span id="cb4-7"><a href=""></a>    init_params,</span>
-<span id="cb4-8"><a href=""></a>    empirical_moments,</span>
-<span id="cb4-9"><a href=""></a>    moments_cov,</span>
-<span id="cb4-10"><a href=""></a>    simulate_moments,</span>
-<span id="cb4-11"><a href=""></a>    optimize_options<span class="op">=</span>{</span>
-<span id="cb4-12"><a href=""></a>        <span class="st">"algorithm"</span>: <span class="st">"scipy_lbfgsb"</span>,</span>
-<span id="cb4-13"><a href=""></a>        <span class="st">"error_handling"</span>: <span class="st">"continue"</span>,</span>
-<span id="cb4-14"><a href=""></a>        <span class="st">"multistart"</span>: <span class="va">True</span>,</span>
-<span id="cb4-15"><a href=""></a>        <span class="st">"numdiff_options"</span>: {<span class="st">"n_cores"</span>: <span class="dv">24</span>},</span>
-<span id="cb4-16"><a href=""></a>    },</span>
-<span id="cb4-17"><a href=""></a>    estimagic_options<span class="op">=</span>{</span>
-<span id="cb4-18"><a href=""></a>        <span class="st">"lower_bounds"</span>: lower_bounds,</span>
-<span id="cb4-19"><a href=""></a>        <span class="st">"upper_bounds"</span>: upper_bounds,</span>
-<span id="cb4-20"><a href=""></a>    },</span>
-<span id="cb4-21"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="method-of-simulated-moments-2" class="slide level2">
+<h2>Method of Simulated Moments</h2>
+<h3 id="given-theta_0-simulate-moments">5. Given <span class="math inline">\(\theta_0\)</span>, simulate moments</h3>
+<ul>
+<li>Solve model given parameters <span class="math inline">\(\theta_0\)</span></li>
+<li>Simulate model
+<ul>
+<li>1,000 agents</li>
+<li>1 full lifetime (25 to 100 years old)</li>
+<li>Ignore mortality for simulation</li>
+<li>Calculate median wealth for each age bracket</li>
+</ul></li>
+</ul>
+<h3 id="estimate-the-model-parameters">6. Estimate the Model Parameters</h3>
+<h4 id="objective-function">Objective function</h4>
+<p><span class="math display">\[\begin{equation}
+  \min_{\theta \in \Theta} \hat{g}(\theta)' \hat{W} \hat{g}(\theta) \qquad \qquad \hat{g}(\theta) = \hat{s} - s(\theta)
+\end{equation}\]</span></p>
 </section>
 <section id="results" class="slide level2">
 <h2>Results</h2>
 
-<img data-src="figures/cis_results.svg" class="r-stretch quarto-figure-center"><p class="caption">
+<img data-src="figures/lcim_results.svg" class="r-stretch quarto-figure-center"><p class="caption">
 Figure&nbsp;4: Simulated vs.&nbsp;Empirical Moments
-</p><pre><code>              value  standard_error  ci_lower  ci_upper       p_value  
-CRRA    0  3.038229        0.250762  2.546745  3.529714  8.690398e-34     
-DiscFac 0  0.972242        0.003527  0.965330  0.979155  0.000000e+00  </code></pre>
+</p><table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th>
+</th>
+<th>
+</th>
+<th>
+value
+</th>
+<th>
+standard_error
+</th>
+<th>
+ci_lower
+</th>
+<th>
+ci_upper
+</th>
+<th>
+p_value
+</th>
+<th>
+free
+</th>
+<th>
+stars
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>
+CRRA
+</th>
+<th>
+0
+</th>
+<td>
+3.038009
+</td>
+<td>
+0.227844
+</td>
+<td>
+2.591442
+</td>
+<td>
+3.484576
+</td>
+<td>
+1.474017e-40
+</td>
+<td>
+True
+</td>
+<td>
+***
+</td>
+</tr>
+<tr>
+<th>
+DiscFac
+</th>
+<th>
+0
+</th>
+<td>
+0.972248
+</td>
+<td>
+0.003222
+</td>
+<td>
+0.965933
+</td>
+<td>
+0.978563
+</td>
+<td>
+0.000000e+00
+</td>
+<td>
+True
+</td>
+<td>
+***
+</td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="sensitivity" class="slide level2">
 <h2>Sensitivity</h2>
 
-<img data-src="figures/sensitivity.svg" class="r-stretch quarto-figure-center"><p class="caption">
+<img data-src="figures/lcim_sensitivity.svg" class="r-stretch quarto-figure-center"><p class="caption">
 Figure&nbsp;5: Sensitivity
 </p></section>
 <section id="more-results" class="slide level2">
 <h2>More Results</h2>
 <div class="panel-tabset">
-<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">Terminal Only</a></li><li><a href="#tabset-3-2">Warm Glow Only</a></li><li><a href="#tabset-3-3">Full</a></li><li><a href="#tabset-3-4">Non-Separable T.R.P.</a></li></ul>
+<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">LCIM</a></li><li><a href="#tabset-3-2">Non-Separable</a></li><li><a href="#tabset-3-3">WG Homothetic</a></li><li><a href="#tabset-3-4">WG Non-Homothetic</a></li></ul>
 <div class="tab-content">
 <div id="tabset-3-1">
-<p><img data-src="figures/termbeq_results.svg"></p>
+<p><img data-src="figures/lcim_results.svg"></p>
 </div>
 <div id="tabset-3-2">
-<p><img data-src="figures/wgbeq_results.svg"></p>
+<p><img data-src="figures/trp_results.svg"></p>
 </div>
 <div id="tabset-3-3">
 <p><img data-src="figures/fullbeq_results.svg"></p>
 </div>
 <div id="tabset-3-4">
-<p><img data-src="figures/trp_results.svg"></p>
+<p><img data-src="figures/wgbeq_results.svg"></p>
 </div>
 </div>
 </div>
@@ -1273,37 +1226,578 @@ Figure&nbsp;5: Sensitivity
 <section id="more-results-1" class="slide level2">
 <h2>More Results</h2>
 <div class="panel-tabset">
-<ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">Terminal Only</a></li><li><a href="#tabset-4-2">Warm Glow Only</a></li><li><a href="#tabset-4-3">Full</a></li><li><a href="#tabset-4-4">Non-Separable T.R.P.</a></li></ul>
+<ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">LCIM</a></li><li><a href="#tabset-4-2">Non-Separable</a></li><li><a href="#tabset-4-3">WG Homothetic</a></li><li><a href="#tabset-4-4">WG Non-Homothetic</a></li></ul>
 <div class="tab-content">
 <div id="tabset-4-1">
-<pre><code>                    value  standard_error   ci_lower   ci_upper       p_value  
-CRRA         0   3.039525        0.193870   2.659547   3.419503  2.133078e-55   
-DiscFac      0   0.972220        0.002772   0.966788   0.977652  0.000000e+00   
-BeqCRRATerm  0   1.125000        0.000000   1.125000   1.125000  0.000000e+00   
-BeqFacTerm   0  67.187500        0.000000  67.187500  67.187500  0.000000e+00   
-BeqShiftTerm 0  17.187500        0.000000  17.187500  17.187500  0.000000e+00</code></pre>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th>
+</th>
+<th>
+</th>
+<th>
+value
+</th>
+<th>
+standard_error
+</th>
+<th>
+ci_lower
+</th>
+<th>
+ci_upper
+</th>
+<th>
+p_value
+</th>
+<th>
+free
+</th>
+<th>
+stars
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>
+CRRA
+</th>
+<th>
+0
+</th>
+<td>
+3.038009
+</td>
+<td>
+0.227844
+</td>
+<td>
+2.591442
+</td>
+<td>
+3.484576
+</td>
+<td>
+1.474017e-40
+</td>
+<td>
+True
+</td>
+<td>
+***
+</td>
+</tr>
+<tr>
+<th>
+DiscFac
+</th>
+<th>
+0
+</th>
+<td>
+0.972248
+</td>
+<td>
+0.003222
+</td>
+<td>
+0.965933
+</td>
+<td>
+0.978563
+</td>
+<td>
+0.000000e+00
+</td>
+<td>
+True
+</td>
+<td>
+***
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="tabset-4-2">
-<pre><code>                value  standard_error     ci_lower     ci_upper       p_value  
-CRRA     0   4.233600        0.205016     3.831775     4.635424  9.748335e-95   
-DiscFac  0   0.923009        0.008554     0.906242     0.939775  0.000000e+00   
-BeqCRRA  0   2.427211        2.614537    -2.697187     7.551609  3.532248e-01   
-BeqFac   0  70.763872      698.885867 -1299.027256  1440.555000  9.193501e-01   
-BeqShift 0   1.630113       17.348288   -32.371906    35.632133  9.251378e-01</code></pre>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th>
+</th>
+<th>
+</th>
+<th>
+value
+</th>
+<th>
+standard_error
+</th>
+<th>
+ci_lower
+</th>
+<th>
+ci_upper
+</th>
+<th>
+p_value
+</th>
+<th>
+free
+</th>
+<th>
+stars
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>
+CRRA
+</th>
+<th>
+0
+</th>
+<td>
+2.646309
+</td>
+<td>
+0.539211
+</td>
+<td>
+1.589474
+</td>
+<td>
+3.703144
+</td>
+<td>
+9.213221e-07
+</td>
+<td>
+True
+</td>
+<td>
+***
+</td>
+</tr>
+<tr>
+<th>
+DiscFac
+</th>
+<th>
+0
+</th>
+<td>
+0.950000
+</td>
+<td>
+0.002992
+</td>
+<td>
+0.944136
+</td>
+<td>
+0.955864
+</td>
+<td>
+0.000000e+00
+</td>
+<td>
+True
+</td>
+<td>
+***
+</td>
+</tr>
+<tr>
+<th>
+WealthShare
+</th>
+<th>
+0
+</th>
+<td>
+0.246470
+</td>
+<td>
+0.021571
+</td>
+<td>
+0.204191
+</td>
+<td>
+0.288749
+</td>
+<td>
+3.109380e-30
+</td>
+<td>
+True
+</td>
+<td>
+***
+</td>
+</tr>
+<tr>
+<th>
+WealthShift
+</th>
+<th>
+0
+</th>
+<td>
+3.592352
+</td>
+<td>
+1.406597
+</td>
+<td>
+0.835473
+</td>
+<td>
+6.349232
+</td>
+<td>
+1.065142e-02
+</td>
+<td>
+True
+</td>
+<td>
+**
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="tabset-4-3">
-<pre><code>                    value  standard_error   ci_lower   ci_upper       p_value  
-CRRA         0   4.507691        0.574552   3.381591   5.633791  4.309510e-15   
-DiscFac      0   0.912999        0.021864   0.870145   0.955852  0.000000e+00   
-BeqCRRA      0   2.516346        0.056806   2.405008   2.627684  0.000000e+00   
-BeqFac       0  90.986219        0.004840  90.976733  90.995704  0.000000e+00   
-BeqShift     0   1.532614        0.129104   1.279575   1.785654  1.671346e-32   
-BeqCRRATerm  0   2.748689        0.000000   2.748689   2.748689  0.000000e+00   
-BeqFacTerm   0  64.515898        0.000000  64.515898  64.515898  0.000000e+00   
-BeqShiftTerm 0  30.746973        0.000000  30.746973  30.746973  0.000000e+00</code></pre>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th>
+</th>
+<th>
+</th>
+<th>
+value
+</th>
+<th>
+standard_error
+</th>
+<th>
+ci_lower
+</th>
+<th>
+ci_upper
+</th>
+<th>
+p_value
+</th>
+<th>
+free
+</th>
+<th>
+stars
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>
+CRRA
+</th>
+<th>
+0
+</th>
+<td>
+2.155238
+</td>
+<td>
+0.164354
+</td>
+<td>
+1.833111
+</td>
+<td>
+2.477365
+</td>
+<td>
+2.758510e-39
+</td>
+<td>
+True
+</td>
+<td>
+***
+</td>
+</tr>
+<tr>
+<th>
+DiscFac
+</th>
+<th>
+0
+</th>
+<td>
+0.970986
+</td>
+<td>
+0.002005
+</td>
+<td>
+0.967058
+</td>
+<td>
+0.974915
+</td>
+<td>
+0.000000e+00
+</td>
+<td>
+True
+</td>
+<td>
+***
+</td>
+</tr>
+<tr>
+<th>
+BeqFac
+</th>
+<th>
+0
+</th>
+<td>
+75.566673
+</td>
+<td>
+34.238945
+</td>
+<td>
+8.459575
+</td>
+<td>
+142.673772
+</td>
+<td>
+2.731136e-02
+</td>
+<td>
+True
+</td>
+<td>
+**
+</td>
+</tr>
+<tr>
+<th>
+BeqShift
+</th>
+<th>
+0
+</th>
+<td>
+2.056486
+</td>
+<td>
+1.255906
+</td>
+<td>
+-0.405045
+</td>
+<td>
+4.518017
+</td>
+<td>
+1.015360e-01
+</td>
+<td>
+True
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="tabset-4-4">
-
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th>
+</th>
+<th>
+</th>
+<th>
+value
+</th>
+<th>
+standard_error
+</th>
+<th>
+ci_lower
+</th>
+<th>
+ci_upper
+</th>
+<th>
+p_value
+</th>
+<th>
+free
+</th>
+<th>
+stars
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>
+CRRA
+</th>
+<th>
+0
+</th>
+<td>
+4.233600
+</td>
+<td>
+0.205016
+</td>
+<td>
+3.831775
+</td>
+<td>
+4.635424
+</td>
+<td>
+9.748335e-95
+</td>
+<td>
+True
+</td>
+<td>
+***
+</td>
+</tr>
+<tr>
+<th>
+DiscFac
+</th>
+<th>
+0
+</th>
+<td>
+0.923009
+</td>
+<td>
+0.008554
+</td>
+<td>
+0.906242
+</td>
+<td>
+0.939775
+</td>
+<td>
+0.000000e+00
+</td>
+<td>
+True
+</td>
+<td>
+***
+</td>
+</tr>
+<tr>
+<th>
+BeqCRRA
+</th>
+<th>
+0
+</th>
+<td>
+2.427211
+</td>
+<td>
+2.614537
+</td>
+<td>
+-2.697187
+</td>
+<td>
+7.551609
+</td>
+<td>
+3.532248e-01
+</td>
+<td>
+True
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<th>
+BeqFac
+</th>
+<th>
+0
+</th>
+<td>
+70.763872
+</td>
+<td>
+698.885867
+</td>
+<td>
+-1299.027256
+</td>
+<td>
+1440.555000
+</td>
+<td>
+9.193501e-01
+</td>
+<td>
+True
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<th>
+BeqShift
+</th>
+<th>
+0
+</th>
+<td>
+1.630113
+</td>
+<td>
+17.348288
+</td>
+<td>
+-32.371906
+</td>
+<td>
+35.632133
+</td>
+<td>
+9.251378e-01
+</td>
+<td>
+True
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
@@ -1311,19 +1805,19 @@ BeqShiftTerm 0  30.746973        0.000000  30.746973  30.746973  0.000000e+00</c
 <section id="more-results-2" class="slide level2">
 <h2>More Results</h2>
 <div class="panel-tabset">
-<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1">Terminal Only</a></li><li><a href="#tabset-5-2">Warm Glow Only</a></li><li><a href="#tabset-5-3">Full</a></li><li><a href="#tabset-5-4">Non-Separable T.R.P.</a></li></ul>
+<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1">LCIM</a></li><li><a href="#tabset-5-2">Non-Separable</a></li><li><a href="#tabset-5-3">WG Homothetic</a></li><li><a href="#tabset-5-4">WG Non-Homothetic</a></li></ul>
 <div class="tab-content">
 <div id="tabset-5-1">
-<p><img data-src="figures/termbeq_sensitivity.svg"></p>
+<p><img data-src="figures/lcim_sensitivity.svg"></p>
 </div>
 <div id="tabset-5-2">
-<p><img data-src="figures/wgbeq_sensitivity.svg"></p>
+<p><img data-src="figures/trp_sensitivity.svg"></p>
 </div>
 <div id="tabset-5-3">
 <p><img data-src="figures/fullbeq_sensitivity.svg"></p>
 </div>
 <div id="tabset-5-4">
-<p><img data-src="figures/trp_sensitivity.svg"></p>
+<p><img data-src="figures/wgbeq_sensitivity.svg"></p>
 </div>
 </div>
 </div>
