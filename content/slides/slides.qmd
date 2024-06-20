@@ -140,6 +140,8 @@ $$
 
 -   Do the rich save more? - Dynan Skinner Zeldes \[2004\]
 
+    - Yes! (savings rate increases by income)
+
 ## The baseline Life Cycle Incomplete Markets model
 
 The agent maximizes PDV of utility from consumption over life cycle with
@@ -204,6 +206,8 @@ $$\begin{aligned}
 ### Separable -- Bequest Models
 
 -   Wealth inequality and intergenerational links - De Nardi \[2004\]
+-   To Leave or Not to Leave: The Distribution of Bequest Motives - Kopczuk, Lupton \[2007\]
+-   Bequests and heterogeneity in Retirement Wealth - De Nardi, Yang \[2014\]
 
 ### Non-separable -- Money in the Utility
 
@@ -323,7 +327,7 @@ Simulated vs. Empirical Moments
 ::: {#fig-sensitivity}
 ![](figures/lcim_sensitivity.svg)
 
-Sensitivity
+Sensitivity from Andrews, Gentzkow & Shapiro [2017]
 :::
 
 ## More Results
@@ -397,14 +401,10 @@ Sensitivity
     -   young parents with children and low income
     -   working middle aged
     -   retirees with low wealth
+-   Separable WG Non-Homothetic has best fit, but not well identified
 
 #### Future Work
 
--   Better estimation techniques such as Sequence Space Jacobians
-    (Auclert et al. \[2021\])
-    -   Will also help speed up sensitivity analysis
--   Implement policy experiments and derive impulse response functions
-    by life cycle
--   Analyze the effect of policy experiments on different segments of
-    the population
--   Evaluate optimal policy to minimize differential harm
+-   Portfolio Choice: How well do these models match risky share of portfolio?
+-   Alternative sources of data: PSID, CES, HRS
+-   Correlation of income / mortality / health expense shocks
