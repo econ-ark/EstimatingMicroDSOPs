@@ -115,7 +115,7 @@ def run_replication():
     if which_replication == "q":
         return
 
-    elif which_replication == "1" or which_replication == "":
+    if which_replication == "1" or which_replication == "":
         print("Running low-resource replication...")
         replication_specs.update(**low_resource)
 

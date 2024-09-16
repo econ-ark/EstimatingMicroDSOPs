@@ -3,7 +3,10 @@ channels:
   - conda-forge
 dependencies:
   - python=3.12
+  - estimagic=0.4.7
+  - econ-ark=0.15.1
   - jupyter
+  - statsmodels
   - jupyterlab
   - black
   - ruff
@@ -14,7 +17,5 @@ dependencies:
   - pip:
       - DFO-LS
       - tranquilo
-      - git+https://github.com/alanlujan91/HARK@wealth_portfolio_solver
-      - git+https://github.com/OpenSourceEconomics/estimagic
       - black[jupyter]
       - -e ./code/

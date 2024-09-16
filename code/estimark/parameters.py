@@ -11,13 +11,11 @@ import warnings
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 import numpy as np
-from HARK.Calibration.Income.IncomeTools import (
-    Cagetti_income,
-    parse_income_spec,
-)
-from HARK.Calibration.life_tables.us_ssa.SSATools import parse_ssa_life_table
+from HARK.Calibration.Income.IncomeTools import Cagetti_income, parse_income_spec
 from HARK.ConsumptionSaving.ConsIndShockModel import init_lifecycle
+from HARK.Calibration.life_tables.us_ssa.SSATools import parse_ssa_life_table
 from HARK.distribution import DiscreteDistribution
+from HARK.ConsumptionSaving.ConsPortfolioModel import portfolio_constructor_dict
 
 # ---------------------------------------------------------------------------------
 # - Define all of the model parameters for EstimatingMicroDSOPs and ConsumerExamples -
@@ -239,6 +237,8 @@ init_calibration = {
     "sim_common_Rrisky": False,  # idiosyncratic risky return
     "WealthShift": init_WealthShift,
 }
+
+init_calibration["constructors"] = portfolio_constructor_dict
 
 Eq_prem = 0.03
 RiskyStd = 0.20
