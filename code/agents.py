@@ -8,8 +8,6 @@ consumption-saving model with idiosyncratic shocks to permanent and transitory
 income as defined in ConsIndShockModel.
 """
 
-import numpy as np
-
 from HARK.ConsumptionSaving.ConsBequestModel import (
     BequestWarmGlowConsumerType,
     BequestWarmGlowPortfolioType,
@@ -28,7 +26,7 @@ class TempConsumerType(AgentType):
     def check_restrictions(self):
         return None
 
-    def sim_birth(self, which_agents):
+    def simBirth(self, which_agents):
         """Alternate method for simulating initial states for simulated agents, drawing from a finite
         distribution.  Used to overwrite IndShockConsumerType.simBirth, which uses lognormal distributions.
 
@@ -51,9 +49,6 @@ class TempConsumerType(AgentType):
         self.t_age[which_agents] = 0
         # Which period of the cycle each agents is currently in
         self.t_cycle[which_agents] = 0
-        
-    def sim_death(self):
-        return np.zeros(self.AgentCount, dtype=bool)
 
 
 ### Overwrite sim_one_period to not have death or look up of agent ages

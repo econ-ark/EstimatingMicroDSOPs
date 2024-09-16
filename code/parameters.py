@@ -15,14 +15,6 @@ from HARK.Calibration.Income.IncomeTools import (
     Cagetti_income,
     parse_income_spec,
 )
-from HARK.Calibration.Assets.AssetProcesses import (
-    make_lognormal_RiskyDstn,
-    combine_IncShkDstn_and_RiskyDstn,
-    calc_ShareLimit_for_CRRA,
-)
-from HARK.ConsumptionSaving.ConsRiskyAssetModel import (
-    make_simple_ShareGrid,
-)
 from HARK.Calibration.life_tables.us_ssa.SSATools import parse_ssa_life_table
 from HARK.ConsumptionSaving.ConsIndShockModel import init_lifecycle
 from HARK.distribution import DiscreteDistribution
@@ -32,17 +24,17 @@ from HARK.distribution import DiscreteDistribution
 # ---------------------------------------------------------------------------------
 
 # Assets grid
-exp_nest = 2  # Number of times to "exponentially nest" when constructing a_grid
+exp_nest = 1  # Number of times to "exponentially nest" when constructing a_grid
 aXtraMin = 0.001  # Minimum end-of-period "assets above minimum" value
-aXtraMax = 20  # Maximum end-of-period "assets above minimum" value
-aXtraCount = 24  # Number of points in the grid of "assets above minimum"
+aXtraMax = 100  # Maximum end-of-period "assets above minimum" value
+aXtraCount = 20  # Number of points in the grid of "assets above minimum"
 
 # Artificial borrowing constraint
 BoroCnstArt = 0.0  # imposed minimum level of end-of period assets
 Rfree = 1.03  # Interest factor on assets
 
 # Use cubic spline interpolation when True, linear interpolation when False
-CubicBool = True
+CubicBool = False
 vFuncBool = False  # Whether to calculate the value function during solution
 
 # Income process parameters
@@ -247,14 +239,6 @@ init_calibration = {
     "sim_common_Rrisky": False,  # idiosyncratic risky return
     "WealthShift": init_WealthShift,
 }
-
-Risky_constructors = {
-    "RiskyDstn": make_lognormal_RiskyDstn,
-    "ShockDstn": combine_IncShkDstn_and_RiskyDstn,
-    "ShareLimit": calc_ShareLimit_for_CRRA,
-    "ShareGrid": make_simple_ShareGrid,
-    }
-init_calibration['constructors'].update(Risky_constructors)
 
 Eq_prem = 0.03
 RiskyStd = 0.20

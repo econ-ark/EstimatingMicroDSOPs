@@ -12,19 +12,19 @@ import csv
 from pathlib import Path
 from time import time
 
-import estimagic as em
+#import estimagic as em
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
 # Estimation methods
-from estimagic.inference import get_bootstrap_samples
+#from estimagic.inference import get_bootstrap_samples
 from scipy.optimize import approx_fprime
-from statsmodels.stats.weightstats import DescrStatsW
+#from statsmodels.stats.weightstats import DescrStatsW
 
 # Import modules from core HARK libraries:
 # The consumption-saving micro model
-from estimark.agents import (
+from agents import (
     BequestWarmGlowLifeCycleConsumerType,
     BequestWarmGlowLifeCyclePortfolioType,
     IndShkLifeCycleConsumerType,
@@ -33,7 +33,7 @@ from estimark.agents import (
 )
 
 # Parameters for the consumer type and the estimation
-from estimark.parameters import (
+from parameters import (
     age_mapping,
     bootstrap_options,
     init_calibration,
@@ -45,8 +45,8 @@ from estimark.parameters import (
 )
 
 # SCF 2004 data on household wealth
-from estimark.scf import scf_data
-from estimark.snp import snp_data
+#from scf import scf_data
+#from snp import snp_data
 
 # =====================================================
 # Define objects and functions used for the estimation
@@ -808,6 +808,8 @@ def estimate(
     ############################################################
 
     agent = make_agent(agent_name)
+    
+    return agent
 
     ############################################################
     # Get initial guess
@@ -883,7 +885,7 @@ def estimate(
 if __name__ == "__main__":
     # Set booleans to determine which tasks should be done
     # Which agent type to estimate ("IndShock" or "Portfolio")
-    local_agent_name = "WarmGlowPortfolio"
+    local_agent_name = "WarmGlow"
     local_params_to_estimate = ["CRRA", "BeqFac", "BeqShift"]
     local_estimate_model = True  # Whether to estimate the model
     # Whether to get standard errors via bootstrap
@@ -894,7 +896,7 @@ if __name__ == "__main__":
     local_make_contour_plot = False
     local_save_dir = "content/tables/min"
 
-    estimate(
+    agent = estimate(
         agent_name=local_agent_name,
         params_to_estimate=local_params_to_estimate,
         estimate_model=local_estimate_model,
@@ -903,3 +905,18 @@ if __name__ == "__main__":
         make_contour_plot=local_make_contour_plot,
         save_dir=local_save_dir,
     )
+    
+    agent.CRRA = 2.0
+    agent.BeqCRRA = agent.CRRA
+    agent.BeqFac = 44.0
+    agent.BeqShift = 0.0
+    
+    agent.solve()
+    agent.initialize_sim()
+    agent.simulate()
+    
+    W = agent.history["bNrm"]
+    W_mean = np.mean(W,axis=1)
+    plt.plot(np.mean(W,axis=1))
+    plt.ylim(0., 11.)
+    plt.show()

@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from parameters import (
+from estimark.parameters import (
     education,
     final_age_data,
     initial_age,
