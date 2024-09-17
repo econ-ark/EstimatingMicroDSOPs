@@ -34,15 +34,15 @@ from HARK.distribution import DiscreteDistribution
 # Assets grid
 exp_nest = 2  # Number of times to "exponentially nest" when constructing a_grid
 aXtraMin = 0.001  # Minimum end-of-period "assets above minimum" value
-aXtraMax = 20  # Maximum end-of-period "assets above minimum" value
-aXtraCount = 24  # Number of points in the grid of "assets above minimum"
+aXtraMax = 150  # Maximum end-of-period "assets above minimum" value
+aXtraCount = 96  # Number of points in the grid of "assets above minimum"
 
 # Artificial borrowing constraint
 BoroCnstArt = 0.0  # imposed minimum level of end-of period assets
 Rfree = 1.03  # Interest factor on assets
 
 # Use cubic spline interpolation when True, linear interpolation when False
-CubicBool = True
+CubicBool = False
 vFuncBool = False  # Whether to calculate the value function during solution
 
 # Income process parameters
@@ -261,6 +261,7 @@ RiskyStd = 0.20
 
 init_calibration["RiskyAvg"] = Rfree + Eq_prem
 init_calibration["RiskyStd"] = RiskyStd
+init_calibration["RiskyCount"] = 15
 
 # from Mateo's JMP for College Educated
 ElnR_nom = 0.020

@@ -44,6 +44,8 @@ from parameters import (
     sim_mapping,
 )
 
+from HARK.ConsumptionSaving.ConsPortfolioModel import make_portfolio_solution_terminal
+
 # SCF 2004 data on household wealth
 #from scf import scf_data
 #from snp import snp_data
@@ -73,6 +75,9 @@ def make_agent(agent_name):
             calibration.update(init_subjective_stock)
         if "(Labor)" in agent_name:
             calibration.update(init_subjective_labor)
+            
+    if "Portfolio" in agent_name:
+        calibration["constructors"]["solution_terminal"] = make_portfolio_solution_terminal
 
     # Make a lifecycle consumer to be used for estimation, including simulated
     # shocks (plus an initial distribution of wealth)
@@ -883,9 +888,11 @@ def estimate(
 
 
 if __name__ == "__main__":
+    from HARK.utilities import plot_funcs
+    
     # Set booleans to determine which tasks should be done
     # Which agent type to estimate ("IndShock" or "Portfolio")
-    local_agent_name = "WarmGlow"
+    local_agent_name = "WealthPortfolio"
     local_params_to_estimate = ["CRRA", "BeqFac", "BeqShift"]
     local_estimate_model = True  # Whether to estimate the model
     # Whether to get standard errors via bootstrap
@@ -906,17 +913,40 @@ if __name__ == "__main__":
         save_dir=local_save_dir,
     )
     
-    agent.CRRA = 2.0
+    agent.DiscFac = 1.0
+    agent.CRRA = 3.1
     agent.BeqCRRA = agent.CRRA
-    agent.BeqFac = 44.0
-    agent.BeqShift = 0.0
+    agent.BeqFac = 0.0
+    agent.BeqShift = 1.0
+    agent.WealthShare = 0.2
+    agent.WealthShift = 0.0
     
+    agent.update()
     agent.solve()
+    
+    # agent.RiskyAvg = init_subjective_stock["RiskyAvgTrue"]
+    # agent.RiskyStd = init_subjective_stock["RiskyStdTrue"]
+    # agent.Rfree = init_subjective_stock["Rfree"]
+    # agent.update_RiskyDstn()
     agent.initialize_sim()
     agent.simulate()
     
+    ages = np.arange(25,121)
+    
     W = agent.history["bNrm"]
-    W_mean = np.mean(W,axis=1)
-    plt.plot(np.mean(W,axis=1))
-    plt.ylim(0., 11.)
+    W_mean = np.nanmedian(W,axis=1)
+    plt.plot(ages, W_mean)
+    plt.ylim(0., 15.)
+    plt.xlim(24., 100.)
+    plt.xlabel('Age')
+    plt.ylabel('Wealth to income ratio')
+    plt.show()
+    
+    S = agent.history["Share"]
+    S_mean = np.nanmedian(S,axis=1)
+    plt.plot(ages, S_mean)
+    plt.ylim(0., 1.)
+    plt.xlim(65., 100.)
+    plt.xlabel('Age')
+    plt.ylabel('Risky asset share')
     plt.show()
