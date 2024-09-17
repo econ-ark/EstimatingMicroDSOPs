@@ -247,8 +247,6 @@ def simulate_moments(params, agent=None, emp_moments=None):
         agent.PermShkStd = init_subjective_labor["PermShkStd"]
         agent.update_income_process()
 
-    agent.LivPrb = init_calibration["LivPrb"]
-
     agent.update()
 
     # Solve the model for these parameters, then simulate wealth data
@@ -265,8 +263,6 @@ def simulate_moments(params, agent=None, emp_moments=None):
         agent.TranShkStd = init_subjective_labor["TranShkStd"]
         agent.PermShkStd = init_subjective_labor["PermShkStd"]
         agent.update_income_process()
-
-    agent.LivPrb = [1.0] * agent.T_cycle
 
     agent.update()
 
