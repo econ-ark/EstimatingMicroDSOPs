@@ -16,6 +16,7 @@ from HARK.ConsumptionSaving.ConsIndShockModel import init_lifecycle
 from HARK.Calibration.life_tables.us_ssa.SSATools import parse_ssa_life_table
 from HARK.distribution import DiscreteDistribution
 from HARK.ConsumptionSaving.ConsPortfolioModel import portfolio_constructor_dict
+from HARK.ConsumptionSaving.ConsWealthPortfolioModel import make_ChiFromOmega_function
 
 # ---------------------------------------------------------------------------------
 # - Define all of the model parameters for EstimatingMicroDSOPs and ConsumerExamples -
@@ -236,9 +237,12 @@ init_calibration = {
     "neutral_measure": True,  # Harmemberg
     "sim_common_Rrisky": False,  # idiosyncratic risky return
     "WealthShift": init_WealthShift,
+    "ChiFromOmega_N": 501,  # Number of gridpoints in chi-from-omega function
+    "ChiFromOmega_bound": 15,  # Highest gridpoint to use for it
 }
 
 init_calibration["constructors"] = portfolio_constructor_dict
+init_calibration["constructors"]["ChiFunc"] = make_ChiFromOmega_function
 
 Eq_prem = 0.03
 RiskyStd = 0.20
