@@ -12,10 +12,9 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 
 import numpy as np
 from HARK.Calibration.Income.IncomeTools import Cagetti_income, parse_income_spec
-from HARK.ConsumptionSaving.ConsIndShockModel import init_lifecycle
 from HARK.Calibration.life_tables.us_ssa.SSATools import parse_ssa_life_table
 from HARK.distribution import DiscreteDistribution
-from HARK.ConsumptionSaving.ConsPortfolioModel import portfolio_constructor_dict
+from HARK.ConsumptionSaving.ConsPortfolioModel import PortfolioConsumerType_constructors_default
 from HARK.ConsumptionSaving.ConsWealthPortfolioModel import make_ChiFromOmega_function
 
 # ---------------------------------------------------------------------------------
@@ -70,23 +69,23 @@ params_to_estimate = ["CRRA"]
 # Initial guess of the coefficient of relative risk aversion during estimation (rho)
 init_CRRA = 2.0
 # Bounds for rho; if violated, objective function returns "penalty value"
-bounds_CRRA = [2.0, 20.0]
+bounds_CRRA = [1.1, 20.0]
 
 # Initial guess of the adjustment to the discount factor during estimation (beth)
 init_DiscFac = 1.0
 # Bounds for beth; if violated, objective function returns "penalty value"
 bounds_DiscFac = [0.5, 1.1]
 
-init_WealthShare = 0.3  # Initial guess of the wealth share parameter
-bounds_WealthShare = [0.0, 0.7]  # Bounds for the wealth share parameter
+init_WealthShare = 0.05  # Initial guess of the wealth share parameter
+bounds_WealthShare = [0.01, 0.99]  # Bounds for the wealth share parameter
 
 init_WealthShift = 0.0  # Initial guess of the wealth shift parameter
 bounds_WealthShift = [0.0, 100.0]  # Bounds for the wealth shift parameter
 
-init_BeqFac = 1.0  # Initial guess of the bequest factor
-bounds_BeqFac = [0.0, 70.0]  # Bounds for the bequest factor
+init_BeqFac = 10.0  # Initial guess of the bequest factor
+bounds_BeqFac = [0.0, 10000.0]  # Bounds for the bequest factor
 
-init_BeqShift = 1.0  # Initial guess of the bequest shift parameter
+init_BeqShift = 0.0  # Initial guess of the bequest shift parameter
 bounds_BeqShift = [0.0, 70.0]  # Bounds for the bequest shift parameter
 
 ######################################################################
@@ -203,7 +202,6 @@ minimize_options = {
 
 # Dictionary that can be passed to ConsumerType to instantiate
 init_calibration = {
-    **init_lifecycle,
     "CRRA": init_CRRA,
     "DiscFac": init_DiscFac,
     "Rfree": Rfree,
@@ -240,9 +238,6 @@ init_calibration = {
     "ChiFromOmega_N": 501,  # Number of gridpoints in chi-from-omega function
     "ChiFromOmega_bound": 15,  # Highest gridpoint to use for it
 }
-
-init_calibration["constructors"] = portfolio_constructor_dict
-init_calibration["constructors"]["ChiFunc"] = make_ChiFromOmega_function
 
 Eq_prem = 0.03
 RiskyStd = 0.20
