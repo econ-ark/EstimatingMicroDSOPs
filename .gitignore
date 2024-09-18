@@ -148,7 +148,6 @@ cython_debug/
 
 .ipynb_checkpoints
 _build
-code/data/S&P Target Date glidepath.xlsx
 .Rproj.user
 *.Rproj
 *.Rhistory
