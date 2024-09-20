@@ -292,7 +292,7 @@ complicated and may not be invertible in terms of optimal consumption. Consider
 the first order condition for an optimal combination of consumption and savings,
 denoted by $^*$:
 
-\begin{equation} \uFunc*{c}'(\cNrm^*, \aNrm^*) - \uFunc*{a}'(\cNrm^_, \aNrm^_) =
+\begin{equation} \uFunc*{c}'(\cNrm^*, \aNrm^_) - \uFunc_{a}'(\cNrm^_, \aNrm^_) =
 \DiscFac \wFunc'(\aNrm^\*) \end{equation}
 
 If the utility of consumption and wealth is additively separable, then the Euler

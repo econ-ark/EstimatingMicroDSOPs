@@ -2,7 +2,8 @@
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/econ-ark/EstimatingMicroDSOPs/HEAD)
 
-To reproduces all the results in the repository first clone this repository locally:
+To reproduces all the results in the repository first clone this repository
+locally:
 
 ```
 # Clone this repository
@@ -12,8 +13,9 @@ $ git clone https://github.com/econ-ark/EstimatingMicroDSOPs
 $ cd EstimatingMicroDSOPs
 ```
 
-Then you can either use a local virtual env(conda) or [nbreproduce](https://github.com/econ-ark/nbreproduce) to
-reproduce to the results.
+Then you can either use a local virtual env(conda) or
+[nbreproduce](https://github.com/econ-ark/nbreproduce) to reproduce to the
+results.
 
 #### A local conda environment and execute the do_all.py file.
 
