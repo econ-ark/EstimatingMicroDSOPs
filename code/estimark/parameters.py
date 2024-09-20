@@ -14,7 +14,9 @@ import numpy as np
 from HARK.Calibration.Income.IncomeTools import Cagetti_income, parse_income_spec
 from HARK.Calibration.life_tables.us_ssa.SSATools import parse_ssa_life_table
 from HARK.distribution import DiscreteDistribution
-from HARK.ConsumptionSaving.ConsPortfolioModel import PortfolioConsumerType_constructors_default
+from HARK.ConsumptionSaving.ConsPortfolioModel import (
+    PortfolioConsumerType_constructors_default,
+)
 from HARK.ConsumptionSaving.ConsWealthPortfolioModel import make_ChiFromOmega_function
 
 # ---------------------------------------------------------------------------------
@@ -83,7 +85,7 @@ init_WealthShift = 0.0  # Initial guess of the wealth shift parameter
 bounds_WealthShift = [0.0, 100.0]  # Bounds for the wealth shift parameter
 
 init_BeqFac = 1.0  # Initial guess of the bequest factor
-bounds_BeqFac = [0.0, 10000.0]  # Bounds for the bequest factor
+bounds_BeqFac = [0.0, 100.0]  # Bounds for the bequest factor
 
 init_BeqShift = 0.0  # Initial guess of the bequest shift parameter
 bounds_BeqShift = [0.0, 70.0]  # Bounds for the bequest shift parameter

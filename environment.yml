@@ -4,7 +4,6 @@ channels:
 dependencies:
   - python=3.12
   - estimagic=0.4.7
-  - econ-ark=0.15.1
   - jupyter
   - statsmodels
   - jupyterlab
@@ -15,6 +14,7 @@ dependencies:
   - openpyxl
   - pip
   - pip:
+      - git+https://github.com/econ-ark/HARK@master
       - DFO-LS
       - tranquilo
       - black[jupyter]
