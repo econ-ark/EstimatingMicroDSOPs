@@ -247,8 +247,6 @@ def simulate_moments(params, agent=None, emp_moments=None):
         agent.PermShkStd = init_subjective_labor["PermShkStd"]
         agent.update_income_process()
 
-    agent.LivPrb = init_calibration["LivPrb"]
-
     agent.update()
 
     # Solve the model for these parameters, then simulate wealth data
@@ -265,8 +263,6 @@ def simulate_moments(params, agent=None, emp_moments=None):
         agent.TranShkStd = init_subjective_labor["TranShkStd"]
         agent.PermShkStd = init_subjective_labor["PermShkStd"]
         agent.update_income_process()
-
-    agent.LivPrb = [1.0] * agent.T_cycle
 
     agent.update()
 
@@ -883,8 +879,8 @@ def estimate(
 if __name__ == "__main__":
     # Set booleans to determine which tasks should be done
     # Which agent type to estimate ("IndShock" or "Portfolio")
-    local_agent_name = "WarmGlowPortfolio"
-    local_params_to_estimate = ["CRRA", "BeqFac", "BeqShift"]
+    local_agent_name = "WealthPortfolio"
+    local_params_to_estimate = ["CRRA", "WealthShare","WealthShift"]
     local_estimate_model = True  # Whether to estimate the model
     # Whether to get standard errors via bootstrap
     local_compute_se_bootstrap = False
