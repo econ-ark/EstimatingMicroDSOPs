@@ -1,11 +1,11 @@
 * This file selects variables, using SCF95
-* This file closely follows codes written for SAS which create summary variables. 
-* (These codes are available at http://www.federalreserve.gov/pubs/oss/oss2/bulletin.macro.txt)  
+* This file closely follows codes written for SAS which create summary variables.
+* (These codes are available at http://www.federalreserve.gov/pubs/oss/oss2/bulletin.macro.txt)
 
-clear 
+clear
 
-** Set memeory 
-set memory 32m 
+** Set memeory
+set memory 32m
 
 global startDir "`c(pwd)'"
 global scfFldr 1995
@@ -21,7 +21,7 @@ if _rc~=0 {
 }
 
 
-                   
+
 ** Load data and pick up necessary vars from original data
 use y1 x42000 x42001 x5729 x7362 x5751 x7650 ///
     x3506 x3507 x3510 x3511 x3514 x3515 x3518 x3519 x3522 x3523 x3526 x3527 x3529 ///
@@ -47,7 +47,7 @@ use y1 x42000 x42001 x5729 x7362 x5751 x7650 ///
     x14 x19 x8020 x8023 x5902 x5904 x6102 x6104 ///
     using "scf95.dta"
 
-** Generate variables 
+** Generate variables
 * ID
 gen ID   = y1                  /* ID # */
 gen HHID = (y1-mod(y1,10))/10  /* HH ID # */
@@ -62,15 +62,15 @@ replace INCOME = x7362 if x7650!=3
 scalar CPIBASE = 2116                   /* September 1992 consumer price index level, the numbers can be found in http://www.federalreserve.gov/pubs/oss/oss2/bulletin.macro.txt*/
 scalar CPIADJ = CPIBASE/2265           /* Adjust with CPI (adjusted to 1992$ price) */
 scalar CPILAG = 2254/2201              /* Income is the previous year's income level, CPILAG adjust income to survey year */
-replace INCOME = INCOME*CPILAG*CPIADJ   /* Adjust with CPI (adjusted to 1992$ price) */  
+replace INCOME = INCOME*CPILAG*CPIADJ   /* Adjust with CPI (adjusted to 1992$ price) */
 
-* Asset 
+* Asset
 gen CHECKING = max(0,x3506)*(x3507==5)+max(0,x3510)*(x3511==5) ///
               +max(0,x3514)*(x3515==5)+max(0,x3518)*(x3519==5) ///
               +max(0,x3522)*(x3523==5)+max(0,x3526)*(x3527==5) ///
-              +max(0,x3529)*(x3527==5) 
+              +max(0,x3529)*(x3527==5)
 gen SAVING   = max(0,x3804)+max(0,x3807)+max(0,x3810)+max(0,x3813) ///
-              +max(0,x3816)+max(0,x3818) 
+              +max(0,x3816)+max(0,x3818)
  gen MMDA    = max(0,x3506)*((x3507==1)*(11<=x9113 & x9113<=13)) ///
               +max(0,x3510)*((x3511==1)*(11<=x9114 & x9114<=13)) ///
               +max(0,x3514)*((x3515==1)*(11<=x9115 & x9115<=13)) ///
@@ -81,7 +81,7 @@ gen SAVING   = max(0,x3804)+max(0,x3807)+max(0,x3810)+max(0,x3813) ///
               +max(0,x3706)*(11<=x9131 & x9131<=13) ///
               +max(0,x3711)*(11<=x9132 & x9132<=13) ///
               +max(0,x3716)*(11<=x9133 & x9133<=13) ///
-              +max(0,x3718)*(11<=x9133 & x9133<=13) 
+              +max(0,x3718)*(11<=x9133 & x9133<=13)
  gen MMMF    = max(0,x3506)*(x3507==1)*(x9113<11|x9113>13) ///
               +max(0,x3510)*(x3511==1)*(x9114<11|x9114>13) ///
               +max(0,x3514)*(x3515==1)*(x9115<11|x9115>13) ///
@@ -92,25 +92,25 @@ gen SAVING   = max(0,x3804)+max(0,x3807)+max(0,x3810)+max(0,x3813) ///
               +max(0,x3706)*(x9131<11|x9131>13) ///
               +max(0,x3711)*(x9132<11|x9132>13) ///
               +max(0,x3716)*(x9133<11|x9133>13) ///
-              +max(0,x3718)*(x9133<11|x9133>13) 
-gen MMA      = MMDA+MMMF 
-gen CALL     = max(0,x3930) 
-gen LIQ      = CHECKING+SAVING+MMA+CALL 
+              +max(0,x3718)*(x9133<11|x9133>13)
+gen MMA      = MMDA+MMMF
+gen CALL     = max(0,x3930)
+gen LIQ      = CHECKING+SAVING+MMA+CALL
 
-gen CDS      = max(0,x3721) 
- gen STMUTF  = (x3821==1)*max(0,x3822) 
- gen TFBMUTF = (x3823==1)*max(0,x3824) 
- gen GBMUTF  = (x3825==1)*max(0,x3826) 
- gen OBMUTF  = (x3827==1)*max(0,x3828) 
- gen COMUTF  = (x3829==1)*max(0,x3830) 
- gen SNMMF   = TFBMUTF+GBMUTF+OBMUTF+(.5*(COMUTF)) 
- gen RNMMF   = STMUTF + (.5*(COMUTF)) 
-gen NMMF     = SNMMF + RNMMF 
-gen STOCKS   = max(0,x3915) 
- gen NOTXBND = x3910 
- gen MORTBND = x3906 
- gen GOVTBND = x3908 
- gen OBND    = x7634+x7633 
+gen CDS      = max(0,x3721)
+ gen STMUTF  = (x3821==1)*max(0,x3822)
+ gen TFBMUTF = (x3823==1)*max(0,x3824)
+ gen GBMUTF  = (x3825==1)*max(0,x3826)
+ gen OBMUTF  = (x3827==1)*max(0,x3828)
+ gen COMUTF  = (x3829==1)*max(0,x3830)
+ gen SNMMF   = TFBMUTF+GBMUTF+OBMUTF+(.5*(COMUTF))
+ gen RNMMF   = STMUTF + (.5*(COMUTF))
+gen NMMF     = SNMMF + RNMMF
+gen STOCKS   = max(0,x3915)
+ gen NOTXBND = x3910
+ gen MORTBND = x3906
+ gen GOVTBND = x3908
+ gen OBND    = x7634+x7633
 gen BOND     = NOTXBND + MORTBND + GOVTBND + OBND
  gen IRAKH   = max(0,x3610)+max(0,x3620)+max(0,x3630)
  gen THRIFT  = max(0,x4226)*(x4216==1|x4216==2|x4227==1|x4231==1) ///
@@ -122,7 +122,7 @@ gen BOND     = NOTXBND + MORTBND + GOVTBND + OBND
  gen PMOP     = x4436
  replace PMOP = 0 if x4436<=0
  replace PMOP = 0 if x4216!=0 & x4316!=0 & x4416!=0 & x4231!=0 & x4331!=0 & x4431!=0
- replace THRIFT = THRIFT + PMOP 
+ replace THRIFT = THRIFT + PMOP
  replace PMOP   = x5036
  replace PMOP = 0 if x5036<=0
  replace PMOP = 0 if x4816!=0 & x4916!=0 & x5016!=0 & x4831!=0 & x4931!=0 & x5031!=0
@@ -135,11 +135,11 @@ gen CASHLI   = max(0,x4006)
  gen COTHMA  = 0
  replace ROTHMA = x3942 if x3947==1 | x3947==3
  replace SOTHMA = x3942 if x3947==2 | x3947==7
- replace COTHMA = x3942 if x3947==5 | x3947==6 | x3947==8 | x3947==9 | x3947==-7 
+ replace COTHMA = x3942 if x3947==5 | x3947==6 | x3947==8 | x3947==9 | x3947==-7
 gen OTHMA    = ROTHMA+SOTHMA+COTHMA
 gen OTHFIN   = x4018+x4022*(x4020==62|x4020==63|x4020==64|x4020==66|x4020==71|x4020==73|x4020==74|x4020==-7) ///
               +x4026*(x4024==62|x4024==63|x4024==64|x4024==66|x4024==71|x4024==73|x4024==74|x4024==-7) ///
-              +x4030*(x4028==62|x4028==63|x4028==64|x4028==66|x4028==71|x4028==73|x4028==74|x4028==-7)  
+              +x4030*(x4028==62|x4028==63|x4028==64|x4028==66|x4028==71|x4028==73|x4028==74|x4028==-7)
 gen FIN      = LIQ+CDS+NMMF+STOCKS+BOND+RETQLIQ+SAVBND+CASHLI+OTHMA+OTHFIN /* Total fin asset */
 
 gen VEHIC    = max(0,x8166)+max(0,x8167)+max(0,x8168)+max(0,x8188) ///
@@ -186,7 +186,7 @@ gen OTHNFIN  = x4022 + x4026 + x4030 - OTHFIN + x4018
 gen NFIN     = VEHIC+HOUSES+ORESRE+NNRESRE+BUS+OTHNFIN
 gen ASSET    = FIN+NFIN /* Total asset */
 
-* Debt 
+* Debt
 gen MRTHEL   = x805+x905+x1005+x1108*(x1103==1)+x1119*(x1114==1) ///
               +x1130*(x1125==1)+max(0,x1136)*(x1108*(x1103==1)+x1119*(x1114==1) ///
               +x1130*(x1125==1))/(x1108+x1119+x1130) if (x1108+x1119+x1130)>=1
@@ -203,11 +203,11 @@ replace RESDBT = RESDBT+x2723*(x2710==78)+x2740*(x2727==78)+x2823*(x2810==78)+x2
                 +x2923*(x2910==78)+x2940*(x2927==78) if FLAG781!=1 & ORESRE>0
  gen FLAG67   = (ORESRE>0)
 replace RESDBT= RESDBT+x2723*(x2710==67)+x2740*(x2727==67)+x2823*(x2810==67)+x2840*(x2827==67) ///
-               +x2923*(x2910==67)+x2940*(x2927==67) if ORESRE>0 
+               +x2923*(x2910==67)+x2940*(x2927==67) if ORESRE>0
 gen OTHLOC   = x1108*(x1103!=1)+x1119*(x1114!=1)+x1130*(x1125!=1) ///
               +max(0,x1136)*(x1108*(x1103!=1)+x1119*(x1114!=1) ///
               +x1130*(x1125!=1))/(x1108+x1119+x1130) if (x1108+x1119+x1130)>=1
-replace OTHLOC = .5*(max(0,x1136)) if (x1108+x1119+x1130)<1 
+replace OTHLOC = .5*(max(0,x1136)) if (x1108+x1119+x1130)<1
 gen CCBAL    = max(0,x427)+max(0,x413)+max(0,x421)+max(0,x430)+max(0,x424)+max(0,x7575)
 gen INSTALL  = x2218+x2318+x2418+x7169+x2424+x2519+x2619+x2625+x7183 ///
               +x7824+x7847+x7870+x7924+x7947+x7970+x7179+x1044+x1215+x1219
@@ -227,12 +227,12 @@ gen CALLDBT  = max(0,x3932)*(x7194==5)
 gen ODEBT    = max(0,x4032)
 gen DEBT     = MRTHEL+RESDBT+OTHLOC+CCBAL+INSTALL+PENDBT+CASHLIDB+CALLDBT+ODEBT /* Total debt */
 
-* Net worth 
+* Net worth
 gen NETW     = ASSET-DEBT
 replace NETW = NETW*CPIADJ
 
-* Ratio of net worth to income 
-gen WIRATIO  = NETW/INCOME    
+* Ratio of net worth to income
+gen WIRATIO  = NETW/INCOME
 
 
 * Demographic vars
@@ -246,7 +246,7 @@ replace EDUC = 2 if /* RTORESP==1 & */ x5902==1 /* High school deg */
 replace EDUC = 3 if /* RTORESP==1 & */ x5904==1 /* College deg */
 * keep if EDUC == 3            /* Keep college graduates only */
 
-* Correct time effects. The base is set at 25 yrs old in 1980 (0 yrs old in 1955) 
+* Correct time effects. The base is set at 25 yrs old in 1980 (0 yrs old in 1955)
 replace INCOME = INCOME/exp(0.016*(YEAR-1955-AGE))
 drop if INCOME<=0
 replace NETW   = NETW/exp(0.016*(YEAR-1955-AGE))
@@ -258,7 +258,7 @@ keep HHID YEAR WGT INCOME NETW WIRATIO AGE
 cd "$startDir"
 cd ../../Data/Constructed
 ** Save data
-save "./SCF$scfFldr$SuffixForConstructedFile", replace 
+save "./SCF$scfFldr$SuffixForConstructedFile", replace
 
 ** End in the same directory you started from
 cd "$startDir"

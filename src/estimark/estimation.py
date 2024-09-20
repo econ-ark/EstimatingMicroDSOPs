@@ -8,6 +8,8 @@ consumption-saving model with idiosyncratic shocks to permanent and transitory
 income as defined in ConsIndShockModel.
 """
 
+from __future__ import annotations
+
 import csv
 from pathlib import Path
 from time import time
@@ -880,7 +882,7 @@ if __name__ == "__main__":
     # Set booleans to determine which tasks should be done
     # Which agent type to estimate ("IndShock" or "Portfolio")
     local_agent_name = "WealthPortfolio"
-    local_params_to_estimate = ["CRRA", "WealthShare","WealthShift"]
+    local_params_to_estimate = ["CRRA", "WealthShare", "WealthShift"]
     local_estimate_model = True  # Whether to estimate the model
     # Whether to get standard errors via bootstrap
     local_compute_se_bootstrap = False

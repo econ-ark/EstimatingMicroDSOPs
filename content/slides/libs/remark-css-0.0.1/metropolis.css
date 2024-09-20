@@ -1,37 +1,39 @@
 .remark-slide-content {
-  background-color: #FAFAFA;
-  border-top: 80px solid #23373B;
+  background-color: #fafafa;
+  border-top: 80px solid #23373b;
   font-size: 20px;
   font-weight: 300;
   line-height: 1.5;
-  padding: 1em 2em 1em 2em
+  padding: 1em 2em 1em 2em;
 }
 
 .title-slide .inverse .remark-slide-content {
-  background-color: #FAFAFA;
+  background-color: #fafafa;
 }
 
 .inverse {
-  background-color: #23373B;
+  background-color: #23373b;
   text-shadow: none;
 }
 
 /* Removes colored bar from top of the slide resulting in a clear slide */
-.clear{
-  border-top: 0px solid #FAFAFA;
+.clear {
+  border-top: 0px solid #fafafa;
 }
 
 h1 {
   font-weight: normal;
   margin-top: -95px;
   margin-left: -00px;
-  color: #FAFAFA;
+  color: #fafafa;
 }
 
-h2, h3, h4 {
+h2,
+h3,
+h4 {
   padding-top: -15px;
   padding-bottom: 00px;
-  color: #1A292C;
+  color: #1a292c;
   text-shadow: none;
   font-weight: 400;
   text-align: left;
@@ -51,21 +53,24 @@ h2, h3, h4 {
   font-size: 30px;
 }
 
-.left-column h2, .left-column h3, .left-column h4 {
+.left-column h2,
+.left-column h3,
+.left-column h4 {
   color: #777;
 }
 
-.left-column h2:last-of-type, .left-column h3:last-child {
-  color: #1A292C;
+.left-column h2:last-of-type,
+.left-column h3:last-child {
+  color: #1a292c;
 }
 
 .title-slide {
-  background-color: #FAFAFA;
-  border-top: 80px solid #FAFAFA;
+  background-color: #fafafa;
+  border-top: 80px solid #fafafa;
 }
 
-.title-slide h1  {
-  color: #1A292C;
+.title-slide h1 {
+  color: #1a292c;
   font-size: 40px;
   text-shadow: none;
   font-weight: 400;
@@ -73,18 +78,18 @@ h2, h3, h4 {
   margin-left: 15px;
   padding-top: 80px;
 }
-.title-slide h2  {
+.title-slide h2 {
   margin-top: -25px;
   padding-bottom: -20px;
-  color: #1A292C;
+  color: #1a292c;
   text-shadow: none;
   font-weight: 300;
   font-size: 35px;
   text-align: left;
   margin-left: 15px;
 }
-.title-slide h3  {
-  color: #1A292C;
+.title-slide h3 {
+  color: #1a292c;
   text-shadow: none;
   font-weight: 300;
   font-size: 25px;
@@ -93,16 +98,19 @@ h2, h3, h4 {
   margin-bottom: -30px;
 }
 
-hr, .title-slide h2::after, .mline h1::after {
-  content: '';
+hr,
+.title-slide h2::after,
+.mline h1::after {
+  content: "";
   display: block;
   border: none;
-  background-color: #EB811B;
-  color: #EB811B;
+  background-color: #eb811b;
+  color: #eb811b;
   height: 1px;
 }
 
-hr, .mline h1::after {
+hr,
+.mline h1::after {
   margin: 1em 15px 0 15px;
 }
 
@@ -121,7 +129,7 @@ hr, .mline h1::after {
 }
 .inverse .remark-slide-number {
   font-size: 13pt;
-  color: #FAFAFA;
+  color: #fafafa;
   opacity: 1;
 }
 

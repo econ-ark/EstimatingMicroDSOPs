@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import itertools
 
 import dask
 from dask.distributed import Client
+
 from estimark.estimation import estimate, get_empirical_moments, get_moments_cov
 from estimark.options import low_resource
 

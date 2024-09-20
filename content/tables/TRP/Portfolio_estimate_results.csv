@@ -20,11 +20,11 @@ The tranquilo_ls algorithm reported: Absolute criterion change smaller than tole
 
 Independent of the convergence criteria used by tranquilo_ls, the strength of convergence can be assessed by the following criteria:
 
-                             one_step     five_steps 
-relative_criterion_change  9.827e-08*    9.827e-08*  
-relative_params_change     6.104e-06*    6.104e-06*  
-absolute_criterion_change  6.312e-08*    6.312e-08*  
-absolute_params_change     5.647e-05     5.647e-05   
+                             one_step     five_steps
+relative_criterion_change  9.827e-08*    9.827e-08*
+relative_params_change     6.104e-06*    6.104e-06*
+absolute_criterion_change  6.312e-08*    6.312e-08*
+absolute_params_change     5.647e-05     5.647e-05
 
 (***: change <= 1e-10, **: change <= 1e-8, *: change <= 1e-5. Change refers to a change between accepted steps. The first column only considers the last step. The second column considers the last five steps.)], 'exploration_sample': [{'CRRA': 9.252342476844415}, {'CRRA': 8.1875}, {'CRRA': 10.549999999999999}, {'CRRA': 12.9125}, {'CRRA': 5.824999999999999}, {'CRRA': 14.093749999999998}, {'CRRA': 15.274999999999999}, {'CRRA': 4.64375}, {'CRRA': 17.6375}, {'CRRA': 3.4625}], 'exploration_results': array([0.64235832, 0.6831279 , 0.69939713, 1.02360977, 1.18227674,
        1.26376333, 1.54278366, 1.78141341, 2.1808234 , 2.89794431])}"

@@ -24,10 +24,10 @@ The tranquilo_ls algorithm reported: Absolute params change smaller than toleran
 Independent of the convergence criteria used by tranquilo_ls, the strength of convergence can be assessed by the following criteria:
 
                            one_step  five_steps
-relative_criterion_change  0.4266      0.611   
-relative_params_change     0.2042     0.2042   
-absolute_criterion_change   254.4      364.4   
-absolute_params_change      0.674      0.674   
+relative_criterion_change  0.4266      0.611
+relative_params_change     0.2042     0.2042
+absolute_criterion_change   254.4      364.4
+absolute_params_change      0.674      0.674
 
 (***: change <= 1e-10, **: change <= 1e-8, *: change <= 1e-5. Change refers to a change between accepted steps. The first column only considers the last step. The second column considers the last five steps.)], 'exploration_sample': [{'CRRA': 3.4625, 'DiscFac': 0.875}, {'CRRA': 4.64375, 'DiscFac': 0.6875}, {'CRRA': 2.871875, 'DiscFac': 0.78125}, {'CRRA': 2.28125, 'DiscFac': 1.0625}], 'exploration_results': array([1069.96402275, 1180.14464257, 1201.13045726, 2198.69465259])}"
 algorithm_output,"{'states': [State(trustregion=Region(center=array([3.78766627, 0.8916693 ]), radius=0.3787666272489316, bounds=Bounds(lower=array([1.1, 0.5]), upper=array([20. ,  1.1]))), model_indices=[0], model=ScalarModel(intercept=960.8060529870695, linear_terms=array([0., 0.]), square_terms=array([[0., 0.],

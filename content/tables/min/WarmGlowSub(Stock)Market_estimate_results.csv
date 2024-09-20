@@ -20,10 +20,10 @@ multistart_info,"{'start_parameters': [{'CRRA': 3.4625, 'DiscFac': 0.875}, {'CRR
 Independent of the convergence criteria used by tranquilo_ls, the strength of convergence can be assessed by the following criteria:
 
                            one_step  five_steps
-relative_criterion_change  0.9326     0.9326   
-relative_params_change     0.1316     0.1316   
-absolute_criterion_change   527.7      527.7   
-absolute_params_change      0.323      0.323   
+relative_criterion_change  0.9326     0.9326
+relative_params_change     0.1316     0.1316
+absolute_criterion_change   527.7      527.7
+absolute_params_change      0.323      0.323
 
 (***: change <= 1e-10, **: change <= 1e-8, *: change <= 1e-5. Change refers to a change between accepted steps. The first column only considers the last step. The second column considers the last five steps.), Minimize with 2 free parameters terminated.
 

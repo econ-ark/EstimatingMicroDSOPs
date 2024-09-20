@@ -21,11 +21,11 @@ The tranquilo_ls algorithm reported: Absolute criterion change smaller than tole
 
 Independent of the convergence criteria used by tranquilo_ls, the strength of convergence can be assessed by the following criteria:
 
-                             one_step     five_steps 
-relative_criterion_change  5.606e-08*    5.606e-08*  
-relative_params_change     0.0001132     0.0001132   
-absolute_criterion_change  1.358e-08*    1.358e-08*  
-absolute_params_change     3.272e-05     3.272e-05   
+                             one_step     five_steps
+relative_criterion_change  5.606e-08*    5.606e-08*
+relative_params_change     0.0001132     0.0001132
+absolute_criterion_change  1.358e-08*    1.358e-08*
+absolute_params_change     3.272e-05     3.272e-05
 
 (***: change <= 1e-10, **: change <= 1e-8, *: change <= 1e-5. Change refers to a change between accepted steps. The first column only considers the last step. The second column considers the last five steps.), Minimize with 2 free parameters terminated.
 
@@ -33,11 +33,11 @@ The tranquilo_ls algorithm reported: Absolute criterion change smaller than tole
 
 Independent of the convergence criteria used by tranquilo_ls, the strength of convergence can be assessed by the following criteria:
 
-                             one_step     five_steps 
-relative_criterion_change  3.629e-07*    0.0001686   
-relative_params_change     1.947e-05       0.00153   
-absolute_criterion_change  8.791e-08*    4.083e-05   
-absolute_params_change     4.454e-06*    0.0005847   
+                             one_step     five_steps
+relative_criterion_change  3.629e-07*    0.0001686
+relative_params_change     1.947e-05       0.00153
+absolute_criterion_change  8.791e-08*    4.083e-05
+absolute_params_change     4.454e-06*    0.0005847
 
 (***: change <= 1e-10, **: change <= 1e-8, *: change <= 1e-5. Change refers to a change between accepted steps. The first column only considers the last step. The second column considers the last five steps.)], 'exploration_sample': [{'CRRA': 5.35399091577092, 'WealthShare': 0.1710302407154898}, {'CRRA': 7.00625, 'WealthShare': 0.19375}, {'CRRA': 12.9125, 'WealthShare': 0.1325}, {'CRRA': 4.64375, 'WealthShare': 0.31625000000000003}, {'CRRA': 8.1875, 'WealthShare': 0.3775}, {'CRRA': 15.274999999999999, 'WealthShare': 0.255}, {'CRRA': 17.046875, 'WealthShare': 0.224375}, {'CRRA': 11.73125, 'WealthShare': 0.43875}, {'CRRA': 18.81875, 'WealthShare': 0.07125}, {'CRRA': 10.549999999999999, 'WealthShare': 0.5}, {'CRRA': 9.368749999999999, 'WealthShare': 0.56125}, {'CRRA': 16.45625, 'WealthShare': 0.68375}, {'CRRA': 2.871875, 'WealthShare': 0.469375}, {'CRRA': 7.596874999999999, 'WealthShare': 0.714375}, {'CRRA': 14.093749999999998, 'WealthShare': 0.80625}, {'CRRA': 3.4625, 'WealthShare': 0.6225}, {'CRRA': 17.6375, 'WealthShare': 0.8674999999999999}, {'CRRA': 5.824999999999999, 'WealthShare': 0.745}, {'CRRA': 12.321874999999999, 'WealthShare': 0.959375}, {'CRRA': 2.28125, 'WealthShare': 0.92875}], 'exploration_results': array([2.42227546e-01, 3.27384376e-01, 1.14034055e+00, 1.50312179e+00,
        1.79325436e+00, 2.08879824e+00, 2.54067782e+00, 2.64114350e+00,

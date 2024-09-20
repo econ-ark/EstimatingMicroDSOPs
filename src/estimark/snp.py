@@ -1,5 +1,7 @@
 """Sets up the S&P data for use in the EstimatingMicroDSOPs estimation."""
 
+from __future__ import annotations
+
 from pathlib import Path
 
 import pandas as pd

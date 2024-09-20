@@ -5,6 +5,7 @@ model.  The empirical data is stored in a separate csv file and is loaded in set
 # Discount Factor of 1.0 always
 # income uncertainty doubles at retirement
 # only estimate CRRA, Bequest params
+from __future__ import annotations
 
 import warnings
 
@@ -14,10 +15,6 @@ import numpy as np
 from HARK.Calibration.Income.IncomeTools import Cagetti_income, parse_income_spec
 from HARK.Calibration.life_tables.us_ssa.SSATools import parse_ssa_life_table
 from HARK.distribution import DiscreteDistribution
-from HARK.ConsumptionSaving.ConsPortfolioModel import (
-    PortfolioConsumerType_constructors_default,
-)
-from HARK.ConsumptionSaving.ConsWealthPortfolioModel import make_ChiFromOmega_function
 
 # ---------------------------------------------------------------------------------
 # - Define all of the model parameters for EstimatingMicroDSOPs and ConsumerExamples -

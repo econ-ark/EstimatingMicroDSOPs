@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from estimark.estimation import estimate
 from estimark.options import low_resource
 

@@ -45,6 +45,8 @@ Python PATH with the locations of the MicroDSOP directory structure so it can
 still run.
 """
 
+from __future__ import annotations
+
 from estimark.estimation import estimate
 from estimark.options import (
     all_replications,
@@ -61,7 +63,7 @@ def run_replication():
 
         [1] IndShockConsumerType
 
-         2  PortfolioConsumerType 
+         2  PortfolioConsumerType
 
          3  BequestWarmGlowConsumerType
 

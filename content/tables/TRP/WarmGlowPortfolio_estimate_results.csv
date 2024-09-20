@@ -22,11 +22,11 @@ The tranquilo_ls algorithm reported: Relative criterion change smaller than tole
 
 Independent of the convergence criteria used by tranquilo_ls, the strength of convergence can be assessed by the following criteria:
 
-                             one_step     five_steps 
-relative_criterion_change  1.182e-08*    2.384e-08*  
-relative_params_change     7.164e-07*    7.164e-07*  
-absolute_criterion_change  7.578e-09**   1.529e-08*  
-absolute_params_change     3.435e-05     3.435e-05   
+                             one_step     five_steps
+relative_criterion_change  1.182e-08*    2.384e-08*
+relative_params_change     7.164e-07*    7.164e-07*
+absolute_criterion_change  7.578e-09**   1.529e-08*
+absolute_params_change     3.435e-05     3.435e-05
 
 (***: change <= 1e-10, **: change <= 1e-8, *: change <= 1e-5. Change refers to a change between accepted steps. The first column only considers the last step. The second column considers the last five steps.), Minimize with 3 free parameters terminated.
 
@@ -34,11 +34,11 @@ The tranquilo_ls algorithm reported: Absolute criterion change smaller than tole
 
 Independent of the convergence criteria used by tranquilo_ls, the strength of convergence can be assessed by the following criteria:
 
-                             one_step     five_steps 
-relative_criterion_change  8.029e-09**   7.847e-06*  
-relative_params_change     2.558e-07*    0.0001336   
-absolute_criterion_change  5.148e-09**   5.032e-06*  
-absolute_params_change      5.08e-06*      0.00307   
+                             one_step     five_steps
+relative_criterion_change  8.029e-09**   7.847e-06*
+relative_params_change     2.558e-07*    0.0001336
+absolute_criterion_change  5.148e-09**   5.032e-06*
+absolute_params_change      5.08e-06*      0.00307
 
 (***: change <= 1e-10, **: change <= 1e-8, *: change <= 1e-5. Change refers to a change between accepted steps. The first column only considers the last step. The second column considers the last five steps.), Minimize with 3 free parameters terminated.
 
@@ -46,11 +46,11 @@ The tranquilo_ls algorithm reported: Absolute criterion change smaller than tole
 
 Independent of the convergence criteria used by tranquilo_ls, the strength of convergence can be assessed by the following criteria:
 
-                             one_step     five_steps 
-relative_criterion_change  5.493e-08*    6.761e-06*  
-relative_params_change     1.236e-05     5.445e-05   
-absolute_criterion_change  3.522e-08*    4.335e-06*  
-absolute_params_change     0.0006154      0.000671   
+                             one_step     five_steps
+relative_criterion_change  5.493e-08*    6.761e-06*
+relative_params_change     1.236e-05     5.445e-05
+absolute_criterion_change  3.522e-08*    4.335e-06*
+absolute_params_change     0.0006154      0.000671
 
 (***: change <= 1e-10, **: change <= 1e-8, *: change <= 1e-5. Change refers to a change between accepted steps. The first column only considers the last step. The second column considers the last five steps.)], 'exploration_sample': [{'CRRA': 9.206778216146489, 'BeqShift': 50.64405071849033, 'BeqFac': 26.1368726540768}, {'CRRA': 9.368749999999999, 'BeqShift': 39.375, 'BeqFac': 18.75}, {'CRRA': 8.778125, 'BeqShift': 63.4375, 'BeqFac': 28.125}, {'CRRA': 9.959375, 'BeqShift': 6.5625, 'BeqFac': 84.375}, {'CRRA': 8.1875, 'BeqShift': 26.25, 'BeqFac': 62.5}, {'CRRA': 10.549999999999999, 'BeqShift': 35.0, 'BeqFac': 50.0}, {'CRRA': 7.596874999999999, 'BeqShift': 50.3125, 'BeqFac': 71.875}, {'CRRA': 7.00625, 'BeqShift': 13.125, 'BeqFac': 31.25}, {'CRRA': 11.73125, 'BeqShift': 30.625, 'BeqFac': 6.25}, {'CRRA': 12.321874999999999, 'BeqShift': 67.8125, 'BeqFac': 96.875}, {'CRRA': 6.415625, 'BeqShift': 19.6875, 'BeqFac': 15.625}, {'CRRA': 12.9125, 'BeqShift': 8.75, 'BeqFac': 87.5}, {'CRRA': 5.824999999999999, 'BeqShift': 52.5, 'BeqFac': 75.0}, {'CRRA': 13.503124999999999, 'BeqShift': 45.9375, 'BeqFac': 3.125}, {'CRRA': 5.234375, 'BeqShift': 59.0625, 'BeqFac': 9.375}, {'CRRA': 14.093749999999998, 'BeqShift': 56.875, 'BeqFac': 43.75}, {'CRRA': 14.684375, 'BeqShift': 24.0625, 'BeqFac': 59.375}, {'CRRA': 4.64375, 'BeqShift': 21.875, 'BeqFac': 93.75}, {'CRRA': 15.274999999999999, 'BeqShift': 17.5, 'BeqFac': 25.0}, {'CRRA': 4.053125, 'BeqShift': 10.9375, 'BeqFac': 53.125}, {'CRRA': 15.865624999999998, 'BeqShift': 54.6875, 'BeqFac': 65.625}, {'CRRA': 3.4625, 'BeqShift': 43.75, 'BeqFac': 37.5}, {'CRRA': 16.45625, 'BeqShift': 48.125, 'BeqFac': 81.25}, {'CRRA': 17.046875, 'BeqShift': 15.3125, 'BeqFac': 21.875}, {'CRRA': 2.871875, 'BeqShift': 32.8125, 'BeqFac': 46.875}, {'CRRA': 2.28125, 'BeqShift': 65.625, 'BeqFac': 56.25}, {'CRRA': 17.6375, 'BeqShift': 61.25, 'BeqFac': 12.5}, {'CRRA': 18.228125, 'BeqShift': 28.4375, 'BeqFac': 78.125}, {'CRRA': 18.81875, 'BeqShift': 4.375, 'BeqFac': 68.75}, {'CRRA': 19.409375, 'BeqShift': 41.5625, 'BeqFac': 34.375}], 'exploration_results': array([0.64119816, 0.64211564, 0.64842422, 0.66164008, 0.68191739,
        0.7044766 , 0.74714868, 0.84823283, 0.8626059 , 0.97951322,

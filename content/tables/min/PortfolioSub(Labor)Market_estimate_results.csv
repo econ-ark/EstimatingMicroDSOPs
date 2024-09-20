@@ -22,20 +22,20 @@ The tranquilo_ls algorithm reported: Absolute params change smaller than toleran
 Independent of the convergence criteria used by tranquilo_ls, the strength of convergence can be assessed by the following criteria:
 
                              one_step   five_steps
-relative_criterion_change    0.02632     0.2707   
-relative_params_change     0.0005553     0.0918   
-absolute_criterion_change    0.03186     0.3276   
-absolute_params_change     0.0006017      1.071   
+relative_criterion_change    0.02632     0.2707
+relative_params_change     0.0005553     0.0918
+absolute_criterion_change    0.03186     0.3276
+absolute_params_change     0.0006017      1.071
 
 (***: change <= 1e-10, **: change <= 1e-8, *: change <= 1e-5. Change refers to a change between accepted steps. The first column only considers the last step. The second column considers the last five steps.), Minimize with 2 free parameters terminated.
 
 Independent of the convergence criteria used by tranquilo_ls, the strength of convergence can be assessed by the following criteria:
 
                             one_step    five_steps
-relative_criterion_change     0.449       1.086   
-relative_params_change     0.004166     0.07772   
-absolute_criterion_change    0.3226      0.7803   
-absolute_params_change     0.005346      0.9465   
+relative_criterion_change     0.449       1.086
+relative_params_change     0.004166     0.07772
+absolute_criterion_change    0.3226      0.7803
+absolute_params_change     0.005346      0.9465
 
 (***: change <= 1e-10, **: change <= 1e-8, *: change <= 1e-5. Change refers to a change between accepted steps. The first column only considers the last step. The second column considers the last five steps.)], 'exploration_sample': [{'CRRA': 12.321874999999999, 'DiscFac': 1.08125}, {'CRRA': 12.279830990813757, 'DiscFac': 1.0776706629061286}, {'CRRA': 14.093749999999998, 'DiscFac': 0.9875}, {'CRRA': 17.6375, 'DiscFac': 1.0250000000000001}, {'CRRA': 16.45625, 'DiscFac': 0.9125000000000001}, {'CRRA': 11.73125, 'DiscFac': 0.7625000000000001}, {'CRRA': 10.549999999999999, 'DiscFac': 0.8}, {'CRRA': 12.9125, 'DiscFac': 0.575}, {'CRRA': 15.274999999999999, 'DiscFac': 0.65}, {'CRRA': 17.046875, 'DiscFac': 0.6312500000000001}, {'CRRA': 18.81875, 'DiscFac': 0.5375}, {'CRRA': 9.368749999999999, 'DiscFac': 0.8375}, {'CRRA': 8.1875, 'DiscFac': 0.7250000000000001}, {'CRRA': 7.00625, 'DiscFac': 0.6125}, {'CRRA': 5.824999999999999, 'DiscFac': 0.9500000000000001}, {'CRRA': 4.64375, 'DiscFac': 0.6875}, {'CRRA': 2.871875, 'DiscFac': 0.78125}, {'CRRA': 3.4625, 'DiscFac': 0.875}, {'CRRA': 2.28125, 'DiscFac': 1.0625}], 'exploration_results': array([ 1.25226984,  1.54798499,  1.77139048,  1.79567843,  2.19243348,
         2.99563577,  3.4003551 ,  3.46407238,  3.67340234,  3.72448066,

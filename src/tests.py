@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from estimark.min import estimate_min
 from estimark.options import low_resource, medium_resource
 

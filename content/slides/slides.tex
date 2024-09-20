@@ -20,7 +20,7 @@
   \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
 \fi
 \usepackage{lmodern}
-\ifPDFTeX\else  
+\ifPDFTeX\else
     % xetex/luatex font selection
 \fi
 % Use upquote if available, for straight quotes in verbatim environments
@@ -392,8 +392,8 @@ Equation}\label{recursive-bellman-equation}
 \[\begin{aligned}
     {\vFunc}_{t}({m}_{t}) & = \max_{\cNrm_{t}} ~ \uFunc(\cNrm_{t})+\beth\Alive_{t+1}\hat{\DiscFac}_{t+1}
     \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})]
-    \\ & \text{s.t.} & 
-    \\ \aNrm_{t} & = {m}_{t}-\cNrm_{t} 
+    \\ & \text{s.t.} &
+    \\ \aNrm_{t} & = {m}_{t}-\cNrm_{t}
     \\ {m}_{t+1} & = \aNrm_{t}\underbrace{\left(\frac{\Rfree}{\PermShk_{t+1}\PermGroFac_{t+1}}\right)}_{\equiv \RNrm_{t+1}} + \TranShkEmp_{t+1}
 \end{aligned}\]
 
@@ -423,7 +423,7 @@ The transitory and permanent shocks to income are defined as:
 where
 
 \[\begin{aligned}
-\TranShkEmp_{s}  = & \begin{cases} 0  & \text{with probability } \pZero>0  \\ 
+\TranShkEmp_{s}  = & \begin{cases} 0  & \text{with probability } \pZero>0  \\
 \xi_{s}/\pZero & \text{with probability } (1-\pZero) \text{, where } \log \xi_{s}\thicksim \mathcal{N}(-\sigma_{[\xi, t]}^{2}/2,\sigma_{[\xi, t]}^{2}) \end{cases} \\
 \phantom{/\pZero} \\ & \text{and }  \log \PermShk_{s}   \thicksim \mathcal{N}(-\sigma_{[\PermShk, t]}^{2}/2,\sigma_{[\PermShk, t]}^{2}).
 \end{aligned}\]
@@ -436,8 +436,8 @@ Model}\label{wealth-in-the-utility-function-incomplete-markets-model}
 \[\begin{aligned}
     {\vFunc}_{t}({m}_{t}) & = \max_{\cNrm_{t}}  \uFunc(\cNrm_{t}, \aNrm_{t})+\beth\Alive_{t+1}\hat{\DiscFac}_{t+1}
     \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})]
-    \\ & \text{s.t.} & 
-    \\ \aNrm_{t} & = {m}_{t}-\cNrm_{t} 
+    \\ & \text{s.t.} &
+    \\ \aNrm_{t} & = {m}_{t}-\cNrm_{t}
     \\ {m}_{t+1} & = \aNrm_{t}\RNrm_{t+1}+ ~\TranShkEmp_{t+1}
 \end{aligned}\]
 

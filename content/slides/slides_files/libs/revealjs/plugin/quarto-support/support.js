@@ -7,14 +7,14 @@ window.QuartoSupport = function () {
   // helper for theme toggling
   function toggleBackgroundTheme(el, onDarkBackground, onLightBackground) {
     if (onDarkBackground) {
-      el.classList.add('has-dark-background')
+      el.classList.add("has-dark-background");
     } else {
-      el.classList.remove('has-dark-background')
+      el.classList.remove("has-dark-background");
     }
     if (onLightBackground) {
-      el.classList.add('has-light-background')
+      el.classList.add("has-light-background");
     } else {
-      el.classList.remove('has-light-background')
+      el.classList.remove("has-light-background");
     }
   }
 
@@ -96,7 +96,7 @@ window.QuartoSupport = function () {
               return false;
             }
           },
-          false
+          false,
         );
       }
     });
@@ -130,14 +130,20 @@ window.QuartoSupport = function () {
     deck.on("slidechanged", function (ev) {
       const revealParent = deck.getRevealElement();
       const slideNumberEl = revealParent.querySelector(".slide-number");
-      const onDarkBackground = Reveal.getSlideBackground(ev.indexh, ev.indexv).classList.contains('has-dark-background');
-      const onLightBackground = Reveal.getSlideBackground(ev.indexh, ev.indexv).classList.contains('has-light-background');
+      const onDarkBackground = Reveal.getSlideBackground(
+        ev.indexh,
+        ev.indexv,
+      ).classList.contains("has-dark-background");
+      const onLightBackground = Reveal.getSlideBackground(
+        ev.indexh,
+        ev.indexv,
+      ).classList.contains("has-light-background");
       toggleBackgroundTheme(slideNumberEl, onDarkBackground, onLightBackground);
-    })
+    });
   }
 
-   // add footer text
-   function addFooter(deck) {
+  // add footer text
+  function addFooter(deck) {
     const revealParent = deck.getRevealElement();
     const defaultFooterDiv = document.querySelector(".footer-default");
     if (defaultFooterDiv) {
@@ -146,23 +152,37 @@ window.QuartoSupport = function () {
       if (!isPrintView()) {
         deck.on("slidechanged", function (ev) {
           const prevSlideFooter = document.querySelector(
-            ".reveal > .footer:not(.footer-default)"
+            ".reveal > .footer:not(.footer-default)",
           );
           if (prevSlideFooter) {
             prevSlideFooter.remove();
           }
           const currentSlideFooter = ev.currentSlide.querySelector(".footer");
-          const onDarkBackground = Reveal.getSlideBackground(ev.indexh, ev.indexv).classList.contains('has-dark-background')
-          const onLightBackground = Reveal.getSlideBackground(ev.indexh, ev.indexv).classList.contains('has-light-background')
+          const onDarkBackground = Reveal.getSlideBackground(
+            ev.indexh,
+            ev.indexv,
+          ).classList.contains("has-dark-background");
+          const onLightBackground = Reveal.getSlideBackground(
+            ev.indexh,
+            ev.indexv,
+          ).classList.contains("has-light-background");
           if (currentSlideFooter) {
             defaultFooterDiv.style.display = "none";
             const slideFooter = currentSlideFooter.cloneNode(true);
             handleLinkClickEvents(deck, slideFooter);
             deck.getRevealElement().appendChild(slideFooter);
-            toggleBackgroundTheme(slideFooter, onDarkBackground, onLightBackground)
+            toggleBackgroundTheme(
+              slideFooter,
+              onDarkBackground,
+              onLightBackground,
+            );
           } else {
             defaultFooterDiv.style.display = "block";
-            toggleBackgroundTheme(defaultFooterDiv, onDarkBackground, onLightBackground)
+            toggleBackgroundTheme(
+              defaultFooterDiv,
+              onDarkBackground,
+              onLightBackground,
+            );
           }
         });
       }
@@ -216,7 +236,7 @@ window.QuartoSupport = function () {
         const config = deck.getConfig();
         let buttons = !!config.chalkboard.buttons;
         const slideButtons = ev.currentSlide.getAttribute(
-          "data-chalkboard-buttons"
+          "data-chalkboard-buttons",
         );
         if (slideButtons) {
           if (slideButtons === "true" || slideButtons === "1") {
@@ -306,7 +326,7 @@ window.QuartoSupport = function () {
       // remove all whitespace text nodes
       // whitespace nodes cause the columns to be misaligned
       // since they have inline-block layout
-      // 
+      //
       // Quarto emits no whitespace nodes, but third-party tooling
       // has bugs that can cause whitespace nodes to be emitted.
       // See https://github.com/quarto-dev/quarto-cli/issues/8382

@@ -22,10 +22,10 @@ The tranquilo_ls algorithm reported: Absolute criterion change smaller than tole
 Independent of the convergence criteria used by tranquilo_ls, the strength of convergence can be assessed by the following criteria:
 
                             one_step  five_steps
-relative_criterion_change  0.02962     0.1773   
-relative_params_change      0.1778     0.4224   
-absolute_criterion_change    9.634      57.67   
-absolute_params_change      0.8087      1.921   
+relative_criterion_change  0.02962     0.1773
+relative_params_change      0.1778     0.4224
+absolute_criterion_change    9.634      57.67
+absolute_params_change      0.8087      1.921
 
 (***: change <= 1e-10, **: change <= 1e-8, *: change <= 1e-5. Change refers to a change between accepted steps. The first column only considers the last step. The second column considers the last five steps.), Minimize with 2 free parameters terminated.
 

@@ -22,10 +22,10 @@ The tranquilo_ls algorithm reported: Absolute params change smaller than toleran
 Independent of the convergence criteria used by tranquilo_ls, the strength of convergence can be assessed by the following criteria:
 
                            one_step  five_steps
-relative_criterion_change  0.4931     0.7235   
-relative_params_change     0.2452     0.2452   
-absolute_criterion_change  0.5564     0.8164   
-absolute_params_change      1.918      1.918   
+relative_criterion_change  0.4931     0.7235
+relative_params_change     0.2452     0.2452
+absolute_criterion_change  0.5564     0.8164
+absolute_params_change      1.918      1.918
 
 (***: change <= 1e-10, **: change <= 1e-8, *: change <= 1e-5. Change refers to a change between accepted steps. The first column only considers the last step. The second column considers the last five steps.)], 'exploration_sample': [{'CRRA': 10.549999999999999, 'DiscFac': 0.8}, {'CRRA': 11.73125, 'DiscFac': 0.7625000000000001}, {'CRRA': 9.368749999999999, 'DiscFac': 0.8375}, {'CRRA': 7.596874999999999, 'DiscFac': 0.9312500000000001}, {'CRRA': 12.9125, 'DiscFac': 0.575}, {'CRRA': 15.274999999999999, 'DiscFac': 0.65}, {'CRRA': 17.046875, 'DiscFac': 0.6312500000000001}, {'CRRA': 16.45625, 'DiscFac': 0.9125000000000001}, {'CRRA': 18.81875, 'DiscFac': 0.5375}, {'CRRA': 8.1875, 'DiscFac': 0.7250000000000001}, {'CRRA': 14.093749999999998, 'DiscFac': 0.9875}, {'CRRA': 12.321874999999999, 'DiscFac': 1.08125}, {'CRRA': 17.6375, 'DiscFac': 1.0250000000000001}, {'CRRA': 7.00625, 'DiscFac': 0.6125}, {'CRRA': 5.0, 'DiscFac': 0.95}, {'CRRA': 4.64375, 'DiscFac': 0.6875}, {'CRRA': 2.871875, 'DiscFac': 0.78125}, {'CRRA': 3.4625, 'DiscFac': 0.875}, {'CRRA': 2.28125, 'DiscFac': 1.0625}], 'exploration_results': array([  1.74531296,   2.10648864,   2.17581064,   2.66803924,
          2.70500778,   2.87740953,   3.0406658 ,   3.37839016,

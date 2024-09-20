@@ -1,5 +1,6 @@
 # Define settings for "main()" function in StructuralEstiamtion.py based on
 # resource requirements:
+from __future__ import annotations
 
 params_to_estimate = ["CRRA", "BeqShift", "BeqFac", "WealthShare"]
 

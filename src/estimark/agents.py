@@ -8,6 +8,9 @@ consumption-saving model with idiosyncratic shocks to permanent and transitory
 income as defined in ConsIndShockModel.
 """
 
+from __future__ import annotations
+
+import numpy as np
 from HARK.ConsumptionSaving.ConsBequestModel import (
     BequestWarmGlowConsumerType,
     BequestWarmGlowPortfolioType,
@@ -16,7 +19,6 @@ from HARK.ConsumptionSaving.ConsIndShockModel import IndShockConsumerType
 from HARK.ConsumptionSaving.ConsPortfolioModel import PortfolioConsumerType
 from HARK.ConsumptionSaving.ConsWealthPortfolioModel import WealthPortfolioConsumerType
 from HARK.core import AgentType
-import numpy as np
 
 # =====================================================
 # Define objects and functions used for the estimation
@@ -50,7 +52,7 @@ class TempConsumerType(AgentType):
         self.t_age[which_agents] = 0
         # Which period of the cycle each agents is currently in
         self.t_cycle[which_agents] = 0
-        
+
     def sim_death(self):
         return np.zeros(self.AgentCount, dtype=bool)
 
