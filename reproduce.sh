@@ -19,4 +19,4 @@ fi
 conda activate estimatingmicrodsops
 
 # Execute script to reproduce figures
-ipython code/run_all.py
+ipython src/run_all.py

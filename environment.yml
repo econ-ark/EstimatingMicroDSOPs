@@ -18,4 +18,4 @@ dependencies:
       - DFO-LS
       - tranquilo
       - black[jupyter]
-      - -e ./code/
+      - -e .
