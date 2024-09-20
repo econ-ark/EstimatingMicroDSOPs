@@ -1,4 +1,5 @@
-a, a > code {
+a,
+a > code {
   color: rgb(249, 38, 114);
   text-decoration: none;
 }
@@ -8,14 +9,18 @@ a, a > code {
   padding-right: 4em;
   font-size: 90%;
 }
-.remark-code-line-highlighted     { background-color: #ffff88; }
+.remark-code-line-highlighted {
+  background-color: #ffff88;
+}
 
 .inverse {
   background-color: #272822;
   color: #d6d6d6;
   text-shadow: 0 0 20px #333;
 }
-.inverse h1, .inverse h2, .inverse h3 {
+.inverse h1,
+.inverse h2,
+.inverse h3 {
   color: #f3f3f3;
 }
 /* Two-column layout */
@@ -25,7 +30,8 @@ a, a > code {
   height: 92%;
   float: left;
 }
-.left-column h2:last-of-type, .left-column h3:last-child {
+.left-column h2:last-of-type,
+.left-column h3:last-child {
   color: #000;
 }
 .right-column {
@@ -44,7 +50,9 @@ a, a > code {
 .pull-right + * {
   clear: both;
 }
-img, video, iframe {
+img,
+video,
+iframe {
   max-width: 100%;
 }
 blockquote {
@@ -56,11 +64,22 @@ blockquote {
   border-top: 1px solid #666;
   border-bottom: 1px solid #666;
 }
-.remark-slide table thead th { border-bottom: 1px solid #ddd; }
-th, td { padding: 5px; }
-.remark-slide thead, .remark-slide tfoot, .remark-slide tr:nth-child(even) { background: #eee }
+.remark-slide table thead th {
+  border-bottom: 1px solid #ddd;
+}
+th,
+td {
+  padding: 5px;
+}
+.remark-slide thead,
+.remark-slide tfoot,
+.remark-slide tr:nth-child(even) {
+  background: #eee;
+}
 
-@page { margin: 0; }
+@page {
+  margin: 0;
+}
 @media print {
   .remark-slide-scaler {
     width: 100% !important;

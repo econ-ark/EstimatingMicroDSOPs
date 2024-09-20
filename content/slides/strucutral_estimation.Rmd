@@ -81,7 +81,7 @@ $$
   - the rich have higher lifetime savings rates
   - models of consumption smoothing and precautionary savings can not explain this
   - propose a model where wealth is in the utility function
-  - households derive utility from wealth itself OR 
+  - households derive utility from wealth itself OR
   - wealth provides a flow of services such as political power or social status
 
 --
@@ -116,8 +116,8 @@ $$\begin{aligned}
 $$\begin{aligned}
     {\vFunc}_{t}({m}_{t}) & = \max_{\cNrm_{t}} ~ \uFunc(\cNrm_{t})+\beth\Alive_{t+1}\hat{\DiscFac}_{t+1}
     \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})]
-    \\ & \text{s.t.} & 
-    \\ \aNrm_{t} & = {m}_{t}-\cNrm_{t} 
+    \\ & \text{s.t.} &
+    \\ \aNrm_{t} & = {m}_{t}-\cNrm_{t}
     \\ {m}_{t+1} & = \aNrm_{t}\underbrace{\left(\frac{\Rfree}{\PermShk_{t+1}\PermGroFac_{t+1}}\right)}_{\equiv \RNrm_{t+1}} + \TranShkEmp_{t+1}
 \end{aligned}$$
 
@@ -144,10 +144,10 @@ $$\begin{aligned}
     \\ \TranShkEmp_{t+1} & :  \text{mean-one transitory shock to permanent income}
 \end{aligned}$$
 
-where 
+where
 
 $$\begin{aligned}
-\TranShkEmp_{s}  = & \begin{cases} 0  & \text{with probability } \pZero>0  \\ 
+\TranShkEmp_{s}  = & \begin{cases} 0  & \text{with probability } \pZero>0  \\
 \xi_{s}/\pZero & \text{with probability } (1-\pZero) \text{, where } \log \xi_{s}\thicksim \mathcal{N}(-\sigma_{[\xi, t]}^{2}/2,\sigma_{[\xi, t]}^{2}) \end{cases} \\
 \phantom{/\pZero} \\ & \text{and }  \log \PermShk_{s}   \thicksim \mathcal{N}(-\sigma_{[\PermShk, t]}^{2}/2,\sigma_{[\PermShk, t]}^{2}).
 \end{aligned}$$
@@ -156,13 +156,13 @@ $$\begin{aligned}
 
 # The WUFIM model
 
-#### Wealth in the Utility Function Incomplete Markets Model 
+#### Wealth in the Utility Function Incomplete Markets Model
 
 $$\begin{aligned}
     {\vFunc}_{t}({m}_{t}) & = \max_{\cNrm_{t}}  \uFunc(\cNrm_{t}, \aNrm_{t})+\beth\Alive_{t+1}\hat{\DiscFac}_{t+1}
     \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})]
-    \\ & \text{s.t.} & 
-    \\ \aNrm_{t} & = {m}_{t}-\cNrm_{t} 
+    \\ & \text{s.t.} &
+    \\ \aNrm_{t} & = {m}_{t}-\cNrm_{t}
     \\ {m}_{t+1} & = \aNrm_{t}\RNrm_{t+1}+ ~\TranShkEmp_{t+1}
 \end{aligned}$$
 
@@ -196,12 +196,12 @@ $$\begin{equation}
 
 # Calibration and Estimation
 
-Calibration 
+Calibration
 
 | Parameter | Description | Values |
 |----------|----------|----------|
 | $\sigma_{[\xi, t]}, \sigma_{[\PermShk, t]}$  | Std. dev. of trans. and perm. shocks |Sabelhaus and Song [2010] |
-| $\pZero = 0.005$ | Probability of zero income | Carroll [1992] | 
+| $\pZero = 0.005$ | Probability of zero income | Carroll [1992] |
 | $\Alive_{t},\hat{\DiscFac}_{t}$ | Survival and discount factors | Caggetti [2003] |
 | $\Rfree = 1.03$ | Risk free interest rate | Caggetti [2003] |
 
@@ -277,7 +277,7 @@ class:center
 
 #### Conclusion
 
-- Need wealth in the utility function to better capture distribution of wealth 
+- Need wealth in the utility function to better capture distribution of wealth
 - Need life cycle structure to understand effect of policies on:
   - young parents with children and low income
   - working middle aged
@@ -286,7 +286,7 @@ class:center
 --
 
 #### Future Work
-  
+
 - Better estimation techniques such as Sequence Space Jacobians (Auclert et al. [2021])
   - Will also help speed up sensitivity analysis
 - Implement policy experiments and derive impulse response functions by life cycle

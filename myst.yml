@@ -11,7 +11,9 @@ site:
       url: https://mystmd.org/guide
   domains: []
 project:
-  title: Structural Estimation of Life Cycle Models with Wealth in the Utility Function
+  title:
+    Structural Estimation of Life Cycle Models with Wealth in the Utility
+    Function
   # description:
   keywords: structural estimation, life cycle, wealth in the utility
   authors:

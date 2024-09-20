@@ -10,7 +10,7 @@ window.QuartoLineHighlight = function () {
   };
 
   const regex = new RegExp(
-    "^[\\d" + Object.values(delimiters).join("") + "]+$"
+    "^[\\d" + Object.values(delimiters).join("") + "]+$",
   );
 
   function handleLinesSelector(deck, attr) {
@@ -56,7 +56,7 @@ window.QuartoLineHighlight = function () {
               // each clone should follow in an incremental sequence
               let fragmentIndex = parseInt(
                 code.getAttribute(kFragmentIndex),
-                10
+                10,
               );
               fragmentIndex =
                 typeof fragmentIndex !== "number" || isNaN(fragmentIndex)
@@ -70,7 +70,7 @@ window.QuartoLineHighlight = function () {
                   var fragmentBlock = code.cloneNode(true);
                   fragmentBlock.setAttribute(
                     "data-code-line-numbers",
-                    joinLineNumbers([step])
+                    joinLineNumbers([step]),
                   );
                   fragmentBlock.classList.add("fragment");
 
@@ -81,7 +81,7 @@ window.QuartoLineHighlight = function () {
                       if (span.hasAttribute("id")) {
                         span.setAttribute(
                           "id",
-                          span.getAttribute("id").concat("-" + stepN)
+                          span.getAttribute("id").concat("-" + stepN),
                         );
                       }
                     });
@@ -106,23 +106,23 @@ window.QuartoLineHighlight = function () {
                     scrollHighlightedLineIntoView.bind(
                       this,
                       fragmentBlock,
-                      scrollState
-                    )
+                      scrollState,
+                    ),
                   );
                   fragmentBlock.addEventListener(
                     "hidden",
                     scrollHighlightedLineIntoView.bind(
                       this,
                       fragmentBlock.previousSibling,
-                      scrollState
-                    )
+                      scrollState,
+                    ),
                   );
-                }
+                },
               );
               code.removeAttribute(kFragmentIndex);
               code.setAttribute(
                 kCodeLineNumbersAttr,
-                joinLineNumbers([highlightSteps[0]])
+                joinLineNumbers([highlightSteps[0]]),
               );
             }
 
@@ -136,7 +136,7 @@ window.QuartoLineHighlight = function () {
                 scrollHighlightedLineIntoView(code, scrollState, true);
                 slide.removeEventListener(
                   "visible",
-                  scrollFirstHighlightIntoView
+                  scrollFirstHighlightIntoView,
                 );
               };
               slide.addEventListener("visible", scrollFirstHighlightIntoView);
@@ -151,7 +151,7 @@ window.QuartoLineHighlight = function () {
 
   function highlightCodeBlock(codeBlock) {
     const highlightSteps = splitLineNumbers(
-      codeBlock.getAttribute(kCodeLineNumbersAttr)
+      codeBlock.getAttribute(kCodeLineNumbersAttr),
     );
 
     if (highlightSteps.length) {
@@ -169,20 +169,20 @@ window.QuartoLineHighlight = function () {
                 highlight.first +
                 "):nth-of-type(-n+" +
                 highlight.last +
-                ")"
-            )
+                ")",
+            ),
           );
         } else if (typeof highlight.first === "number") {
           spanToHighlight = [].slice.call(
             codeBlock.querySelectorAll(
-              ":scope > span:nth-of-type(" + highlight.first + ")"
-            )
+              ":scope > span:nth-of-type(" + highlight.first + ")",
+            ),
           );
         }
         if (spanToHighlight.length) {
           // Add a class on <code> and <span> to select line to highlight
           spanToHighlight.forEach((span) =>
-            span.classList.add("highlight-line")
+            span.classList.add("highlight-line"),
           );
           codeBlock.classList.add("has-line-highlights");
         }
@@ -226,7 +226,7 @@ window.QuartoLineHighlight = function () {
     // Make sure the scroll target is within bounds
     targetTop = Math.max(
       Math.min(targetTop, block.scrollHeight - viewportHeight),
-      0
+      0,
     );
 
     if (skipAnimation === true || startTop === targetTop) {
@@ -339,8 +339,8 @@ window.QuartoLineHighlight = function () {
             deck
               .getRevealElement()
               .querySelectorAll(
-                "pre code[data-code-line-numbers].current-fragment"
-              )
+                "pre code[data-code-line-numbers].current-fragment",
+              ),
           )
           .forEach(function (block) {
             scrollHighlightedLineIntoView(block, {}, true);

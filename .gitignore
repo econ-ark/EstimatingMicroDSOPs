@@ -137,18 +137,25 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-.vscode/*
+# setuptools_scm
+src/*/_version.py
 
-# Local History for Visual Studio Code
-.history/
 
-# Built Visual Studio Code Extensions
-*.vsix
-.idea/*
+# ruff
+.ruff_cache/
 
-.ipynb_checkpoints
+# OS specific stuff
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Common editor files
+*~
+*.swp
+
+# MyST build outputs
 _build
-.Rproj.user
-*.Rproj
-*.Rhistory
-*.dta
