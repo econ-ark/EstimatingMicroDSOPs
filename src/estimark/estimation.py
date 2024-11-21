@@ -180,6 +180,9 @@ def get_empirical_moments(agent_name):
         groups="age_group",
         mapping=age_mapping,
     )
+    emp_moments['(80,85]'] = 10.
+    emp_moments['(85,90]'] = 10.
+    emp_moments['(90,95]'] = 10.
 
     # Add share moments if agent is a portfolio type
 
@@ -304,7 +307,7 @@ def calculate_weights(emp_moments):
         (len(emp_moments) - n_port_stats) / n_port_stats if n_port_stats != 0 else 1.0
     )
 
-    port_fac = 1.0
+    #port_fac = 1.0
 
     # Using dictionary comprehension to create weights
     weights = {
@@ -881,8 +884,8 @@ def estimate(
 if __name__ == "__main__":
     # Set booleans to determine which tasks should be done
     # Which agent type to estimate ("IndShock" or "Portfolio")
-    local_agent_name = "WealthPortfolio"
-    local_params_to_estimate = ["CRRA", "WealthShare", "WealthShift"]
+    local_agent_name = "WealthPortfolioUSE2"
+    local_params_to_estimate = ["CRRA","WealthShare"]
     local_estimate_model = True  # Whether to estimate the model
     # Whether to get standard errors via bootstrap
     local_compute_se_bootstrap = False

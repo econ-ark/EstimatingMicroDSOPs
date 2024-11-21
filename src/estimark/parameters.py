@@ -82,10 +82,10 @@ init_WealthShift = 0.0  # Initial guess of the wealth shift parameter
 bounds_WealthShift = [0.0, 100.0]  # Bounds for the wealth shift parameter
 
 init_BeqFac = 1.0  # Initial guess of the bequest factor
-bounds_BeqFac = [0.0, 100.0]  # Bounds for the bequest factor
+bounds_BeqFac = [0.0, 10000.0]  # Bounds for the bequest factor
 
-init_BeqShift = 0.0  # Initial guess of the bequest shift parameter
-bounds_BeqShift = [0.0, 70.0]  # Bounds for the bequest shift parameter
+init_BeqShift = 1.0  # Initial guess of the bequest shift parameter
+bounds_BeqShift = [0.0, 10.0]  # Bounds for the bequest shift parameter
 
 ######################################################################
 # Constructed parameters
@@ -187,9 +187,9 @@ minimize_options = {
     "error_handling": "continue",
     "algo_options": {
         "convergence.absolute_params_tolerance": 1e-6,
-        "convergence.absolute_criterion_tolerance": 1e-6,
-        "stopping.max_iterations": 100,
-        "stopping.max_criterion_evaluations": 200,
+        "convergence.absolute_criterion_tolerance": 1e-8,
+        "stopping.max_iterations": 1000,
+        "stopping.max_criterion_evaluations": 2000,
         "n_cores": 12,
     },
     "numdiff_options": {"n_cores": 12},
@@ -208,7 +208,7 @@ init_calibration = {
     "PermGroFacAgg": 1.0,
     "BoroCnstArt": BoroCnstArt,
     "PermShkStd": inc_calib["PermShkStd"][: retirement_t + 1]
-    + [inc_calib["PermShkStd"][retirement_t]] * (terminal_t - retirement_t - 1),
+    + [0*inc_calib["PermShkStd"][retirement_t]] * (terminal_t - retirement_t - 1),
     "PermShkCount": PermShkCount,
     "TranShkStd": inc_calib["TranShkStd"][: retirement_t + 1]
     + [inc_calib["TranShkStd"][retirement_t]] * (terminal_t - retirement_t - 1),
@@ -216,7 +216,7 @@ init_calibration = {
     "T_cycle": terminal_t,
     "UnempPrb": UnempPrb,
     "UnempPrbRet": UnempPrbRet,
-    "T_retire": retirement_t,
+    "T_retire": 0,
     "T_age": terminal_t,
     "IncUnemp": IncUnemp,
     "IncUnempRet": IncUnempRet,
@@ -276,3 +276,4 @@ init_subjective_labor = {
     "PermShkStd": [0.03] * (retirement_t + 1)
     + [0.03 * np.sqrt(2)] * (terminal_t - retirement_t - 1),
 }
+#init_calibration.update(init_subjective_labor)
