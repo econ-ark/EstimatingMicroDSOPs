@@ -236,8 +236,6 @@ init_calibration = {
     "WealthShift": init_WealthShift,
     "ChiFromOmega_N": 501,  # Number of gridpoints in chi-from-omega function
     "ChiFromOmega_bound": 15,  # Highest gridpoint to use for it
-    "BeqMPC" : 1.0,
-    "BeqInt" : 1.0,
 }
 
 Eq_prem = 0.03

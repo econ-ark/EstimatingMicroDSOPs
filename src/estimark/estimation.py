@@ -87,6 +87,9 @@ def make_agent(agent_name):
     if "Portfolio" in agent_name:
         track_vars += ["Share"]
     agent.track_vars = track_vars
+    if "WarmGlow" in agent_name:
+        agent.BeqMPC = 1.0 # dummy value
+        agent.BeqInt = 1.0
 
     agent.name = agent_name
 
@@ -251,7 +254,7 @@ def simulate_moments(params, agent=None, emp_moments=None):
     
     # Update parameters on the agent / construct them
     agent.update()
-    if hasattr(agent, 'BeqMPC'):
+    if "WarmGlow" in agent.name:
         agent.BeqFac = agent.BeqMPC**(-agent.CRRA)
         agent.BeqShift = agent.BeqInt / agent.BeqMPC
     
