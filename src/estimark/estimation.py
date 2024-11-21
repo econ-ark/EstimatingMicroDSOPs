@@ -248,9 +248,13 @@ def simulate_moments(params, agent=None, emp_moments=None):
         agent.TranShkStd = init_subjective_labor["TranShkStd"]
         agent.PermShkStd = init_subjective_labor["PermShkStd"]
         agent.update_income_process()
-
+    
+    # Update parameters on the agent / construct them
     agent.update()
-
+    if hasattr(agent, 'BeqMPC'):
+        agent.BeqFac = agent.BeqMPC**(-agent.CRRA)
+        agent.BeqShift = agent.BeqInt / agent.BeqMPC
+    
     # Solve the model for these parameters, then simulate wealth data
     agent.solve()  # Solve the microeconomic model
 
@@ -881,8 +885,8 @@ def estimate(
 if __name__ == "__main__":
     # Set booleans to determine which tasks should be done
     # Which agent type to estimate ("IndShock" or "Portfolio")
-    local_agent_name = "WealthPortfolio"
-    local_params_to_estimate = ["CRRA", "WealthShare", "WealthShift"]
+    local_agent_name = "WarmGlowPortfolio"
+    local_params_to_estimate = ["CRRA", "BeqMPC", "BeqInt"]
     local_estimate_model = True  # Whether to estimate the model
     # Whether to get standard errors via bootstrap
     local_compute_se_bootstrap = False
