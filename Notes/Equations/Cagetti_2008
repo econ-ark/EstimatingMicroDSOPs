@@ -1,0 +1,9 @@
+\begin{equation}
+\begin{aligned}
+U = \quad & \mathbb{E} \bigg\{ \sum_{t=1}^{N} \beta^t \bigg( \Pi_{j=1}^{t}s_t \bigg) u(c_t) \bigg \} \\
+V(x,t) = \max_{c,a'} \quad & \{ u(c) + \beta s_{t+1} \mathbb{E}[v(x', t+1) |x ] \} \\
+\text{s.t.} \quad & W = B + Y - T - c_1 \\
+\end{aligned}
+\end{equation}
+
+where $x=(a,z)$ and $T$ are accidental bequests left by all deceased in a period, which are \textit{assumed to be redistributed by the government to all people alive}.

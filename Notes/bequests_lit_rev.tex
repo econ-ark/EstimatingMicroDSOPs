@@ -1,0 +1,110 @@
+\documentclass{article}
+
+\usepackage{color,hyperref}
+% Uses hyperref to link DOI
+\newcommand\doilink[1]{\href{http://dx.doi.org/#1}{#1}}
+\newcommand\doi[1]{doi:\doilink{#1}}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+
+\usepackage{dirtytalk}
+
+% Packages for citations
+\usepackage[utf8]{inputenc}
+\usepackage[backend=bibtex, style=authoryear]{biblatex} % You can change the style if you prefer a different citation style
+\addbibresource{BeqRefs.bib}
+
+% Preamble
+\title{Notes on Modeling Bequests}
+\author{Decory Edwards}
+\date{\today}
+
+
+\begin{document}
+
+\maketitle
+
+Many consumption-saving models incorporate a probability of death in the given period as a way to ensure a stationary distribution of wealth. A common accompanying assumption of these models is that, upon death, assets are divided equally amongst all remaining survivors. This receipt of assets is a \say{surprise}, since these assets were accumulated by a previous consumer due to their desire to finance future consumption via saving.
+
+This rationale can be applied to incorporate bequests into the consumption-saving framework. Traditionally, this is done by extending the model to include (i) some overlapping generation component and/or (ii) some component to link current and future households (i.e. parent and descendants). \footnote{However, the most general specification dealing with bequests only requires this \say{surprise} event of death in a given period.}
+
+With this in mind, there are three broadly defined classes of bequest models:
+
+\begin{enumerate}
+\item Accidental bequests - Households have some number of descendants who, upon death, receive their assets as bequests.
+\item Dynastic (or altruistic) models - Households have some number of descendants \textit{whose consumption they care about}. Upon death, those descendants receive assets of their predecessor as bequests.
+\item Wealth in utility models - Households have some desire to hold assets \textit{beyond} potentially fianancing their future consumption via saving. 
+\end{enumerate}
+
+Two surveys which provide a useful way of understanding the different types of bequests models are \cite{Laitner2002-hu} and \cite{Cagetti2008-cc}. A further discussion on the implications of these different model assumptions is detailed in \cite{Carroll1998-tz}.
+
+\section{Accidental Bequests}
+
+Not only are these models are natural extension of the consumption-saving framework after incorporating a probablility of death, they are also more consistent with the empirical literature on the nature of bequests. Indeed, there is little support for the idea that households accumulate resources for altrusitic considerations regarding their descendants. \cite{Gokhale2001-dj} provides a thorough discussion of this counter-evidence and states that, in general, the empirical evidence suggests that bequests are \say{unintended or motivated by non-altruistic considerations}.
+
+\subsection{Model from \cite{Abel1985-ef}}
+
+\input{./Equations/Abel_1985}
+
+\subsection{Model from \cite{Cagetti2008-cc}}
+
+\input{./Equations/Cagetti_2008}
+
+\section{Dynasitc or altruistic models}
+
+Models where current households care about the utility of their future descendants have the distinct implication that the entire dynasty's wealth should matter to the current household making the consumption-saving decision. Thus, there should be evidence of consumption smoothing across the dynasties. When compared to empirical evidence, this prediction does not hold up for most households (though it may be plausible for the extremely wealthy).
+
+\subsection{Model from \cite{Barro1974-mp}}
+
+\input{./Equations/Barro_1974}
+
+\subsection{Model from \cite{Cagetti2006-pu}}
+
+\input{./Equations/Cagetti_2006}
+
+\section{Bequests and wealth in utility function}
+
+The most general class of models accomodating bequests are those that assume households receive direct utility from holding assets (i.e. other than the utility earned from being able to finance future consumption with saving today). This includes \say{warm glow} bequest models as a special case.
+
+\subsection{Model from \cite{Carroll1998-tz}}
+
+\input{./Equations/Carroll_1998}
+
+\subsection{Model from \cite{Cagetti2003-yp}}
+
+\input{./Equations/Cagetti_2003}
+
+\subsection{Model from \cite{Gourinchas2002-lq}}
+
+\input{./Equations/Gourinchas_2002}
+
+Now that we see how the wealth in the utility function enters the recursive formulation of the household's problem, form this point we include only the component of the utility function which captures the preference for wealth holdings beyond financing future consumption. 
+
+\subsection{Model from \cite{De_Nardi2004-xs}}
+
+\input{./Equations/DeNardi_2004}
+
+\subsection{Model from \cite{Dynan2004-bu}}
+
+\input{./Equations/Dynan_2004}
+
+\subsection{Model from \cite{De_Nardi2016-yi}}
+
+\input{./Equations/DeNardi_2016}
+
+\subsection{Model from \cite{Saez2018-we}}
+
+\input{./Equations/Saez_2017}
+
+\subsection{Model from \cite{Straub_undated-gy}}
+
+\input{./Equations/Straub_2019}
+
+%\subsection{Stone-geary and related extensions}
+
+%\subsection{Non-separable wealth in utility}
+
+\printbibliography
+
+\end{document}

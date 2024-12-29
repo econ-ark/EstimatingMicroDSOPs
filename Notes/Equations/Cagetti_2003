@@ -1,0 +1,8 @@
+\begin{equation}
+\begin{aligned}
+\max_{W_{t+1}, C_t} \quad & \mathbb{E} \bigg( \sum_{t=0}^{\tilde{T}} \beta^t e^{Z_t \theta} \frac{C_{t}^{1-\gamma}}{1-\gamma} + \beta^{\tilde{T}+1} e^{Z_{\tilde{T}} \theta} S(W_{\tilde{T} +1}) \bigg) \\
+\text{s.t.} \quad & W_{t+1} = R W_t + Y_t - C_t + B_t\\
+\end{aligned}
+\end{equation}
+
+where the utility from bequests is specified as $$ S(W) = \alpha \frac{W^{1-\gamma}}{1-\gamma}.$$ 

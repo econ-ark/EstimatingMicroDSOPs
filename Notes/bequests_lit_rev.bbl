@@ -1,0 +1,798 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\datalist[entry]{nyt/global//global/global}
+  \entry{Abel1985-ef}{article}{}
+    \name{author}{1}{}{%
+      {{hash=AAB}{%
+         family={Abel},
+         familyi={A\bibinitperiod},
+         given={Andrew\bibnamedelima B},
+         giveni={A\bibinitperiod\bibinitdelim B\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {American Economic Association}%
+    }
+    \strng{namehash}{AAB1}
+    \strng{fullhash}{AAB1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{1985}
+    \field{labeldatesource}{}
+    \field{sortinit}{A}
+    \field{sortinithash}{A}
+    \field{issn}{0002-8282}
+    \field{number}{4}
+    \field{pages}{777\bibrangedash 791}
+    \field{title}{{Precautionary Saving and Accidental Bequests}}
+    \verb{url}
+    \verb http://www.jstor.org/stable/1821355
+    \endverb
+    \field{volume}{75}
+    \verb{file}
+    \verb All-Papers/A/Abel-1985-Precautionary-Saving-and-Accidental-Bequests.p
+    \verb df
+    \endverb
+    \field{journaltitle}{Am. Econ. Rev.}
+    \field{year}{1985}
+  \endentry
+
+  \entry{Barro1974-mp}{article}{}
+    \name{author}{1}{}{%
+      {{hash=BRJ}{%
+         family={Barro},
+         familyi={B\bibinitperiod},
+         given={Robert\bibnamedelima J},
+         giveni={R\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {University of Chicago Press}%
+    }
+    \strng{namehash}{BRJ1}
+    \strng{fullhash}{BRJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{1974}
+    \field{labeldatesource}{}
+    \field{sortinit}{B}
+    \field{sortinithash}{B}
+    \field{issn}{0022-3808, 1537-534X}
+    \field{number}{6}
+    \field{pages}{1095\bibrangedash 1117}
+    \field{title}{{Are Government Bonds Net Wealth?}}
+    \verb{url}
+    \verb http://www.jstor.org/stable/1830663
+    \endverb
+    \field{volume}{82}
+    \verb{file}
+    \verb All-Papers/B/Barro-1974-Are-Government-Bonds-Net-Wealth.pdf
+    \endverb
+    \field{journaltitle}{J. Polit. Econ.}
+    \field{year}{1974}
+  \endentry
+
+  \entry{Cagetti2003-yp}{article}{}
+    \name{author}{1}{}{%
+      {{hash=CM}{%
+         family={Cagetti},
+         familyi={C\bibinitperiod},
+         given={Marco},
+         giveni={M\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {[American Statistical Association, Taylor \& Francis, Ltd.]}%
+    }
+    \strng{namehash}{CM1}
+    \strng{fullhash}{CM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2003}
+    \field{labeldatesource}{}
+    \field{sortinit}{C}
+    \field{sortinithash}{C}
+    \field{abstract}{%
+    [This article constructs and simulates a life cycle model of wealth
+  accumulation and estimates the parameters of the utility function (the rate
+  of time preference and the coefficient of risk aversion) by matching the
+  simulated median wealth profiles with those observed in the Panel Study of
+  Income Dynamics and in the Survey of Consumer Finances. The estimates imply a
+  low degree of patience and a high degree of risk aversion. The results are
+  used to study the importance of precautionary savings in explaining wealth
+  accumulation. They imply that wealth accumulation is driven mostly by
+  precautionary motives at the beginning of the life cycle, whereas savings for
+  retirement purposes become significant only closer to retirement.]%
+    }
+    \field{issn}{0735-0015}
+    \field{number}{3}
+    \field{pages}{339\bibrangedash 353}
+    \field{title}{{Wealth Accumulation over the Life Cycle and Precautionary
+  Savings}}
+    \verb{url}
+    \verb http://www.jstor.org/stable/1392584
+    \endverb
+    \field{volume}{21}
+    \verb{file}
+    \verb All-Papers/C/Cagetti-2003-Wealth-Accumulation-over-the-Life-Cycle-and
+    \verb -Precautionary-Savings.pdf
+    \endverb
+    \field{journaltitle}{J. Bus. Econ. Stat.}
+    \field{year}{2003}
+  \endentry
+
+  \entry{Cagetti2006-pu}{article}{}
+    \name{author}{2}{}{%
+      {{hash=CM}{%
+         family={Cagetti},
+         familyi={C\bibinitperiod},
+         given={Marco},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=DNM}{%
+         family={De\bibnamedelima Nardi},
+         familyi={D\bibinitperiod\bibinitdelim N\bibinitperiod},
+         given={Mariacristina},
+         giveni={M\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {The University of Chicago Press}%
+    }
+    \strng{namehash}{CMDNM1}
+    \strng{fullhash}{CMDNM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2006}
+    \field{labeldatesource}{}
+    \field{sortinit}{C}
+    \field{sortinithash}{C}
+    \field{abstract}{%
+    This paper constructs and calibrates a parsimonious model of occupational
+  choice that allows for entrepreneurial entry, exit, and investment decisions
+  in the presence of borrowing constraints. The model fits very well a number
+  of empirical observations, including the observed wealth distribution for
+  entrepreneurs and workers. At the aggregate level, more restrictive borrowing
+  constraints generate less wealth concentration and reduce average firm size,
+  aggregate capital, and the fraction of entrepreneurs. Voluntary bequests
+  allow some high?ability workers to establish or enlarge an entrepreneurial
+  activity. With accidental bequests only, there would be fewer very large
+  firms and less aggregate capital and wealth concentration.%
+    }
+    \verb{doi}
+    \verb 10.1086/508032
+    \endverb
+    \field{issn}{0022-3808}
+    \field{number}{5}
+    \field{pages}{835\bibrangedash 870}
+    \field{title}{{Entrepreneurship, Frictions, and Wealth}}
+    \verb{url}
+    \verb https://doi.org/10.1086/508032
+    \endverb
+    \field{volume}{114}
+    \verb{file}
+    \verb All-Papers/C/Cagetti-and-De-Nardi-2006-Entrepreneurship,-Frictions,-a
+    \verb nd-Wealth.pdf
+    \endverb
+    \field{journaltitle}{J. Polit. Econ.}
+    \field{month}{10}
+    \field{year}{2006}
+  \endentry
+
+  \entry{Cagetti2008-cc}{article}{}
+    \name{author}{2}{}{%
+      {{hash=CM}{%
+         family={Cagetti},
+         familyi={C\bibinitperiod},
+         given={Marco},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=DNM}{%
+         family={De\bibnamedelima Nardi},
+         familyi={D\bibinitperiod\bibinitdelim N\bibinitperiod},
+         given={Mariacristina},
+         giveni={M\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Cambridge University Press}%
+    }
+    \keyw{Inequality; Savings; Life-Cycle Models}
+    \strng{namehash}{CMDNM1}
+    \strng{fullhash}{CMDNM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2008}
+    \field{labeldatesource}{}
+    \field{sortinit}{C}
+    \field{sortinithash}{C}
+    \field{abstract}{%
+    In the United States wealth is highly concentrated and very unequally
+  distributed: the richest 1\% hold one third of the total wealth in the
+  economy. Understanding the determinants of wealth inequality is a challenge
+  for many economic models. We summarize some key facts about the wealth
+  distribution and what economic models have been able to explain so far.%
+    }
+    \verb{doi}
+    \verb 10.1017/S1365100507070150
+    \endverb
+    \field{issn}{1365-1005, 1469-8056}
+    \field{number}{S2}
+    \field{pages}{285\bibrangedash 313}
+    \field{title}{{Wealth Inequality: Data and Models}}
+    \verb{url}
+    \verb https://www.cambridge.org/core/journals/macroeconomic-dynamics/articl
+    \verb e/wealth-inequality-data-and-models/4C12213FDED94391870AD3D7BCCB7FC2
+    \endverb
+    \field{volume}{12}
+    \verb{file}
+    \verb All-Papers/C/Cagetti-and-De-Nardi-2008-WEALTH-INEQUALITY-DATA-AND-MOD
+    \verb ELS.pdf
+    \endverb
+    \field{journaltitle}{Macroecon. Dyn.}
+    \field{month}{09}
+    \field{year}{2008}
+  \endentry
+
+  \entry{Carroll1998-tz}{unpublished}{}
+    \name{author}{1}{}{%
+      {{hash=CCD}{%
+         family={Carroll},
+         familyi={C\bibinitperiod},
+         given={Christopher\bibnamedelima D},
+         giveni={C\bibinitperiod\bibinitdelim D\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{CCD1}
+    \strng{fullhash}{CCD1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{1998}
+    \field{labeldatesource}{}
+    \field{sortinit}{C}
+    \field{sortinithash}{C}
+    \field{abstract}{%
+    This paper considers several alternative explanations for the fact that
+  households with higher levels of lifetime income ( the rich') have higher
+  lifetime saving rates (Dynan, Skinner, and Zeldes (1996); Lillard and Karoly
+  (1997)). The paper argues that the saving behavior of the richest households
+  cannot be explained by models in which the only purpose of wealth
+  accumulation is to finance future consumption, either their own or that of
+  heirs. The paper concludes that the simplest model that explains the relevant
+  facts is one in which either consumers regard the accumulation of wealth as
+  an end in itself, or unspent wealth yields a flow of services (such as power
+  or social status) which have the same practical effect on behavior as if
+  wealth were intrinsically desirable.%
+    }
+    \verb{doi}
+    \verb 10.3386/w6549
+    \endverb
+    \field{number}{6549}
+    \field{series}{Working Paper Series}
+    \field{title}{{Why Do the Rich Save So Much?}}
+    \verb{url}
+    \verb http://www.nber.org/papers/w6549
+    \endverb
+    \list{institution}{1}{%
+      {National Bureau of Economic Research}%
+    }
+    \verb{file}
+    \verb All-Papers/C/Carroll-1998-Why-Do-the-Rich-Save-So-Much.pdf
+    \endverb
+    \field{month}{05}
+    \field{year}{1998}
+  \endentry
+
+  \entry{De_Nardi2004-xs}{article}{}
+    \name{author}{1}{}{%
+      {{hash=DNM}{%
+         family={De\bibnamedelima Nardi},
+         familyi={D\bibinitperiod\bibinitdelim N\bibinitperiod},
+         given={Mariacristina},
+         giveni={M\bibinitperiod},
+      }}%
+    }
+    \list{language}{1}{%
+      {en}%
+    }
+    \list{publisher}{1}{%
+      {Oxford University Press (OUP)}%
+    }
+    \strng{namehash}{DNM1}
+    \strng{fullhash}{DNM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2004}
+    \field{labeldatesource}{}
+    \field{sortinit}{D}
+    \field{sortinithash}{D}
+    \verb{doi}
+    \verb 10.1111/j.1467-937x.2004.00302.x
+    \endverb
+    \field{issn}{0034-6527, 1467-937X}
+    \field{number}{3}
+    \field{pages}{743\bibrangedash 768}
+    \field{title}{{Wealth inequality and intergenerational links}}
+    \verb{url}
+    \verb https://users.nber.org/~denardim/research/denardi.pdf
+    \endverb
+    \field{volume}{71}
+    \verb{file}
+    \verb All-Papers/D/De-Nardi-2004-Wealth-inequality-and-intergenerational-li
+    \verb nks.pdf
+    \endverb
+    \field{journaltitle}{Rev. Econ. Stud.}
+    \field{month}{07}
+    \field{year}{2004}
+  \endentry
+
+  \entry{De_Nardi2016-yi}{article}{}
+    \name{author}{2}{}{%
+      {{hash=DNM}{%
+         family={De\bibnamedelima Nardi},
+         familyi={D\bibinitperiod\bibinitdelim N\bibinitperiod},
+         given={Mariacristina},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=YF}{%
+         family={Yang},
+         familyi={Y\bibinitperiod},
+         given={Fang},
+         giveni={F\bibinitperiod},
+      }}%
+    }
+    \keyw{Wealth inequality; Parental background; Estate taxation; Bequests;
+  Earnings shocks}
+    \strng{namehash}{DNMYF1}
+    \strng{fullhash}{DNMYF1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2016}
+    \field{labeldatesource}{}
+    \field{sortinit}{D}
+    \field{sortinithash}{D}
+    \field{abstract}{%
+    This paper generates two main contributions. First, it provides a new
+  theory of wealth inequality that merges two empirically relevant forces
+  generating inequality: bequest motives and inheritance of ability across
+  generations; and an earnings process that allows for more earnings risk for
+  the richest. Second, it uses the resulting calibrated framework to study the
+  effects of changing estate taxation. Increasing the estate tax reduces the
+  wealth concentration in the hands of the richest few and the economic
+  advantage of being born to a rich and super-rich family at the cost of
+  reduced aggregate capital and output. However, all of these effects are quite
+  small. In contrast, increasing estate taxation can generate a significant
+  welfare gain to a newborn under the veil of ignorance, but this comes at a
+  large welfare cost for the super-rich.%
+    }
+    \verb{doi}
+    \verb 10.1016/j.jmoneco.2015.10.005
+    \endverb
+    \field{issn}{0304-3932}
+    \field{pages}{130\bibrangedash 145}
+    \field{title}{{Wealth inequality, family background, and estate taxation}}
+    \verb{url}
+    \verb https://www.sciencedirect.com/science/article/pii/S0304393215001245
+    \endverb
+    \field{volume}{77}
+    \verb{file}
+    \verb All-Papers/D/De-Nardi-and-Yang-2016-Wealth-inequality,-family-backgro
+    \verb und,-and-estate-taxation.pdf
+    \endverb
+    \field{journaltitle}{J. Monet. Econ.}
+    \field{month}{02}
+    \field{year}{2016}
+  \endentry
+
+  \entry{Dynan2004-bu}{article}{}
+    \name{author}{3}{}{%
+      {{hash=DKe}{%
+         family={Dynan},
+         familyi={D\bibinitperiod},
+         given={Karen\bibnamedelima e},
+         giveni={K\bibinitperiod\bibinitdelim e\bibinitperiod},
+      }}%
+      {{hash=SJ}{%
+         family={Skinner},
+         familyi={S\bibinitperiod},
+         given={Jonathan},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=ZSp}{%
+         family={Zeldes},
+         familyi={Z\bibinitperiod},
+         given={Stephen\bibnamedelima p},
+         giveni={S\bibinitperiod\bibinitdelim p\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {The University of Chicago Press}%
+    }
+    \strng{namehash}{DKeSJZSp1}
+    \strng{fullhash}{DKeSJZSp1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2004}
+    \field{labeldatesource}{}
+    \field{sortinit}{D}
+    \field{sortinithash}{D}
+    \field{abstract}{%
+    The question of whether higher--lifetime income households save a larger
+  fraction of their income was the subject of much debate in the 1950s and
+  1960s, and while not resolved, it remains central to the evaluation of tax
+  and macroeconomic policies. We resolve this long‐standing question using
+  new empirical methods applied to the Panel Study of Income Dynamics, the
+  Survey of Consumer Finances, and the Consumer Expenditure Survey. We find a
+  strong positive relationship between saving rates and lifetime income and a
+  weaker but still positive relationship between the marginal propensity to
+  save and lifetime income. There is little support for theories that seek to
+  explain these positive correlations by relying solely on time preference
+  rates, nonhomothetic preferences, or variations in Social Security benefits.
+  There is more support for models emphasizing uncertainty with respect to
+  income and health expenses, bequest motives, and asset‐based means testing
+  or behavioral factors causing minimal saving rates among low‐income
+  households.%
+    }
+    \verb{doi}
+    \verb 10.1086/381475
+    \endverb
+    \field{issn}{0022-3808, 1537-534X}
+    \field{number}{2}
+    \field{pages}{397\bibrangedash 444}
+    \field{title}{{Do the Rich Save More?}}
+    \verb{url}
+    \verb http://www.jstor.org/stable/10.1086/381475
+    \endverb
+    \field{volume}{112}
+    \verb{file}
+    \verb All-Papers/D/Dynan-et-al.-2004-Do-the-Rich-Save-More.pdf
+    \endverb
+    \field{journaltitle}{J. Polit. Econ.}
+    \field{year}{2004}
+  \endentry
+
+  \entry{Gokhale2001-dj}{article}{}
+    \name{author}{4}{}{%
+      {{hash=GJ}{%
+         family={Gokhale},
+         familyi={G\bibinitperiod},
+         given={Jagadeesh},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=KLJ}{%
+         family={Kotlikoff},
+         familyi={K\bibinitperiod},
+         given={Laurence\bibnamedelima J},
+         giveni={L\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+      {{hash=SJ}{%
+         family={Sefton},
+         familyi={S\bibinitperiod},
+         given={James},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=WM}{%
+         family={Weale},
+         familyi={W\bibinitperiod},
+         given={Martin},
+         giveni={M\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Elsevier}%
+    }
+    \strng{namehash}{GJ+1}
+    \strng{fullhash}{GJKLJSJWM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2001}
+    \field{labeldatesource}{}
+    \field{sortinit}{G}
+    \field{sortinithash}{G}
+    \field{abstract}{%
+    This paper develops, calibrates, and simulates a dynamic 88-period OLG
+  model to study the intergenerational transmission of U.S. wealth inequality
+  via bequests. The model features marriage, realistic fertility patterns,
+  random death, assortative mating based on skills, heterogeneous skill
+  endowments, heterogeneous rates of return, skill inheritability, progressive
+  income taxation, and resource annuitization via social security. All bequests
+  arise from imperfect annuitization. Nonetheless, the model generates a
+  realistic ratio of aggregate wealth to aggregate labor income, a realistic
+  bequest flow relative to the stock of wealth, and a realistic wealth
+  distribution at retirement. Skill differences, assortative mating, social
+  security, and the time preference are the primary determinants of wealth
+  inequality. Bequests do propagate wealth inequality, but only in the presence
+  of social security, which disproportionately disinherits the lifetime poor.
+  Intergenerational wealth immobility, also considered here, is primarily
+  determined by the inheritance of skills from one's parents and the
+  magnification of the impact of this inheritance by marital sorting.%
+    }
+    \verb{doi}
+    \verb 10.1016/S0047-2727(00)00097-9
+    \endverb
+    \field{issn}{0047-2727}
+    \field{number}{1}
+    \field{pages}{93\bibrangedash 128}
+    \field{title}{{Simulating the transmission of wealth inequality via
+  bequests}}
+    \verb{url}
+    \verb https://www.sciencedirect.com/science/article/pii/S0047272700000979
+    \endverb
+    \field{volume}{79}
+    \verb{file}
+    \verb All-Papers/G/Gokhale-et-al.-2001-Simulating-the-transmission-of-wealt
+    \verb h-inequality-via-bequests.pdf
+    \endverb
+    \field{journaltitle}{J. Public Econ.}
+    \field{month}{01}
+    \field{year}{2001}
+  \endentry
+
+  \entry{Gourinchas2002-lq}{article}{}
+    \name{author}{2}{}{%
+      {{hash=GPO}{%
+         family={Gourinchas},
+         familyi={G\bibinitperiod},
+         given={Pierre-Olivier},
+         giveni={P\bibinithyphendelim O\bibinitperiod},
+      }}%
+      {{hash=PJ}{%
+         family={Parker},
+         familyi={P\bibinitperiod},
+         given={Jonathan},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{GPOPJ1}
+    \strng{fullhash}{GPOPJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2002}
+    \field{labeldatesource}{}
+    \field{sortinit}{G}
+    \field{sortinithash}{G}
+    \field{issn}{0012-9682}
+    \field{number}{1}
+    \field{pages}{47\bibrangedash 89}
+    \field{title}{{Consumption Over the Life Cycle}}
+    \field{volume}{70}
+    \verb{file}
+    \verb All-Papers/G/Gourinchas-and-Parker-2002-Consumption-Over-the-Life-Cyc
+    \verb le.pdf
+    \endverb
+    \field{journaltitle}{Econometrica}
+    \field{year}{2002}
+  \endentry
+
+  \entry{Laitner2002-hu}{article}{}
+    \name{author}{1}{}{%
+      {{hash=LJ}{%
+         family={Laitner},
+         familyi={L\bibinitperiod},
+         given={John},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {American Economic Association}%
+    }
+    \strng{namehash}{LJ1}
+    \strng{fullhash}{LJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2002}
+    \field{labeldatesource}{}
+    \field{sortinit}{L}
+    \field{sortinithash}{L}
+    \field{issn}{0002-8282}
+    \field{number}{2}
+    \field{pages}{270\bibrangedash 273}
+    \field{title}{{Wealth Inequality and Altruistic Bequests}}
+    \verb{url}
+    \verb http://www.jstor.org/stable/3083415
+    \endverb
+    \field{volume}{92}
+    \verb{file}
+    \verb All-Papers/L/Laitner-2002-Wealth-Inequality-and-Altruistic-Bequests.p
+    \verb df
+    \endverb
+    \field{journaltitle}{Am. Econ. Rev.}
+    \field{year}{2002}
+  \endentry
+
+  \entry{Saez2018-we}{article}{}
+    \name{author}{2}{}{%
+      {{hash=SE}{%
+         family={Saez},
+         familyi={S\bibinitperiod},
+         given={Emmanuel},
+         giveni={E\bibinitperiod},
+      }}%
+      {{hash=SS}{%
+         family={Stantcheva},
+         familyi={S\bibinitperiod},
+         given={Stefanie},
+         giveni={S\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Elsevier}%
+    }
+    \keyw{Optimal taxation; Capital; Wealth}
+    \strng{namehash}{SESS1}
+    \strng{fullhash}{SESS1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2018}
+    \field{labeldatesource}{}
+    \field{sortinit}{S}
+    \field{sortinithash}{S}
+    \field{abstract}{%
+    This paper develops a theory of optimal capital taxation that expresses
+  optimal tax formulas in sufficient statistics. We first consider a simple
+  model with utility functions linear in consumption and featuring
+  heterogeneous utility for wealth. In this case, there are no transitional
+  dynamics, the steady-state is reached immediately and has finite elasticities
+  of capital with respect to the net-of-tax rate. This allows for a tractable
+  optimal tax analysis with formulas expressed in terms of empirical
+  elasticities and social preferences that can address many important policy
+  questions. These formulas can easily be taken to the data to simulate optimal
+  taxes, which we do using U.S. tax return data on labor and capital incomes.
+  Second, we show how these results can be extended to the case with concave
+  utility for consumption. The same types of formulas carry over by
+  appropriately defining elasticities. We show that one can recover all the
+  results from the simpler model using a new and non standard steady state
+  approach that respects individual preferences even with a fully general
+  utility function.%
+    }
+    \verb{doi}
+    \verb 10.1016/j.jpubeco.2017.10.004
+    \endverb
+    \field{issn}{0047-2727}
+    \field{pages}{120\bibrangedash 142}
+    \field{title}{{A simpler theory of optimal capital taxation}}
+    \verb{url}
+    \verb https://www.sciencedirect.com/science/article/pii/S0047272717301688
+    \endverb
+    \field{volume}{162}
+    \verb{file}
+    \verb All-Papers/S/Saez-and-Stantcheva-2018-A-simpler-theory-of-optimal-cap
+    \verb ital-taxation.pdf
+    \endverb
+    \field{journaltitle}{J. Public Econ.}
+    \field{month}{06}
+    \field{year}{2018}
+  \endentry
+
+  \entry{Straub_undated-gy}{article}{}
+    \name{author}{15}{}{%
+      {{hash=SL}{%
+         family={Straub},
+         familyi={S\bibinitperiod},
+         given={Ludwig},
+         giveni={L\bibinitperiod},
+      }}%
+      {{hash=AD}{%
+         family={Acemoglu},
+         familyi={A\bibinitperiod},
+         given={Daron},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=AM}{%
+         family={Aguiar},
+         familyi={A\bibinitperiod},
+         given={Mark},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=AM}{%
+         family={Angeletos},
+         familyi={A\bibinitperiod},
+         given={Marios},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=AA}{%
+         family={Auclert},
+         familyi={A\bibinitperiod},
+         given={Adrien},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=BM}{%
+         family={Bils},
+         familyi={B\bibinitperiod},
+         given={Mark},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=DNM}{%
+         family={De\bibnamedelima Nardi},
+         familyi={D\bibinitperiod\bibinitdelim N\bibinitperiod},
+         given={Mariacristina},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=FS}{%
+         family={Fanelli},
+         familyi={F\bibinitperiod},
+         given={Sebasti{\'a}n},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=HM}{%
+         family={Holm},
+         familyi={H\bibinitperiod},
+         given={Martin},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=HG}{%
+         family={Howard},
+         familyi={H\bibinitperiod},
+         given={Greg},
+         giveni={G\bibinitperiod},
+      }}%
+      {{hash=HE}{%
+         family={Hurst},
+         familyi={H\bibinitperiod},
+         given={Erik},
+         giveni={E\bibinitperiod},
+      }}%
+      {{hash=LE}{%
+         family={Liu},
+         familyi={L\bibinitperiod},
+         given={Ernest},
+         giveni={E\bibinitperiod},
+      }}%
+      {{hash=MB}{%
+         family={Moll},
+         familyi={M\bibinitperiod},
+         given={Ben},
+         giveni={B\bibinitperiod},
+      }}%
+      {{hash=RM}{%
+         family={Rognlie},
+         familyi={R\bibinitperiod},
+         given={Matthew},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=ZN}{%
+         family={Zorzi},
+         familyi={Z\bibinitperiod},
+         given={Nathan},
+         giveni={N\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{SL+1}
+    \strng{fullhash}{SLADAMAMAABMDNMFSHMHGHELEMBRMZN1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2019}
+    \field{labeldatesource}{}
+    \field{sortinit}{S}
+    \field{sortinithash}{S}
+  \field{howpublished}{\url{https://scholar.harvard.edu/files/straub/files/cons_ineq_rates.pdf}}
+    \field{note}{Accessed: 2023-10-25}
+    \field{title}{{Consumption, savings, and the distribution of permanent
+  income}}
+    \verb{url}
+    \verb https://scholar.harvard.edu/files/straub/files/cons_ineq_rates.pdf
+    \endverb
+    \verb{file}
+    \verb All-Papers/S/Straub-et-al.-Consumption,-savings,-and-the-distribution
+    \verb -of-permanent-income.pdf
+    \endverb
+    \field{year}{2019}
+  \endentry
+\enddatalist
+\endinput
