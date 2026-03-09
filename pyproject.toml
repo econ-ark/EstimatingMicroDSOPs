@@ -174,4 +174,6 @@ messages_control.disable = [
   "missing-module-docstring",
   "missing-function-docstring",
   "wrong-import-position",
+  # CI nox pylint env has no HARK/numpy/pandas; avoid E0401 import-error
+  "import-error",
 ]
