@@ -47,13 +47,15 @@ repos:
     hooks:
       - id: ruff
         args: ["--fix", "--show-fixes"]
+        files: ^(src/estimark/|tests/|noxfile\.py)
       - id: ruff-format
+        files: ^(src/estimark/|tests/|noxfile\.py)
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: "v1.11.1"
     hooks:
       - id: mypy
-        files: src|tests
+        files: src/estimark|tests
         args: []
         additional_dependencies:
           - pytest
@@ -62,6 +64,8 @@ repos:
     rev: "v2.3.0"
     hooks:
       - id: codespell
+        exclude: ^(content/slides/|.*\.ipynb$)
+        args: ["--skip", "*.do,*.bib"]
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: "v0.10.0.1"
@@ -76,11 +80,11 @@ repos:
         entry: PyBind|Numpy|Cmake|CCache|Github|PyTest
         exclude: .pre-commit-config.yaml
 
-  - repo: https://github.com/abravalheri/validate-pyproject
-    rev: "v0.19"
+  # Use schema-store repo directly to avoid KeyError for removed schemas (e.g. tox.json)
+  - repo: https://github.com/henryiii/validate-pyproject-schema-store
+    rev: "2026.03.06"
     hooks:
       - id: validate-pyproject
-        additional_dependencies: ["validate-pyproject-schema-store[all]"]
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: "0.29.1"
