@@ -31,6 +31,10 @@ jobs:
         with:
           extra_args: --hook-stage manual --all-files
       - name: Run PyLint
+        env:
+          # Avoid nox error: "Can not specify both --no-color and --force-color".
+          # GHA is non-TTY (nox uses --no-color); workflow sets FORCE_COLOR (-> --force-color).
+          FORCE_COLOR: ""
         run: pipx run nox -s pylint -- --output-format=github
 
   checks:
