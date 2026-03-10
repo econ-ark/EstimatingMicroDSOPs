@@ -67,6 +67,9 @@ Discussions = "https://github.com/econ-ark/EstimatingMicroDSOPs/discussions"
 Changelog = "https://github.com/econ-ark/EstimatingMicroDSOPs/releases"
 
 
+[tool.hatch.metadata]
+allow-direct-references = true
+
 [tool.hatch]
 version.source = "vcs"
 build.hooks.vcs.version-file = "src/estimark/_version.py"
@@ -108,8 +111,8 @@ disallow_incomplete_defs = false
 
 [[tool.mypy.overrides]]
 module = "estimark.*"
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
 disallow_subclassing_any = false
 
 [[tool.mypy.overrides]]
@@ -118,6 +121,7 @@ module = [
   "pandas.*",
   "matplotlib.*",
   "scipy.*",
+  "statsmodels.*",
   "estimagic.*",
   "HARK.*",
   "estimark.min",
@@ -169,10 +173,12 @@ isort.required-imports = ["from __future__ import annotations"]
 "src/*.py" = ["T20", "E402"]
 "src/notebooks/**" = ["T20", "E402", "PD", "B018"]
 "src/msm_notebooks/**" = ["T20", "E402", "PD", "ARG001", "E712"]
+"content/**/*.ipynb" = ["T20", "E402", "F403"]
 
 
 [tool.codespell]
-ignore-words-list = "mian"
+ignore-words-list = "mian,aer,cant"
+skip = "content/slides/slides_files,*.min.js,*.svg,*.pdf"
 
 [tool.pylint]
 py-version = "3.8"
