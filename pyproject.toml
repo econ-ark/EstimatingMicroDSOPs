@@ -125,9 +125,17 @@ module = [
   "statsmodels.*",
   "estimagic.*",
   "HARK.*",
+  "dask.*",
   "estimark.min",
 ]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["do_all", "run_all", "run_all_msm", "tests"]
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+disallow_untyped_calls = false
+disallow_subclassing_any = false
 
 
 [tool.ruff]
@@ -164,6 +172,7 @@ ignore = [
   "RET504",   # Unnecessary assignment before return
 ]
 isort.required-imports = ["from __future__ import annotations"]
+isort.known-first-party = ["estimark"]
 # Uncomment if using a _compat.typing backport
 # typing-modules = ["estimark._compat.typing"]
 
