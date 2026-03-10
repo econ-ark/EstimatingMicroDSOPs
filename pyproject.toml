@@ -42,7 +42,7 @@ run = [
   "scipy",
   "statsmodels",
   "estimagic>=0.4",
-  "HARK @ git+https://github.com/econ-ark/HARK@master",
+  "HARK @ git+https://github.com/econ-ark/HARK@main",
 ]
 test = [
   "pytest >=6",

@@ -30,7 +30,7 @@ See `.agents/` for detailed guides on specific subsystems.
   written to `src/estimark/_version.py`.
 - **No core dependencies** are declared in `[project.dependencies]`. Runtime
   deps live in `[project.optional-dependencies].run` (numpy, pandas, matplotlib,
-  scipy, statsmodels, estimagic, HARK from GitHub master).
+  scipy, statsmodels, estimagic, HARK from GitHub main).
 - **Code style**: ruff for linting/formatting, mypy for type checking, codespell
   for spell checking. All enforced via pre-commit (`.pre-commit-config.yaml`).
 - **Pre-commit excludes** CSV files under `content/tables/` since they are
