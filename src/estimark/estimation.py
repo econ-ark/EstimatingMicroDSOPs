@@ -650,7 +650,7 @@ def do_compute_sensitivity(agent, model_estimate, emp_moments, save_dir=None):
     # Compute sensitivity measure. (all moments weighted equally)
     sensitivity = np.dot(np.linalg.inv(np.dot(jac.T, jac)), jac.T)
 
-    # Create lables for moments in the plots
+    # Create labels for moments in the plots
     moment_labels = emp_moments.keys()
 
     # Plot

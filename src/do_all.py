@@ -98,7 +98,7 @@ def run_replication():
          4  Both\n\n""",
     )
 
-    replication_specs = {}
+    replication_specs: dict = {}
 
     if which_model == "1" or which_model == "":
         agent_name = "IndShock"

@@ -45,7 +45,7 @@ def run_replication():
 
             print("Model: ", replication_specs["agent_name"])
 
-            if "Portfolio" in replication_specs["agent_name"]:
+            if "Portfolio" in replication_specs["agent_name"]:  # type: ignore[operator]
                 replication_specs["emp_moments"] = port_emp_moments
                 replication_specs["moments_cov"] = port_moments_cov
             else:

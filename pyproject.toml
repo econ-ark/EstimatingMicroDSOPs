@@ -187,8 +187,8 @@ isort.known-first-party = ["estimark"]
 
 
 [tool.codespell]
-ignore-words-list = "mian,aer,cant"
-skip = "content/slides/slides_files,*.min.js,*.svg,*.pdf"
+ignore-words-list = "mian,aer,cant,te,ue,nd"
+skip = "content/slides/slides_files,*.min.js,*.svg,*.pdf,src/msm_notebooks"
 
 [tool.pylint]
 py-version = "3.8"
