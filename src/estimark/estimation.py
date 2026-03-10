@@ -64,9 +64,14 @@ agent_types = {
 
 
 def make_agent(agent_name):
+    agent_type = None
     for key, value in agent_types.items():
         if key in agent_name:
             agent_type = value
+
+    if agent_type is None:
+        msg = f"Unknown agent name: {agent_name}"
+        raise ValueError(msg)
 
     calibration = init_calibration.copy()
 

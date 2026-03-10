@@ -204,4 +204,6 @@ messages_control.disable = [
   "wrong-import-position",
   # CI nox pylint env has no HARK/numpy/pandas; avoid E0401 import-error
   "import-error",
+  # False positives: variables set in if/elif with else raising ValueError
+  "possibly-used-before-assignment",
 ]
