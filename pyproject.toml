@@ -113,6 +113,7 @@ disallow_incomplete_defs = false
 module = "estimark.*"
 disallow_untyped_defs = false
 disallow_incomplete_defs = false
+disallow_untyped_calls = false
 disallow_subclassing_any = false
 
 [[tool.mypy.overrides]]
@@ -173,7 +174,7 @@ isort.required-imports = ["from __future__ import annotations"]
 "src/*.py" = ["T20", "E402"]
 "src/notebooks/**" = ["T20", "E402", "PD", "B018"]
 "src/msm_notebooks/**" = ["T20", "E402", "PD", "ARG001", "E712"]
-"content/**/*.ipynb" = ["T20", "E402", "F403"]
+"content/**/*.ipynb" = ["T20", "E402", "F403", "F405"]
 
 
 [tool.codespell]
