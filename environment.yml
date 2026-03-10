@@ -14,7 +14,7 @@ dependencies:
   - openpyxl
   - pip
   - pip:
-      - git+https://github.com/econ-ark/HARK@master
+      - git+https://github.com/econ-ark/HARK@main
       - DFO-LS
       - tranquilo
       - black[jupyter]

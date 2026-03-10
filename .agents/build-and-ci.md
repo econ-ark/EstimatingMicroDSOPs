@@ -29,8 +29,8 @@ runtime deps are in optional groups:
 | `dev`  | pytest, pytest-cov                                             | `pip install .[dev]`  |
 | `docs` | sphinx, myst_parser, furo, etc.                                | `pip install .[docs]` |
 
-HARK is installed from GitHub master:
-`HARK @ git+https://github.com/econ-ark/HARK@master`
+HARK is installed from GitHub main:
+`HARK @ git+https://github.com/econ-ark/HARK@main`
 
 A conda environment file also exists: `environment.yml` (Python 3.12, includes
 Dask for parallel MSM estimation).
