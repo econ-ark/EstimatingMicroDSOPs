@@ -37,14 +37,16 @@ em.estimate_msm(simulate_moments, emp_moments, moments_cov, initial_params)
    type with calibrated parameters from `parameters.init_calibration`.
 
 2. **Get initial guess**: `get_initial_guess()` reads from a previous results
-   CSV if available, otherwise falls back to `init_params_options["init_guess"]`.
+   CSV if available, otherwise falls back to
+   `init_params_options["init_guess"]`.
 
 3. **Get empirical moments**: `get_empirical_moments(agent_name)` computes
    weighted medians of wealth-income ratio by age group from SCF data. For
    Portfolio agents, also adds share moments from S&P glidepath data.
 
 4. **Compute weights**: `calculate_weights()` normalizes by max wealth stat.
-   Portfolio share moments get a separate weighting factor (currently set to 1.0).
+   Portfolio share moments get a separate weighting factor (currently set to
+   1.0).
 
 5. **Run optimizer**: `do_estimate_model()` calls either `estimate_min()` or
    `estimate_msm()`. Results saved to CSV.
@@ -60,9 +62,10 @@ Called many times by the optimizer. Each call:
 
 1. `agent.assign_parameters(**params)` — update CRRA, DiscFac, etc.
 2. Handle derived parameters (e.g. `BeqFac = BeqMPC^(-CRRA)`)
-3. Handle subjective beliefs if applicable (swap in subjective distributions
-   for solving, true distributions for simulating)
-4. `agent.update()` → `agent.solve()` → `agent.initialize_sim()` → `agent.simulate()`
+3. Handle subjective beliefs if applicable (swap in subjective distributions for
+   solving, true distributions for simulating)
+4. `agent.update()` → `agent.solve()` → `agent.initialize_sim()` →
+   `agent.simulate()`
 5. Extract `bNrm` (bank balances) history, compute median by age group
 6. For Portfolio agents, also extract `Share` history
 7. Return dict of simulated moments keyed by age-group labels
@@ -70,16 +73,18 @@ Called many times by the optimizer. Each call:
 ### `msm_criterion(params, agent, emp_moments, weights)` — the loss function
 
 Computes weighted squared errors between simulated and empirical moments:
+
 ```
 loss = sum( (weight_k * (sim_k - emp_k))^2  for k in moments )
 ```
 
-Returns a dict with `value` (scalar loss), `contributions` (squared errors),
-and `root_contributions` (signed errors) for least-squares optimizers.
+Returns a dict with `value` (scalar loss), `contributions` (squared errors), and
+`root_contributions` (signed errors) for least-squares optimizers.
 
 ## Age groups and mappings
 
 Defined in `parameters.py`:
+
 - **`age_mapping`**: Maps labels like `"(25,30]"` to arrays of real ages
   `[26, 27, 28, 29, 30]`
 - **`sim_mapping`**: Same labels mapped to simulation time indices (age minus

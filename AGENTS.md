@@ -1,27 +1,27 @@
 # AGENTS.md — EstimatingMicroDSOPs (estimark)
 
-This repository implements structural estimation of life-cycle consumption-saving
-models using the [HARK](https://github.com/econ-ark/HARK) toolkit and
-[estimagic](https://estimagic.readthedocs.io/) optimizer. It matches simulated
-wealth-to-income ratio profiles against median holdings from the 2004 Survey of
-Consumer Finances (SCF), organized around five agent types of increasing
-complexity.
+This repository implements structural estimation of life-cycle
+consumption-saving models using the [HARK](https://github.com/econ-ark/HARK)
+toolkit and [estimagic](https://estimagic.readthedocs.io/) optimizer. It matches
+simulated wealth-to-income ratio profiles against median holdings from the 2004
+Survey of Consumer Finances (SCF), organized around five agent types of
+increasing complexity.
 
 See `.agents/` for detailed guides on specific subsystems.
 
 ## Quick orientation
 
-| Path | Purpose |
-|------|---------|
-| `src/estimark/` | Installable Python package (estimation, agents, calibration) |
-| `src/do_all.py` | Interactive CLI entry point for running replications |
-| `src/notebooks/` | Jupyter notebooks for individual model estimations |
-| `content/paper/` | Research paper in MyST Markdown (`01-paper.md`) |
-| `content/tables/` | Generated CSV estimation results (min/, msm/, TRP/) |
-| `content/figures/` | Generated SVG/PNG/PDF figures |
-| `tests/` | pytest tests (minimal — just version check currently) |
-| `myst.yml` | MyST site config with extensive LaTeX math macros |
-| `noxfile.py` | Nox sessions: lint, pylint, tests, docs, build |
+| Path               | Purpose                                                      |
+| ------------------ | ------------------------------------------------------------ |
+| `src/estimark/`    | Installable Python package (estimation, agents, calibration) |
+| `src/do_all.py`    | Interactive CLI entry point for running replications         |
+| `src/notebooks/`   | Jupyter notebooks for individual model estimations           |
+| `content/paper/`   | Research paper in MyST Markdown (`01-paper.md`)              |
+| `content/tables/`  | Generated CSV estimation results (min/, msm/, TRP/)          |
+| `content/figures/` | Generated SVG/PNG/PDF figures                                |
+| `tests/`           | pytest tests (minimal — just version check currently)        |
+| `myst.yml`         | MyST site config with extensive LaTeX math macros            |
+| `noxfile.py`       | Nox sessions: lint, pylint, tests, docs, build               |
 
 ## Key conventions
 
@@ -48,20 +48,20 @@ See `.agents/` for detailed guides on specific subsystems.
 5. **WealthPortfolio** — Wealth-in-utility + portfolio choice (WealthShare,
    WealthShift params)
 
-Each agent class in `agents.py` inherits from a `TempConsumerType` mixin
-(custom `sim_birth`/`sim_death`) and the corresponding HARK consumer type via
-multiple inheritance.
+Each agent class in `agents.py` inherits from a `TempConsumerType` mixin (custom
+`sim_birth`/`sim_death`) and the corresponding HARK consumer type via multiple
+inheritance.
 
 ## Parameters estimated
 
-| Parameter | Description | Typical bounds |
-|-----------|-------------|----------------|
-| `CRRA` | Coefficient of relative risk aversion | [1.1, 20.0] |
-| `DiscFac` | Discount factor adjustment | [0.5, 1.1] |
-| `BeqMPC` | Bequest pseudo-MPC | [0.0, 1.0] |
-| `BeqInt` | Bequest pseudo-intercept | [0.0, 10.0] |
-| `WealthShare` | Wealth-in-utility share | [0.01, 0.99] |
-| `WealthShift` | Wealth-in-utility shift | [0.0, 100.0] |
+| Parameter     | Description                           | Typical bounds |
+| ------------- | ------------------------------------- | -------------- |
+| `CRRA`        | Coefficient of relative risk aversion | [1.1, 20.0]    |
+| `DiscFac`     | Discount factor adjustment            | [0.5, 1.1]     |
+| `BeqMPC`      | Bequest pseudo-MPC                    | [0.0, 1.0]     |
+| `BeqInt`      | Bequest pseudo-intercept              | [0.0, 10.0]    |
+| `WealthShare` | Wealth-in-utility share               | [0.01, 0.99]   |
+| `WealthShift` | Wealth-in-utility shift               | [0.0, 100.0]   |
 
 ## Running estimations
 

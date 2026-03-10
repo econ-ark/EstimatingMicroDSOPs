@@ -12,6 +12,7 @@ build-backend = "hatchling.build"
 
 Version is derived from git tags and written to `src/estimark/_version.py`.
 Build with:
+
 ```bash
 nox -s build    # or: python -m build
 ```
@@ -21,47 +22,49 @@ nox -s build    # or: python -m build
 Core dependencies are intentionally empty in `[project.dependencies]` — all
 runtime deps are in optional groups:
 
-| Group | Deps | Install |
-|-------|------|---------|
-| `run` | numpy, pandas, matplotlib, scipy, statsmodels, estimagic, HARK | `pip install .[run]` |
-| `test` | pytest, pytest-cov | `pip install .[test]` |
-| `dev` | pytest, pytest-cov | `pip install .[dev]` |
-| `docs` | sphinx, myst_parser, furo, etc. | `pip install .[docs]` |
+| Group  | Deps                                                           | Install               |
+| ------ | -------------------------------------------------------------- | --------------------- |
+| `run`  | numpy, pandas, matplotlib, scipy, statsmodels, estimagic, HARK | `pip install .[run]`  |
+| `test` | pytest, pytest-cov                                             | `pip install .[test]` |
+| `dev`  | pytest, pytest-cov                                             | `pip install .[dev]`  |
+| `docs` | sphinx, myst_parser, furo, etc.                                | `pip install .[docs]` |
 
-HARK is installed from GitHub master: `HARK @ git+https://github.com/econ-ark/HARK@master`
+HARK is installed from GitHub master:
+`HARK @ git+https://github.com/econ-ark/HARK@master`
 
 A conda environment file also exists: `environment.yml` (Python 3.12, includes
 Dask for parallel MSM estimation).
 
 ## Nox sessions (`noxfile.py`)
 
-| Session | Command | Purpose |
-|---------|---------|---------|
-| `lint` | `nox -s lint` | Run pre-commit on all files |
-| `pylint` | `nox -s pylint` | Run PyLint on `estimark` |
-| `tests` | `nox -s tests` | Run pytest |
-| `docs` | `nox -s docs` | Build Sphinx docs (with autobuild in interactive mode) |
-| `build_api_docs` | `nox -s build_api_docs` | Generate API docs with sphinx-apidoc |
-| `build` | `nox -s build` | Build sdist + wheel |
+| Session          | Command                 | Purpose                                                |
+| ---------------- | ----------------------- | ------------------------------------------------------ |
+| `lint`           | `nox -s lint`           | Run pre-commit on all files                            |
+| `pylint`         | `nox -s pylint`         | Run PyLint on `estimark`                               |
+| `tests`          | `nox -s tests`          | Run pytest                                             |
+| `docs`           | `nox -s docs`           | Build Sphinx docs (with autobuild in interactive mode) |
+| `build_api_docs` | `nox -s build_api_docs` | Generate API docs with sphinx-apidoc                   |
+| `build`          | `nox -s build`          | Build sdist + wheel                                    |
 
 Default sessions: `lint`, `pylint`, `tests`.
 
 ## Pre-commit hooks (`.pre-commit-config.yaml`)
 
-| Hook | Purpose |
-|------|---------|
-| blacken-docs | Format Python in docs |
-| pre-commit-hooks | Standard checks (large files, merge conflicts, trailing whitespace, etc.) |
-| pygrep-hooks | RST syntax checks |
-| prettier | Format YAML, Markdown, HTML, CSS, JS, JSON (with `--prose-wrap=always`) |
-| ruff | Python linting + formatting |
-| mypy | Type checking (on `src/` and `tests/`) |
-| codespell | Spell checking |
-| shellcheck | Shell script linting |
-| validate-pyproject | Validate pyproject.toml |
-| check-jsonschema | Validate dependabot, GitHub workflows, ReadTheDocs configs |
+| Hook               | Purpose                                                                   |
+| ------------------ | ------------------------------------------------------------------------- |
+| blacken-docs       | Format Python in docs                                                     |
+| pre-commit-hooks   | Standard checks (large files, merge conflicts, trailing whitespace, etc.) |
+| pygrep-hooks       | RST syntax checks                                                         |
+| prettier           | Format YAML, Markdown, HTML, CSS, JS, JSON (with `--prose-wrap=always`)   |
+| ruff               | Python linting + formatting                                               |
+| mypy               | Type checking (on `src/` and `tests/`)                                    |
+| codespell          | Spell checking                                                            |
+| shellcheck         | Shell script linting                                                      |
+| validate-pyproject | Validate pyproject.toml                                                   |
+| check-jsonschema   | Validate dependabot, GitHub workflows, ReadTheDocs configs                |
 
-**Important**: Pre-commit excludes `content/tables/` CSVs and `.copier-answers.yml`.
+**Important**: Pre-commit excludes `content/tables/` CSVs and
+`.copier-answers.yml`.
 
 ## CI workflows (`.github/workflows/`)
 
@@ -106,7 +109,8 @@ testpaths = ["tests"]
 
 This repo was generated from the
 [scientific-python/cookie](https://github.com/scientific-python/cookie) template
-(see `.copier-answers.yml`). Many config files follow that template's conventions.
+(see `.copier-answers.yml`). Many config files follow that template's
+conventions.
 
 ## Known issues
 

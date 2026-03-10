@@ -8,13 +8,13 @@ the Utility Function" is written in **MyST Markdown** and built with the
 
 ### Key files
 
-| File | Purpose |
-|------|---------|
-| `content/paper/01-paper.md` | Main paper source (MyST Markdown with directives, cross-refs, citations) |
-| `content/paper/main.bib` | BibTeX bibliography |
-| `content/paper/math.ipynb` | Notebook with mathematical derivations |
-| `content/paper/images/` | Static images referenced in the paper |
-| `content/paper/structural_estimation_pdf_tex/` | LaTeX/PDF output from paper build |
+| File                                           | Purpose                                                                  |
+| ---------------------------------------------- | ------------------------------------------------------------------------ |
+| `content/paper/01-paper.md`                    | Main paper source (MyST Markdown with directives, cross-refs, citations) |
+| `content/paper/main.bib`                       | BibTeX bibliography                                                      |
+| `content/paper/math.ipynb`                     | Notebook with mathematical derivations                                   |
+| `content/paper/images/`                        | Static images referenced in the paper                                    |
+| `content/paper/structural_estimation_pdf_tex/` | LaTeX/PDF output from paper build                                        |
 
 ### Building the paper
 
@@ -46,6 +46,7 @@ maintain consistency with the broader Econ-ARK ecosystem.
 ### Citation format
 
 Uses `sphinxcontrib-bibtex` style references:
+
 ```markdown
 {cite}`carroll2004` or {cite:t}`carroll2004`
 ```
@@ -53,11 +54,13 @@ Uses `sphinxcontrib-bibtex` style references:
 ## Sphinx documentation (`docs/`)
 
 A separate Sphinx-based documentation site exists in `docs/`:
+
 - `docs/conf.py` — Sphinx config (myst_parser, autodoc, Furo theme)
 - `docs/index.md` — Landing page (includes README)
 - Built for ReadTheDocs (`/.readthedocs.yaml`)
 
 Build locally:
+
 ```bash
 nox -s docs
 ```
@@ -65,6 +68,7 @@ nox -s docs
 ## Slides (`content/slides/`)
 
 Presentation slides built with Quarto:
+
 - `slides.ipynb` — Source notebook
 - `slides.tex` — LaTeX output
 - `strucutral_estimation.html` — HTML output (note: typo in filename is
@@ -86,12 +90,14 @@ like `time_to_estimate`.
 ### Figures (`content/figures/`)
 
 SVG, PNG, and PDF figures:
+
 - `*Sensitivity.svg` — Sensitivity bar charts
 - `*SMMcontour.svg` — Contour plots of the objective function
 
 ### Notebooks (`src/notebooks/`)
 
 Jupyter notebooks for individual model estimations and analysis:
+
 - `IndShock.ipynb`, `Portfolio.ipynb`, `WarmGlow.ipynb`, etc.
 - `Model_Comparisons.ipynb` — Cross-model comparison
 - `SCF_notebook.ipynb` — SCF data exploration
@@ -105,6 +111,7 @@ covariance computation notebooks (`NetWorth_Cov.ipynb`, `FinAssets_Cov.ipynb`).
 ## Table of Contents (`_toc.yml`)
 
 Defines the MyST site structure:
+
 ```yaml
 root: README
 chapters:
