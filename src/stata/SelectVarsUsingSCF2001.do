@@ -4,7 +4,7 @@
 
 clear
 
-** Set memeory
+** Set memory
 set memory 32m
 
 global startDir "`c(pwd)'"
