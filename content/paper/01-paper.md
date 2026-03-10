@@ -168,9 +168,9 @@ mortality, and income risk.
 The agent's objective is to maximize present discounted utility from consumption
 over the life cycle with a terminal period of $T$:
 
-\begin{equation} \vFunc*{t}(\pLvl*{t},\mLvl*{t}) = \max*{\{\cFunc\}_{t}^{T}} ~
-\uFunc(\cLvl_{t})+\Ex*{t}\left[\sum*{n=1}^{T-t} {\beth}^{n}
-\Alive*{t}^{t+n}\hat{\DiscFac}*{t}^{t+n} \uFunc(\cLvl\_{t+n}) \right]
+\begin{equation} \vFunc_{t}(\pLvl_{t},\mLvl_{t}) = \max_{\{\cFunc\}_{t}^{T}} ~
+\uFunc(\cLvl_{t})+\Ex_{t}\left[\sum_{n=1}^{T-t} {\beth}^{n}
+\Alive_{t}^{t+n}\hat{\DiscFac}_{t}^{t+n} \uFunc(\cLvl_{t+n}) \right]
 \label{eq:lifecyclemax} \end{equation}
 
 where $\pLvl_{t}$ is the permanent income level, $\mLvl_{t}$ is total market
@@ -187,31 +187,31 @@ problem of permanent income and wealth into a 1 dimensional problem of wealth
 normalized by permanent income. The recursive Bellman equation can be expressed
 as:
 
-\begin{align} {\vFunc}_{t}({m}_{t}) & = \max*{\cNrm*{t}} ~
-\uFunc(\cNrm*{t})+\beth\Alive*{t+1}\hat{\DiscFac}_{t+1}
+\begin{align} {\vFunc}_{t}({m}_{t}) & = \max_{\cNrm_{t}} ~
+\uFunc(\cNrm_{t})+\beth\Alive_{t+1}\hat{\DiscFac}_{t+1}
 \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})] \\
-& \text{s.t.} & \\ \aNrm*{t} & = {m}*{t}-\cNrm*{t} \\ {m}*{t+1} & =
-\aNrm*{t}\underbrace{\left(\frac{\Rfree}{\PermShk*{t+1}\PermGroFac*{t+1}}\right)}*{\equiv
-\RNrm*{t+1}} + ~\TranShkEmp*{t+1} \end{align}
+& \text{s.t.} & \\ \aNrm_{t} & = {m}_{t}-\cNrm_{t} \\ {m}_{t+1} & =
+\aNrm_{t}\underbrace{\left(\frac{\Rfree}{\PermShk_{t+1}\PermGroFac_{t+1}}\right)}_{\equiv
+\RNrm_{t+1}} + ~\TranShkEmp_{t+1} \end{align}
 
 where $\cNrm$, $\aNrm$, and $\mNrm$ are consumption, assets, and market
 resources normalized by permanent income, respectively, $\vFunc$ and $\uFunc$
 are now the normalized value and utility functions, and
 
-\begin{align} \PermShk*{t+1} & : \text{mean-one shock to permanent income} \\
-\PermGroFac*{t+1} & : \text{permanent income growth factor} \\ \TranShkEmp*{t+1}
-& : \text{transitory shock to permanent income} \\ \RNrm*{t+1} & :
+\begin{align} \PermShk_{t+1} & : \text{mean-one shock to permanent income} \\
+\PermGroFac_{t+1} & : \text{permanent income growth factor} \\ \TranShkEmp_{t+1}
+& : \text{transitory shock to permanent income} \\ \RNrm_{t+1} & :
 \text{permanent income growth normalized return factor} \end{align}
 
 with all other variables are defined as above. The transitory and permanent
 shocks to income are defined as:
 
-\begin{align} \TranShkEmp*{s} = & \begin{cases} 0\phantom{/\pZero} & \text{with
-probability $\pZero>0$} \\ \xi*{s}/\pZero & \text{with probability $(1-\pZero)$,
+\begin{align} \TranShkEmp_{s} = & \begin{cases} 0\phantom{/\pZero} & \text{with
+probability $\pZero>0$} \\ \xi_{s}/\pZero & \text{with probability $(1-\pZero)$,
 where
 $\log \xi_{s}\thicksim \mathcal{N}(-\sigma_{[\xi, t]}^{2}/2,\sigma_{[\xi, t]}^{2})$}
-\end{cases} \\ \phantom{/\pZero} \\ & \text{and } \log \PermShk*{s} \thicksim
-\mathcal{N}(-\sigma*{[\PermShk, t]}^{2}/2,\sigma\_{[\PermShk, t]}^{2}).
+\end{cases} \\ \phantom{/\pZero} \\ & \text{and } \log \PermShk_{s} \thicksim
+\mathcal{N}(-\sigma_{[\PermShk, t]}^{2}/2,\sigma_{[\PermShk, t]}^{2}).
 \end{align}
 
 ## Wealth in the Utility Function
@@ -226,19 +226,19 @@ calling it the `Capitalist Spirit' model. In turn, we can add this feature to
 the LCIM model by adding a utility function with consumption and wealth. We call
 this the Wealth in the Utility Function Incomplete Markets (WUFIM) model.
 
-\begin{align} {\vFunc}_{t}({m}_{t}) & = \max*{\cNrm*{t}} ~ \uFunc(\cNrm*{t},
-\aNrm*{t})+\beth\Alive*{t+1}\hat{\DiscFac}*{t+1}
-\Ex*{t}[(\PermShk*{t+1}\PermGroFac*{t+1})^{1-\CRRA}{\vFunc}*{t+1}({m}_{t+1})] \\
+\begin{align} {\vFunc}_{t}({m}_{t}) & = \max_{\cNrm_{t}} ~ \uFunc(\cNrm_{t},
+\aNrm_{t})+\beth\Alive_{t+1}\hat{\DiscFac}_{t+1}
+\Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})] \\
 & \text{s.t.} & \\ \aNrm_{t} & = {m}_{t}-\cNrm_{t} \\ {m}_{t+1} & =
-\aNrm_{t}\RNrm*{t+1}+ ~\TranShkEmp*{t+1} \end{align}
+\aNrm_{t}\RNrm_{t+1}+ ~\TranShkEmp_{t+1} \end{align}
 
 **Separable Utility** [](doi:10.3386/w6549) presents extensive empirical and
 informal evidence for a LCIM model with wealth in the utility function.
 Specifically, the paper uses a utility that is separable in consumption and
 wealth:
 
-\begin{equation} \uFunc(\cNrm*{t}, \aNrm*{t}) =
-\frac{\cNrm*{t}^{1-\CRRA}}{1-\CRRA} + \kapShare*{t} \frac{(\aFunc\_{t} -
+\begin{equation} \uFunc(\cNrm_{t}, \aNrm_{t}) =
+\frac{\cNrm_{t}^{1-\CRRA}}{1-\CRRA} + \kapShare_{t} \frac{(\aFunc_{t} -
 \underline\aNrm)^{1-\wealthShare}}{1-\wealthShare} \end{equation}
 
 where $\kapShare$ is the relative weight of the utility of wealth and
@@ -251,8 +251,8 @@ this dynamic complementarity drives the accumulation of wealth not only for the
 sake of wealth itself, but also because it increases the marginal utility of
 consumption.
 
-\begin{equation} \uFunc(\cNrm*{t}, \aNrm*{t}) =
-\frac{(\cNrm*{t}^{1-\wealthShare} (\aNrm*{t} -
+\begin{equation} \uFunc(\cNrm_{t}, \aNrm_{t}) =
+\frac{(\cNrm_{t}^{1-\wealthShare} (\aNrm_{t} -
 \underline\aNrm)^\wealthShare)^{1-\CRRA}}{(1-\CRRA)} \end{equation}
 
 # Solution Methods
@@ -260,16 +260,16 @@ consumption.
 For a brief departure, let's consider how we solve these problems generally.
 Define the post-decision value function as:
 
-\begin{align} \DiscFac*{t+1} \wFunc*{t}(\aNrm*{t}) & =
-\beth\Alive*{t+1}\hat{\DiscFac}_{t+1}
+\begin{align} \DiscFac_{t+1} \wFunc_{t}(\aNrm_{t}) & =
+\beth\Alive_{t+1}\hat{\DiscFac}_{t+1}
 \Ex_{t}[(\PermShk_{t+1}\PermGroFac_{t+1})^{1-\CRRA}{\vFunc}_{t+1}({m}_{t+1})] \\
-& \text{s.t.} \\ {m}_{t+1} & = \aNrm_{t}\RNrm*{t+1}+ ~\TranShkEmp*{t+1}
+& \text{s.t.} \\ {m}_{t+1} & = \aNrm_{t}\RNrm_{t+1}+ ~\TranShkEmp_{t+1}
 \end{align}
 
 For our purposes, it will be useful to simplify the notation a bit by dropping
 time subscripts. The recursive problem can then be written as:
 
-\begin{align} \vFunc(\mRat) & = \max\_{\cNrm} ~ \uFunc(\cNrm, \aNrm) + \DiscFac
+\begin{align} \vFunc(\mRat) & = \max_{\cNrm} ~ \uFunc(\cNrm, \aNrm) + \DiscFac
 \wFunc(\aRat) \\ & \text{s.t.} \\ \aNrm & = \mRat-\cNrm \end{align}
 
 ## Endogenous Grid Method, Abridged
@@ -292,8 +292,8 @@ complicated and may not be invertible in terms of optimal consumption. Consider
 the first order condition for an optimal combination of consumption and savings,
 denoted by $^*$:
 
-\begin{equation} \uFunc*{c}'(\cNrm^*, \aNrm^_) - \uFunc_{a}'(\cNrm^_, \aNrm^_) =
-\DiscFac \wFunc'(\aNrm^\*) \end{equation}
+\begin{equation} \uFunc_{c}'(\cNrm^*, \aNrm^*) - \uFunc_{a}'(\cNrm^*, \aNrm^*) =
+\DiscFac \wFunc'(\aNrm^*) \end{equation}
 
 If the utility of consumption and wealth is additively separable, then the Euler
 equation can be written as
@@ -317,8 +317,8 @@ turns out to be more efficient than grid search maximization.
 Holding $\mNrm$ constant, we can define a function $f_{m}$ as the difference
 between the marginal utility of consumption and the marginal utility of wealth:
 
-\begin{equation} f*{m}(\cNrm) = \uFunc*{c}'(\cNrm, \mNrm - \cNrm) -
-\uFunc\_{a}'(\cNrm, \mNrm - \cNrm) - \DiscFac \wFunc'(\mNrm - \cNrm)
+\begin{equation} f_{m}(\cNrm) = \uFunc_{c}'(\cNrm, \mNrm - \cNrm) -
+\uFunc_{a}'(\cNrm, \mNrm - \cNrm) - \DiscFac \wFunc'(\mNrm - \cNrm)
 \end{equation}
 
 The optimal consumption policy is the value of $\cNrm$ that satisfies
@@ -412,7 +412,7 @@ consumption and savings over the life cycle. We can then calculate the simulated
 moments of the wealth distribution at the 7 age groups. We can define the
 objective function as
 
-\begin{equation} g(\Theta) = \sum*{\tau=1}^{7} \weight*{\tau} |\varsigma^{\tau}
+\begin{equation} g(\Theta) = \sum_{\tau=1}^{7} \weight_{\tau} |\varsigma^{\tau}
 -\mathbf{s}^{\tau}(\Theta)| \label{eq:naivePowell} \end{equation}
 
 where $\varsigma^{\tau}$ is the empirical moment of the wealth distribution at
