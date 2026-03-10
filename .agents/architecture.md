@@ -38,8 +38,7 @@ Each agent type combines two base classes:
    consumption/portfolio functions.
 
 ```python
-class PortfolioLifeCycleConsumerType(TempConsumerType, PortfolioConsumerType):
-    ...
+class PortfolioLifeCycleConsumerType(TempConsumerType, PortfolioConsumerType): ...
 ```
 
 Python MRO means `TempConsumerType.sim_birth` overrides the HARK default.

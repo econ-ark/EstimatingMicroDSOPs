@@ -424,11 +424,11 @@ def calculate_se_bootstrap(
 
     # Generate a list of seeds for generating bootstrap samples
     RNG = np.random.default_rng(seed)
-    seed_list = RNG.integers(2**31 - 1, size=n_draws)
+    RNG.integers(2**31 - 1, size=n_draws)
 
     # Estimate the model N times, recording each set of estimated parameters
     estimate_list = []
-    for n in range(n_draws):
+    for n in range(n_draws):  # noqa: B007
         t_start = time()
 
         # Bootstrap a new dataset by resampling from the original data
@@ -539,7 +539,8 @@ def do_estimate_model(
         model_estimate = res._params
 
     else:
-        raise ValueError(f"Invalid estimate_method: {estimate_method}")
+        msg = f"Invalid estimate_method: {estimate_method}"
+        raise ValueError(msg)
 
     # Calculate minutes and remaining seconds
     minutes, seconds = divmod(time_to_estimate, 60)
@@ -558,7 +559,7 @@ def do_estimate_model(
 
     keys_to_save = vars(res)
 
-    with open(estimate_results_file, "w") as f:
+    with Path.open(estimate_results_file, "w") as f:
         writer = csv.writer(f)
 
         for key in model_estimate:
@@ -612,7 +613,7 @@ def do_compute_se_boostrap(
     # Create the simple bootstrap table
     bootstrap_results_file = save_dir + agent.name + "_bootstrap_results.csv"
 
-    with open(bootstrap_results_file, "w") as f:
+    with Path.open(bootstrap_results_file, "w") as f:
         writer = csv.writer(f)
         writer.writerow(
             [
@@ -639,7 +640,7 @@ def do_compute_sensitivity(agent, model_estimate, emp_moments, save_dir=None):
         [
             approx_fprime(
                 model_estimate,
-                lambda params: simulate_moments(params, agent=agent)[j],
+                lambda params, j=j: simulate_moments(params, agent=agent)[j],
                 epsilon=0.01,
             )
             for j in range(n_moments)
@@ -752,12 +753,13 @@ def estimate_min(
     criterion=None,
     initial_params=None,
     emp_moments=None,
-    minimize_options={},
+    minimize_options=None,
     criterion_kwargs=None,
     estimagic_options=None,
 ):
     t0 = time()
 
+    minimize_options = minimize_options or {}
     criterion_kwargs = criterion_kwargs or {}
     criterion_kwargs.setdefault("agent", agent)
     criterion_kwargs.setdefault("emp_moments", emp_moments)
@@ -845,7 +847,7 @@ def estimate(
     ############################################################
 
     if estimate_model:
-        model_estimate, res, time_to_estimate = do_estimate_model(
+        model_estimate, _res, time_to_estimate = do_estimate_model(
             agent,
             initial_guess,
             estimate_method=estimate_method,
