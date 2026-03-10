@@ -26,11 +26,11 @@ The file structure is as follows:
     tables/             # Any tables created by the main code
 
 Because computational modeling can be very memory- and time-intensive, this file
-also allows the user to choose whether to run files based on there resouce
+also allows the user to choose whether to run files based on there resource
 requirements. Files are categorized as one of the following three:
 
 - low_resource:     low RAM needed and runs quickly, say less than 1-5 minutes
-- medium_resource:  moderate RAM needed and runs moderately quickly, say 5-10+ mintues
+- medium_resource:  moderate RAM needed and runs moderately quickly, say 5-10+ minutes
 - high_resource:    high RAM needed (and potentially parallel computing required), and high time to run, perhaps even hours, days, or longer.
 
 The designation is purposefully vague and left up the to researcher to specify
@@ -40,7 +40,7 @@ here.
 Finally, this code may serve as example code for efforts that fall outside
 the HARK package structure for one reason or another. Therefore this script will
 attempt to import the necessary MicroDSOP sub-modules as though they are part of
-the HARK package; if that fails, this script reverts to manaully updating the
+the HARK package; if that fails, this script reverts to manually updating the
 Python PATH with the locations of the MicroDSOP directory structure so it can
 still run.
 """

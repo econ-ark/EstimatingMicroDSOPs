@@ -1,5 +1,5 @@
 * AppendDataUsingSCF1992_2007.do
-* This file gives selected varaibles of the Population
+* This file gives selected variables of the Population
 clear
 
 cd $basePath/$logPath
