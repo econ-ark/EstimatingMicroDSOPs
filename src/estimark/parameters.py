@@ -119,7 +119,7 @@ age_groups = [
 ]
 
 # generate labels as (25,30], (30,35], ...
-age_labels = [f"({group[0]-1},{group[-1]}]" for group in age_groups]
+age_labels = [f"({group[0] - 1},{group[-1]}]" for group in age_groups]
 
 # Generate mappings between the real ages in the groups and the indices of simulated data
 age_mapping = dict(zip(age_labels, map(np.array, age_groups)))

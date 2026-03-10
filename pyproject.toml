@@ -34,6 +34,16 @@ dynamic = ["version"]
 dependencies = []
 
 [project.optional-dependencies]
+# Runtime deps for estimation (also satisfied by conda env from environment.yml)
+run = [
+  "numpy",
+  "pandas",
+  "matplotlib",
+  "scipy",
+  "statsmodels",
+  "estimagic>=0.4",
+  "HARK @ git+https://github.com/econ-ark/HARK@master",
+]
 test = [
   "pytest >=6",
   "pytest-cov >=3",
@@ -56,6 +66,9 @@ Homepage = "https://github.com/econ-ark/EstimatingMicroDSOPs"
 Discussions = "https://github.com/econ-ark/EstimatingMicroDSOPs/discussions"
 Changelog = "https://github.com/econ-ark/EstimatingMicroDSOPs/releases"
 
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.hatch]
 version.source = "vcs"
@@ -98,8 +111,31 @@ disallow_incomplete_defs = false
 
 [[tool.mypy.overrides]]
 module = "estimark.*"
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+disallow_untyped_calls = false
+disallow_subclassing_any = false
+
+[[tool.mypy.overrides]]
+module = [
+  "numpy.*",
+  "pandas.*",
+  "matplotlib.*",
+  "scipy.*",
+  "statsmodels.*",
+  "estimagic.*",
+  "HARK.*",
+  "dask.*",
+  "estimark.min",
+]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["do_all", "run_all", "run_all_msm", "tests"]
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+disallow_untyped_calls = false
+disallow_subclassing_any = false
 
 
 [tool.ruff]
@@ -131,16 +167,28 @@ extend-select = [
 ignore = [
   "PLR09",    # Too many <...>
   "PLR2004",  # Magic value used in comparison
+  "PLR1714",  # Consider merging multiple comparisons
   "ISC001",   # Conflicts with formatter
+  "RET504",   # Unnecessary assignment before return
 ]
 isort.required-imports = ["from __future__ import annotations"]
+isort.known-first-party = ["estimark"]
 # Uncomment if using a _compat.typing backport
 # typing-modules = ["estimark._compat.typing"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["T20"]
 "noxfile.py" = ["T20"]
+"src/estimark/**" = ["T20"]
+"src/*.py" = ["T20", "E402"]
+"src/notebooks/**" = ["T20", "E402", "PD", "B018"]
+"src/msm_notebooks/**" = ["T20", "E402", "PD", "ARG001", "E712"]
+"content/**/*.ipynb" = ["T20", "E402", "F403", "F405"]
 
+
+[tool.codespell]
+ignore-words-list = "mian,aer,cant,te,ue,nd,strust"
+skip = "content/slides/slides_files,*.min.js,*.svg,*.pdf,src/msm_notebooks"
 
 [tool.pylint]
 py-version = "3.8"
@@ -154,4 +202,8 @@ messages_control.disable = [
   "missing-module-docstring",
   "missing-function-docstring",
   "wrong-import-position",
+  # CI nox pylint env has no HARK/numpy/pandas; avoid E0401 import-error
+  "import-error",
+  # False positives: variables set in if/elif with else raising ValueError
+  "possibly-used-before-assignment",
 ]

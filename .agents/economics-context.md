@@ -24,6 +24,7 @@ bequests), discounted by a time preference factor.
 ### Income process
 
 Uses Cagetti (2003) calibration for college-educated households:
+
 - Permanent income grows deterministically with age (hump-shaped)
 - Subject to permanent and transitory shocks (log-normal)
 - Unemployment risk: 5% probability with 30% replacement rate while working
@@ -39,8 +40,9 @@ simulated agents, and compare to the SCF empirical median.
 
 ### IndShock (baseline)
 
-Standard buffer-stock saving model. Only parameters: CRRA (and possibly DiscFac).
-Consumer chooses consumption; remainder is saved at the risk-free rate.
+Standard buffer-stock saving model. Only parameters: CRRA (and possibly
+DiscFac). Consumer chooses consumption; remainder is saved at the risk-free
+rate.
 
 ### Portfolio
 
@@ -56,6 +58,7 @@ portfolio rebalancing.
 
 Adds a "warm glow" bequest utility: the consumer gets utility from leaving
 wealth at death, parameterized by:
+
 - **BeqMPC**: Pseudo marginal propensity to consume from bequests. Internally
   transformed: `BeqFac = BeqMPC^(-CRRA)`
 - **BeqInt**: Pseudo intercept. Internally transformed:
@@ -73,12 +76,14 @@ and matches both wealth and portfolio share moments.
 
 An alternative to bequests: utility is defined over both consumption AND wealth
 holdings directly (wealth in the utility function). Parameters:
+
 - **WealthShare**: Weight on wealth in utility (0 to 1)
 - **WealthShift**: Shift parameter for wealth utility
 
 ## Subjective beliefs
 
 Optional extensions add subjective (potentially biased) beliefs about:
+
 - **Stock market**: Consumer may perceive different risk/return than reality.
   Model is solved with subjective beliefs but simulated with true parameters.
   Calibrated from Mateo Velasquez-Giraldo's JMP.
@@ -93,6 +98,7 @@ Activated via the agent name string: `"Sub(Stock)"`, `"Sub(Labor)"`, or
 ### SCF 2004 (`src/data/SCFdata.csv`)
 
 Survey of Consumer Finances, 2004 wave. Contains:
+
 - `wealth_income_ratio`: Financial wealth / permanent income
 - `age_group`: Age bracket labels matching `age_mapping`
 - `weight`: Survey sampling weights
@@ -113,6 +119,7 @@ through HARK's `Calibration.Income.IncomeTools.Cagetti_income`.
 
 The paper and code use Econ-ARK notation extensively. Key symbols defined as
 LaTeX macros in `myst.yml`:
+
 - `\CRRA` (rho) — relative risk aversion
 - `\DiscFac` (beta) — discount factor
 - `\Rfree` — risk-free gross return
