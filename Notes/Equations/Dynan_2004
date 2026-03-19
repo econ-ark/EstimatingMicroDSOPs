@@ -1,0 +1,7 @@
+\begin{equation}
+\begin{aligned}
+V(B_{is}) = \frac{\mu [(B_{is} + YL_{is}^{c})^{1-\gamma} -1]}{1-\gamma} \\
+\end{aligned}
+\end{equation}
+
+where $\mu$ is the trade-off parameter between own consumption and bequests $B_{is}$  and $YL^{c}_{is}$ is the value of the next generation's lifetime earnings.
